@@ -1,0 +1,18 @@
+image: debian:buster
+
+# Install dependencies
+before_script:
+  - apt-get update -y && apt-get install git wget -y
+
+# CI Job mirrors master branch and tags to GitHub.
+publish to github:
+    # Only master branch should be published. Use a merge request to publish the release branch.
+    only:
+      - master
+    # Mirror repository
+    script:
+      - git remote set-url origin $GITHUB_REPO
+      - git push --follow-tags origin master
+    # Run on docker runner
+    tags:
+      - docker
