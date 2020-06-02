@@ -1,0 +1,12 @@
+C++ Examples
+============
+
+.. toctree::
+   :maxdepth: 5
+   :caption: Examples:
+
+   api/dir_examples_cpp_async_fetch_clouds
+   api/dir_examples_cpp_fetch_clouds
+   api/dir_examples_cpp_read_from_file
+   api/dir_examples_cpp_set_scan_pattern
+   api/dir_examples_cpp_standalone_fetch_clouds

@@ -1,0 +1,25 @@
+{
+  "dependencies": {
+    "@types/node": "^12.7.8",
+    "google-protobuf": "^3.6.1",
+    "promise-queue": "^2.2.5"
+  },
+  "description": "",
+  "devDependencies": {
+    "@types/google-protobuf": "^3.7.1",
+    "@types/promise-queue": "^2.2.0",
+    "typescript": "^3.6.3"
+  },
+  "files": [
+    "**/*.js",
+    "**/*.d.ts"
+  ],
+  "name": "blickfeld-scanner",
+  "publishConfig": {
+    "registry": "http://conda:5080/"
+  },
+  "version": "0.0.1",
+  "scripts": {
+    "build": "tsc"
+  }
+}

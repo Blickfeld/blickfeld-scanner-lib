@@ -1,0 +1,62 @@
+syntax = "proto2";
+
+import "blickfeld/options.proto";
+import "blickfeld/data/point_cloud.proto";
+import "blickfeld/status/main.proto";
+
+package blickfeld.protocol.stream;
+
+
+/**
+ * This section describes the different streams to which it is possible to subscribe.
+ * A stream regularly provides data or status updates for the user. The events will not be pushed automatically to the BSL; the client has to retrieve them.
+ */
+message Subscribe {
+	/**
+	 * This request is used for subscribing to a point cloud stream.
+	 */
+	message PointCloud {
+	}
+
+	/**
+	 * This request is used for subscribing to a status stream.
+	 */
+	message Status {
+	}
+
+	/**
+	 * Internal use only
+	 */
+	message Developer {
+		extensions 1 to max;  // Internal developer requests
+	}
+
+	/**
+	 * You can subscribe to one of the streams.
+	 */
+	oneof data {
+		PointCloud point_cloud = 11;  // Refer to [Subscribe.PointCloud](#blickfeld.protocol.stream.Subscribe.PointCloud)
+		Status status = 12;  // Refer to [Subscribe.Status](#blickfeld.protocol.stream.Subscribe.Status)
+		Developer developer = 13;  // Refer to [Subscribe.Developer](#blickfeld.protocol.stream.Subscribe.Developer)
+	}
+}
+
+/**
+ * This section describes the events of streams.
+ */
+message Event {
+
+	/**
+	 * Internal use only
+	 */
+	message Developer {
+		extensions 1 to max;  // Internal developer events
+	}
+
+	oneof data {
+		option (optional_one_of) = true;
+		data.PointCloud point_cloud = 11;  // Refer to [PointCloud](#blickfeld.protocol.data.PointCloud)
+		Status status = 12;  // Refer to [Status](#blickfeld.protocol.status.Status)
+		Developer developer = 13;  // Refer to [Event.Developer](#blickfeld.protocol.stream.Event.Developer)
+	}
+}

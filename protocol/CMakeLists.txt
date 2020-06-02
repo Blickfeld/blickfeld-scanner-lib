@@ -1,0 +1,203 @@
+##
+## Copyright (c) 2020 Blickfeld GmbH.
+## All rights reserved.
+##
+## This source code is licensed under the BSD-style license found in the
+## LICENSE.md file in the root directory of this source tree.
+##
+cmake_minimum_required (VERSION 3.9)
+include(ExternalProject)
+
+project(blickfeld-protocol)
+
+find_program(NODEJS_EXECUTABLE NAMES node)
+find_program(NPM_EXECUTABLE NAMES npm HINTS /usr)
+if (BF_BUILD_NPM AND NODEJS_EXECUTABLE AND NPM_EXECUTABLE)
+	if(${CMAKE_HOST_SYSTEM_NAME} STREQUAL "Windows")
+		set(PROTOC_GEN_TS_PATH ${CMAKE_CURRENT_BINARY_DIR}/npm-install/protoc-gen-ts.cmd)
+	else()
+		set(PROTOC_GEN_TS_PATH ${CMAKE_CURRENT_BINARY_DIR}/npm-install/node_modules/.bin/protoc-gen-ts)
+	endif()
+		
+	add_custom_command(
+		OUTPUT ${PROTOC_GEN_TS_PATH}
+		COMMAND ${CMAKE_COMMAND} -E make_directory ${PROJECT_BINARY_DIR}/npm-install
+		COMMAND ${NPM_EXECUTABLE} install ts-protoc-gen --prefix ${PROJECT_BINARY_DIR}/npm-install
+	)
+	add_custom_target(blickfeld-protocol-npm DEPENDS ${PROTOC_GEN_TS_PATH})
+endif()
+	
+## Protocol Buffers
+if(NOT BF_USE_SYSTEM_PROTOBUF)
+	message("Protobuf compiler is compiled from source")
+	ExternalProject_Add(
+	  Protobuf
+	  SOURCE_DIR ${PROTOBUF_SRC_DIR}
+	  SOURCE_SUBDIR cmake
+	  CMAKE_ARGS
+	    "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"
+	  	"-Dprotobuf_BUILD_TESTS=OFF"
+	  	"-Dprotobuf_BUILD_EXAMPLES=OFF"
+	  	"-Dprotobuf_BUILD_PROTOC_BINARIES=ON"
+	  	"-Dprotobuf_MSVC_STATIC_RUNTIME=OFF"
+	  	"-DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/protobuf"
+	)
+	set(Protobuf_PROTOC_EXECUTABLE ${CMAKE_CURRENT_BINARY_DIR}/protobuf/bin/protoc)
+else()
+	message("Existing protobuf compiler is used: ${Protobuf_PROTOC_EXECUTABLE}")
+	add_custom_target( Protobuf )
+endif()
+set(Protobuf_PROTOC_EXECUTABLE ${Protobuf_PROTOC_EXECUTABLE} PARENT_SCOPE)
+
+# plugin for protobuf compilation
+find_program(BF_PROTOCOL_PLUGIN NAMES bf_protocol_plugin)
+if(BF_PROTOCOL_PLUGIN)
+	set(BF_PROTOCOL_PLUGIN_PATH ${BF_PROTOCOL_PLUGIN})
+else()
+	message("bf_protocol_plugin is compiled from source")
+	set(BF_PROTOCOL_PLUGIN bf_protocol_plugin)
+	ExternalProject_Add(
+		bf_protocol_plugin
+		SOURCE_DIR ${PROJECT_SOURCE_DIR}/plugin
+		DEPENDS Protobuf
+		CMAKE_ARGS
+			"-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"
+			"-DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/protobuf"
+	)
+	if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
+			set(BF_PROTOCOL_PLUGIN_PATH "${CMAKE_CURRENT_BINARY_DIR}/protobuf/bin/bf_protocol_plugin.exe")
+	else()
+			set(BF_PROTOCOL_PLUGIN_PATH "${CMAKE_CURRENT_BINARY_DIR}/protobuf/bin/bf_protocol_plugin")
+	endif()
+endif()
+message("Using bf_protocol_plugin: ${BF_PROTOCOL_PLUGIN}")
+
+# list .proto files here
+set(PROTOBUF_DEFS_DIR ${PROJECT_SOURCE_DIR})
+set(PROTOBUF_SOURCES 
+	blickfeld/config/scan_pattern.proto
+	blickfeld/config/secure.proto
+	
+	blickfeld/status/main.proto
+	blickfeld/status/scanner.proto
+	blickfeld/status/temperature.proto
+	
+	blickfeld/data/frame.proto
+	blickfeld/data/point_cloud.proto
+	blickfeld/data/point.proto
+	blickfeld/data/scanline.proto
+	
+	blickfeld/file/general.proto
+	blickfeld/file/point_cloud.proto
+	
+	blickfeld/stream/connection.proto
+
+	blickfeld/update/hardware.proto
+	blickfeld/update/manifest.proto
+	
+	blickfeld/options.proto
+	blickfeld/error.proto
+	blickfeld/connection.proto
+)
+
+set(PROTOBUF_SOURCES_CUSTOM
+	blickfeld/error.proto
+)
+
+set(PROTOBUF_GENERATED_PY_DIR ${PROJECT_BINARY_DIR}/python)
+
+IF(MSVC)
+	set(DLL_EXPORT "dllexport_decl=BF_DLLEXPORT:")
+ENDIF()
+
+set(PROTOBUF_GENERATED_CPP)
+set(PROTOBUF_GENERATED_HEADER)
+set(PROTOBUF_GENERATED_PY)
+set(PROTOBUF_GENERATED_JS)
+foreach(FILE ${PROTOBUF_SOURCES})
+	string(REPLACE ".proto" ".pb.cc" FILE_CC ${FILE})
+	string(REPLACE ".proto" ".pb.h" FILE_H ${FILE})
+
+	add_custom_command(
+		OUTPUT ${PROJECT_BINARY_DIR}/${FILE_CC}
+		OUTPUT ${LIBINCLUDEDIR_TOP}/${FILE_H}
+		
+		#COMMAND ${CMAKE_COMMAND} -E make_directory ${PROJECT_BINARY_DIR}
+		COMMAND ${Protobuf_PROTOC_EXECUTABLE} ${PROTOBUF_DEFS_DIR}/${FILE} --cpp_out=${DLL_EXPORT}${PROJECT_BINARY_DIR} --proto_path=${PROTOBUF_DEFS_DIR}
+		COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_BINARY_DIR}/${FILE_H} ${LIBINCLUDEDIR_TOP}/${FILE_H}
+		COMMAND ${CMAKE_COMMAND} -E remove ${PROJECT_BINARY_DIR}/${FILE_H}
+		
+		DEPENDS Protobuf
+		DEPENDS ${FILE}
+		WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
+	)
+	list(APPEND PROTOBUF_GENERATED_CPP ${PROJECT_BINARY_DIR}/${FILE_CC})
+	list(APPEND PROTOBUF_GENERATED_HEADER ${LIBINCLUDEDIR_TOP}/${FILE_H})
+	
+	if (BF_BUILD_PYTHON)
+		string(REPLACE ".proto" "_pb2.py" FILE_PY ${FILE})
+		add_custom_command(
+			OUTPUT ${PROTOBUF_GENERATED_PY_DIR}/${FILE_PY}
+		
+			COMMAND ${CMAKE_COMMAND} -E make_directory ${PROJECT_BINARY_DIR}/python
+			COMMAND ${Protobuf_PROTOC_EXECUTABLE} ${PROTOBUF_DEFS_DIR}/${FILE} --python_out=${PROTOBUF_GENERATED_PY_DIR} --proto_path=${PROTOBUF_DEFS_DIR}
+		
+			DEPENDS Protobuf
+			DEPENDS ${FILE}
+			WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
+		)
+	endif()
+	list(APPEND PROTOBUF_GENERATED_PY ${PROTOBUF_GENERATED_PY_DIR}/${FILE_PY})
+	
+	if (BF_BUILD_NPM AND NODEJS_EXECUTABLE AND NPM_EXECUTABLE)
+		string(REPLACE ".proto" "_pb.js" FILE_JS ${FILE})
+		add_custom_command(
+			OUTPUT ${PROJECT_BINARY_DIR}/npm/${FILE_JS}
+			
+			COMMAND ${CMAKE_COMMAND} -E make_directory ${PROJECT_BINARY_DIR}/npm
+			COMMAND ${Protobuf_PROTOC_EXECUTABLE} ${PROTOBUF_DEFS_DIR}/${FILE} --plugin="protoc-gen-ts=${PROTOC_GEN_TS_PATH}" --js_out="import_style=commonjs,binary:${PROJECT_BINARY_DIR}/npm" --ts_out="${PROJECT_BINARY_DIR}/npm" --proto_path=${PROTOBUF_DEFS_DIR}
+			
+			DEPENDS Protobuf
+			DEPENDS blickfeld-protocol-npm
+			DEPENDS ${FILE}
+			WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
+		)
+		list(APPEND PROTOBUF_GENERATED_JS ${PROJECT_BINARY_DIR}/npm/${FILE_JS})
+	endif()
+endforeach()
+
+set(PROTOBUF_GENERATED_CUSTOM)
+foreach(FILE ${PROTOBUF_SOURCES_CUSTOM})
+	string(REPLACE ".proto" ".custom.pb.h" FILE_H ${FILE})
+
+	add_custom_command(
+		OUTPUT ${LIBINCLUDEDIR_TOP}/${FILE_H}
+		COMMAND ${Protobuf_PROTOC_EXECUTABLE} ${PROTOBUF_DEFS_DIR}/${FILE} --plugin=protoc-gen-custom=${BF_PROTOCOL_PLUGIN_PATH} --custom_out=${DLL_EXPORT}${PROJECT_BINARY_DIR} --proto_path=${PROTOBUF_DEFS_DIR}
+		COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_BINARY_DIR}/${FILE_H} ${LIBINCLUDEDIR_TOP}/${FILE_H}
+		COMMAND ${CMAKE_COMMAND} -E remove ${PROJECT_BINARY_DIR}/${FILE_H}
+
+		DEPENDS Protobuf
+		DEPENDS ${BF_PROTOCOL_PLUGIN}
+		DEPENDS ${FILE}
+		WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
+	)
+	list(APPEND PROTOBUF_GENERATED_CUSTOM ${LIBINCLUDEDIR_TOP}/${FILE_H})
+endforeach()
+
+add_library(blickfeld-scanner-protocol-static OBJECT ${PROTOBUF_GENERATED_CUSTOM} ${PROTOBUF_GENERATED_CPP})
+target_include_directories(blickfeld-scanner-protocol-static PRIVATE ${LIBINCLUDEDIR_TOP})
+target_link_libraries(blickfeld-scanner-protocol-static PUBLIC ${Protobuf_LIBRARY})
+target_compile_definitions(blickfeld-scanner-protocol-static PRIVATE "BF_DLLEXPORT=__declspec(dllexport)")
+set_property(TARGET blickfeld-scanner-protocol-static PROPERTY POSITION_INDEPENDENT_CODE ON)
+
+set(PROTOBUF_GENERATED_PY_DIR ${PROTOBUF_GENERATED_PY_DIR} PARENT_SCOPE)
+set(PROTOBUF_GENERATED_PY ${PROTOBUF_GENERATED_PY} PARENT_SCOPE)
+set(PROTOBUF_GENERATED_JS ${PROTOBUF_GENERATED_JS} PARENT_SCOPE)
+set(PROTOBUF_GENERATED_JS_DIR ${PROJECT_BINARY_DIR}/npm PARENT_SCOPE)
+
+add_custom_target(blickfeld-scanner-protocol 
+	DEPENDS blickfeld-scanner-protocol-static
+	DEPENDS ${PROTOBUF_GENERATED_PY})
+
+add_custom_target(blickfeld-scanner-protocol-js
+	DEPENDS ${PROTOBUF_GENERATED_JS})

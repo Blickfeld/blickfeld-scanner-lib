@@ -1,0 +1,30 @@
+syntax = "proto2";
+option optimize_for = CODE_SIZE;
+
+import "blickfeld/options.proto";
+package blickfeld.protocol.update;
+
+// do NOT change enum labels, they are used as strings in code
+enum HardwareVariant {
+    ALL_HARDWARE = 5;
+    UNKNOWN_HARDWARE = 6;
+    NO_HARDWARE = 7;
+
+    CUBE_V0_2 = 0;
+    CUBE_V0_3 = 1;
+    CUBE_V1_0 = 4;
+
+    AURORA_P3 = 3;
+
+    APOLLON_A0 = 2;
+};
+
+// partial parse of trenz_eeprom_msg
+message partial_trenz_eeprom_msg {
+    optional HardwareVariant hardware_variant = 3;
+}
+
+// partial parse of {ldm,scanner,msb}_eeprom_msg
+message partial_module_eeprom_msg {
+    optional string hardware_version = 99;
+}

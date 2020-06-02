@@ -1,0 +1,36 @@
+#ifndef BLICKFELD_SCANNER_CONFIG_H
+#define BLICKFELD_SCANNER_CONFIG_H
+
+#define BSL_VERSION "@PROJECT_VERSION@"
+
+#define SERVER_PORT @SERVER_PORT@
+
+#cmakedefine HAVE_WINDOWS_H
+#cmakedefine HAVE_SYS_TYPES_H
+#cmakedefine HAVE_SYS_SOCKET_H
+#cmakedefine HAVE_SYS_NETINET_IN_H
+#cmakedefine HAVE_SYS_NETINET_IP_H
+#cmakedefine HAVE_ARPA_INET_H
+#cmakedefine HAVE_NETDB_H
+#cmakedefine HAVE_UNISTD_H
+#cmakedefine HAVE_SYSLOG_H
+#cmakedefine HAVE_TIME_H
+#cmakedefine HAVE_GLUT_H
+#cmakedefine HAVE_INTTYPES_H
+#cmakedefine HAVE_WINSOCK_H
+
+#cmakedefine HAVE_CLOCK_GETTIME
+#cmakedefine HAVE_MSG_NOSIGNAL
+
+#cmakedefine BSL_STANDALONE
+#cmakedefine HAVE_OPENSSL
+#cmakedefine BSL_RECORDING
+
+#define DEFAULT_LOG_MSGS_KEPT_IN_MEM @DEFAULT_LOG_MSGS_KEPT_IN_MEM@
+
+#ifndef BF_DLLEXPORT
+  #define BF_DLLEXPORT __declspec(dllimport)  
+#endif
+
+#endif // BLICKFELD_SCANNER_CONFIG_H
+

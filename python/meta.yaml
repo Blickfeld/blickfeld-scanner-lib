@@ -1,0 +1,18 @@
+package:
+  name: blickfeld_scanner
+  version: @CONDA_RELEASE_VERSION@
+
+source:
+  path: ./
+
+build:
+  noarch: python
+
+requirements:
+  build:
+    - python
+    - setuptools
+
+  run:
+    - python
+    - protobuf>=3.6.1

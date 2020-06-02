@@ -1,0 +1,12 @@
+* cmake buildsystem
+
+  we need:
+  - open source
+  - multi platform (has to run on linux, windows, mac, ...)
+  - cross-compiling (e.g. for arm from linux, windows, ...)
+  - well-known and widely used
+
+  also see README.md how to use it.
+
+  tutorial: https://cmake.org/cmake-tutorial/
+  
