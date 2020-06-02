@@ -1,8 +1,4 @@
-image: debian:buster
-
-# Install dependencies
-before_script:
-  - apt-get update -y && apt-get install git wget -y
+image: gitlab.muc.blickfeld.com:4567/firmware/fetch_artifacts:master
 
 # CI Job mirrors master branch and tags to GitHub.
 publish to github:
@@ -13,6 +9,7 @@ publish to github:
     script:
       - git remote add github $GITHUB_REPO
       - git push --follow-tags github HEAD:master
+      - python .ci/upload_release_artifacts.py
     # Run on docker runner
     tags:
       - docker

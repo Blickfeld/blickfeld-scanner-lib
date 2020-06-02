@@ -1,0 +1,29 @@
+site: https://gitlab.muc.blickfeld.com
+
+artifacts:
+  pre-compiled debian:
+    project_id: enduser-software/blickfeld-scanner-lib
+    job_id: build_linux_amd64
+    ref_name: master
+    single_files: False
+    dest_dir: .
+    files:
+      - [ "build/blickfeld-scanner-lib-dev-", False]
+      
+  pre-compiled debian standalone:
+    project_id: enduser-software/blickfeld-scanner-lib
+    job_id: build_linux_amd64 standalone
+    ref_name: master
+    single_files: False
+    dest_dir: .
+    files:
+      - [ "build/blickfeld-scanner-lib-dev-", False]
+      
+  pre-compiled debian testing:
+    project_id: enduser-software/blickfeld-scanner-lib
+    job_id: build_linux_amd64 testing
+    ref_name: master
+    single_files: False
+    dest_dir: .
+    files:
+      - [ "build/blickfeld-scanner-lib-dev-", False]
