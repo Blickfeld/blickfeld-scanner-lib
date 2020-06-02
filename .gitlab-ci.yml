@@ -11,8 +11,8 @@ publish to github:
       - master
     # Mirror repository
     script:
-      - git remote set-url origin $GITHUB_REPO
-      - git push --follow-tags origin master
+      - git remote add github $GITHUB_REPO
+      - git push --follow-tags github HEAD:master
     # Run on docker runner
     tags:
       - docker
