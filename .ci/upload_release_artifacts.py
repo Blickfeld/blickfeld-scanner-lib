@@ -27,7 +27,7 @@ except:
     release = GitRelease.GitRelease(remote_repo._requester, headers, data, completed=True)
     
 # Release notes
-message = local_repo.tags[release_tag].commit.message #.split("\n",2)[2])
+message = local_repo.tags[release_tag].commit.message.split("\n",2)[2]
     
 print("Updating release", release_tag)
 print(message)
@@ -52,3 +52,6 @@ for asset in release.get_assets():
 release.upload_asset("build/blickfeld-scanner-lib-dev-Linux.deb")
 release.upload_asset("build/blickfeld-scanner-lib-dev-standalone-Linux.deb")
 release.upload_asset("build/blickfeld-scanner-lib-dev-testing-Linux.deb")
+
+# Upload package to PyPI
+os.system(f"twine upload --repository testpypi --username __token__ --password {os.environ['PIP_TEST_TOKEN']} build_amd64_python/python/dist/blickfeld_scanner.tar.gz")

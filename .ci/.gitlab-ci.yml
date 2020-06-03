@@ -1,14 +1,15 @@
 image: gitlab.muc.blickfeld.com:4567/firmware/fetch_artifacts:master
 
-# CI Job mirrors master branch and tags to GitHub.
-publish to github:
+# Publishes source code and packages
+publish:
     # Only master branch should be published. Use a merge request to publish the release branch.
     only:
       - master
-    # Mirror repository
     script:
+      # Mirror repository
       - git remote add github $GITHUB_REPO
       - git push --follow-tags github HEAD:master
+      # Upload packages
       - python .ci/upload_release_artifacts.py
     # Run on docker runner
     tags:

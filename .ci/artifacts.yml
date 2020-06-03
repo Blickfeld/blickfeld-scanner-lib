@@ -27,3 +27,12 @@ artifacts:
     dest_dir: .
     files:
       - [ "build/blickfeld-scanner-lib-dev-", False]
+      
+  pre-compiled python package:
+    project_id: enduser-software/blickfeld-scanner-lib
+    job_id: build_amd64_python
+    ref_name: master
+    single_files: False
+    dest_dir: .
+    files:
+      - [ "build_amd64_python/python/dist", False]
