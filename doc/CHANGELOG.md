@@ -13,6 +13,13 @@ influence the resulting point cloud.
 
 ### Removed
 
+## [2.8.2] - 2020.06.04
+
+### Changed
+* Doc: Correct artifacts URL of debian packages
+* CI: Fix upstream sync to GitHub repository
+* [closes #22461] CMake: Clean up targets and drop protoc-dev dependency required for plugin
+
 ## [2.8.1] - 2020.06.03
 
 ### Changed

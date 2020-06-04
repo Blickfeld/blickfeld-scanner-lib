@@ -10,6 +10,7 @@ include(ExternalProject)
 
 project(blickfeld-protocol)
 
+# NPM
 find_program(NODEJS_EXECUTABLE NAMES node)
 find_program(NPM_EXECUTABLE NAMES npm HINTS /usr)
 if (BF_BUILD_NPM AND NODEJS_EXECUTABLE AND NPM_EXECUTABLE)
@@ -31,7 +32,7 @@ endif()
 if(NOT BF_USE_SYSTEM_PROTOBUF)
 	message("Protobuf compiler is compiled from source")
 	ExternalProject_Add(
-	  Protobuf
+	  blickfeld-protobuf
 	  SOURCE_DIR ${PROTOBUF_SRC_DIR}
 	  SOURCE_SUBDIR cmake
 	  CMAKE_ARGS
@@ -45,32 +46,34 @@ if(NOT BF_USE_SYSTEM_PROTOBUF)
 	set(Protobuf_PROTOC_EXECUTABLE ${CMAKE_CURRENT_BINARY_DIR}/protobuf/bin/protoc)
 else()
 	message("Existing protobuf compiler is used: ${Protobuf_PROTOC_EXECUTABLE}")
-	add_custom_target( Protobuf )
+	add_custom_target( blickfeld-protobuf )
 endif()
 set(Protobuf_PROTOC_EXECUTABLE ${Protobuf_PROTOC_EXECUTABLE} PARENT_SCOPE)
 
 # plugin for protobuf compilation
-find_program(BF_PROTOCOL_PLUGIN NAMES bf_protocol_plugin)
-if(BF_PROTOCOL_PLUGIN)
-	set(BF_PROTOCOL_PLUGIN_PATH ${BF_PROTOCOL_PLUGIN})
-else()
-	message("bf_protocol_plugin is compiled from source")
-	set(BF_PROTOCOL_PLUGIN bf_protocol_plugin)
-	ExternalProject_Add(
-		bf_protocol_plugin
-		SOURCE_DIR ${PROJECT_SOURCE_DIR}/plugin
-		DEPENDS Protobuf
-		CMAKE_ARGS
-			"-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"
-			"-DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/protobuf"
-	)
-	if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
-			set(BF_PROTOCOL_PLUGIN_PATH "${CMAKE_CURRENT_BINARY_DIR}/protobuf/bin/bf_protocol_plugin.exe")
+if(BF_BUILD_PROTOBUF_PLUGIN)
+	find_program(BF_PROTOCOL_PLUGIN NAMES blickfeld-protocol-plugin)
+	if(BF_PROTOCOL_PLUGIN)
+		set(BF_PROTOCOL_PLUGIN_PATH ${BF_PROTOCOL_PLUGIN})
 	else()
-			set(BF_PROTOCOL_PLUGIN_PATH "${CMAKE_CURRENT_BINARY_DIR}/protobuf/bin/bf_protocol_plugin")
+		message("blickfeld-protocol-plugin is compiled from source")
+		set(BF_PROTOCOL_PLUGIN blickfeld-protocol-plugin)
+		ExternalProject_Add(
+			blickfeld-protocol-plugin
+			SOURCE_DIR ${PROJECT_SOURCE_DIR}/plugin
+			DEPENDS blickfeld-protobuf
+			CMAKE_ARGS
+				"-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"
+				"-DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/protobuf"
+		)
+		if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
+				set(BF_PROTOCOL_PLUGIN_PATH "${CMAKE_CURRENT_BINARY_DIR}/protobuf/bin/blickfeld-protocol-plugin.exe")
+		else()
+				set(BF_PROTOCOL_PLUGIN_PATH "${CMAKE_CURRENT_BINARY_DIR}/protobuf/bin/blickfeld-protocol-plugin")
+		endif()
 	endif()
+	message("Using blickfeld-protocol-plugin: ${BF_PROTOCOL_PLUGIN}")
 endif()
-message("Using bf_protocol_plugin: ${BF_PROTOCOL_PLUGIN}")
 
 # list .proto files here
 set(PROTOBUF_DEFS_DIR ${PROJECT_SOURCE_DIR})
@@ -117,7 +120,8 @@ set(PROTOBUF_GENERATED_JS)
 foreach(FILE ${PROTOBUF_SOURCES})
 	string(REPLACE ".proto" ".pb.cc" FILE_CC ${FILE})
 	string(REPLACE ".proto" ".pb.h" FILE_H ${FILE})
-
+	
+	# Cpp Build
 	add_custom_command(
 		OUTPUT ${PROJECT_BINARY_DIR}/${FILE_CC}
 		OUTPUT ${LIBINCLUDEDIR_TOP}/${FILE_H}
@@ -127,13 +131,14 @@ foreach(FILE ${PROTOBUF_SOURCES})
 		COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_BINARY_DIR}/${FILE_H} ${LIBINCLUDEDIR_TOP}/${FILE_H}
 		COMMAND ${CMAKE_COMMAND} -E remove ${PROJECT_BINARY_DIR}/${FILE_H}
 		
-		DEPENDS Protobuf
+		DEPENDS blickfeld-protobuf
 		DEPENDS ${FILE}
 		WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
 	)
 	list(APPEND PROTOBUF_GENERATED_CPP ${PROJECT_BINARY_DIR}/${FILE_CC})
 	list(APPEND PROTOBUF_GENERATED_HEADER ${LIBINCLUDEDIR_TOP}/${FILE_H})
 	
+	# Python Build
 	if (BF_BUILD_PYTHON)
 		string(REPLACE ".proto" "_pb2.py" FILE_PY ${FILE})
 		add_custom_command(
@@ -142,13 +147,14 @@ foreach(FILE ${PROTOBUF_SOURCES})
 			COMMAND ${CMAKE_COMMAND} -E make_directory ${PROJECT_BINARY_DIR}/python
 			COMMAND ${Protobuf_PROTOC_EXECUTABLE} ${PROTOBUF_DEFS_DIR}/${FILE} --python_out=${PROTOBUF_GENERATED_PY_DIR} --proto_path=${PROTOBUF_DEFS_DIR}
 		
-			DEPENDS Protobuf
+			DEPENDS blickfeld-protobuf
 			DEPENDS ${FILE}
 			WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
 		)
 	endif()
 	list(APPEND PROTOBUF_GENERATED_PY ${PROTOBUF_GENERATED_PY_DIR}/${FILE_PY})
 	
+	# NPM Build
 	if (BF_BUILD_NPM AND NODEJS_EXECUTABLE AND NPM_EXECUTABLE)
 		string(REPLACE ".proto" "_pb.js" FILE_JS ${FILE})
 		add_custom_command(
@@ -157,7 +163,7 @@ foreach(FILE ${PROTOBUF_SOURCES})
 			COMMAND ${CMAKE_COMMAND} -E make_directory ${PROJECT_BINARY_DIR}/npm
 			COMMAND ${Protobuf_PROTOC_EXECUTABLE} ${PROTOBUF_DEFS_DIR}/${FILE} --plugin="protoc-gen-ts=${PROTOC_GEN_TS_PATH}" --js_out="import_style=commonjs,binary:${PROJECT_BINARY_DIR}/npm" --ts_out="${PROJECT_BINARY_DIR}/npm" --proto_path=${PROTOBUF_DEFS_DIR}
 			
-			DEPENDS Protobuf
+			DEPENDS blickfeld-protobuf
 			DEPENDS blickfeld-protocol-npm
 			DEPENDS ${FILE}
 			WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
@@ -166,27 +172,37 @@ foreach(FILE ${PROTOBUF_SOURCES})
 	endif()
 endforeach()
 
+# Custom plugin protobuf build
 set(PROTOBUF_GENERATED_CUSTOM)
 foreach(FILE ${PROTOBUF_SOURCES_CUSTOM})
 	string(REPLACE ".proto" ".custom.pb.h" FILE_H ${FILE})
 
-	add_custom_command(
-		OUTPUT ${LIBINCLUDEDIR_TOP}/${FILE_H}
-		COMMAND ${Protobuf_PROTOC_EXECUTABLE} ${PROTOBUF_DEFS_DIR}/${FILE} --plugin=protoc-gen-custom=${BF_PROTOCOL_PLUGIN_PATH} --custom_out=${DLL_EXPORT}${PROJECT_BINARY_DIR} --proto_path=${PROTOBUF_DEFS_DIR}
-		COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_BINARY_DIR}/${FILE_H} ${LIBINCLUDEDIR_TOP}/${FILE_H}
-		COMMAND ${CMAKE_COMMAND} -E remove ${PROJECT_BINARY_DIR}/${FILE_H}
+	if(BF_BUILD_PROTOBUF_PLUGIN)
+		add_custom_command(
+			OUTPUT ${LIBINCLUDEDIR_TOP}/${FILE_H}
+			COMMAND ${Protobuf_PROTOC_EXECUTABLE} ${PROTOBUF_DEFS_DIR}/${FILE} --plugin=protoc-gen-custom=${BF_PROTOCOL_PLUGIN_PATH} --custom_out=${DLL_EXPORT}${PROJECT_BINARY_DIR} --proto_path=${PROTOBUF_DEFS_DIR}
+			COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_BINARY_DIR}/${FILE_H} ${LIBINCLUDEDIR_TOP}/${FILE_H}
+			COMMAND ${CMAKE_COMMAND} -E remove ${PROJECT_BINARY_DIR}/${FILE_H}
 
-		DEPENDS Protobuf
-		DEPENDS ${BF_PROTOCOL_PLUGIN}
-		DEPENDS ${FILE}
-		WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
-	)
+			DEPENDS blickfeld-protobuf
+			DEPENDS ${BF_PROTOCOL_PLUGIN}
+			DEPENDS ${FILE}
+			WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
+		)
+	else()  # if plugin build is deactivated the header files will just be copied
+		add_custom_command(
+			OUTPUT ${LIBINCLUDEDIR_TOP}/${FILE_H}
+			COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/plugin/${FILE_H} ${LIBINCLUDEDIR_TOP}/${FILE_H}
+			DEPENDS ${FILE}
+			WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
+		)
+	endif()
 	list(APPEND PROTOBUF_GENERATED_CUSTOM ${LIBINCLUDEDIR_TOP}/${FILE_H})
 endforeach()
 
 add_library(blickfeld-scanner-protocol-static OBJECT ${PROTOBUF_GENERATED_CUSTOM} ${PROTOBUF_GENERATED_CPP})
 target_include_directories(blickfeld-scanner-protocol-static PRIVATE ${LIBINCLUDEDIR_TOP})
-target_link_libraries(blickfeld-scanner-protocol-static PUBLIC ${Protobuf_LIBRARY})
+target_link_libraries(blickfeld-scanner-protocol-static PUBLIC ${blickfeld-protobuf_LIBRARY})
 target_compile_definitions(blickfeld-scanner-protocol-static PRIVATE "BF_DLLEXPORT=__declspec(dllexport)")
 set_property(TARGET blickfeld-scanner-protocol-static PROPERTY POSITION_INDEPENDENT_CODE ON)
 

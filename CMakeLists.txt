@@ -20,13 +20,15 @@ if (CMAKE_CROSSCOMPILING)
 else()
   option(BF_USE_SYSTEM_PROTOBUF "Use system wide protobuf" ON)
 endif()
-option(BF_BUILD_EXAMPLES "Build ${CMAKE_PROJECT_NAME} examples" ON)
-option(BF_BUILD_TESTS "Build ${CMAKE_PROJECT_NAME} tests" ON)
-option(BF_BUILD_NPM "Build ${CMAKE_PROJECT_NAME} NPM package" ON)
-option(BF_BUILD_PYTHON "Build ${CMAKE_PROJECT_NAME} python package" ON)
-option(BF_ENABLE_SSL "Enable ${CMAKE_PROJECT_NAME} SSL support (internal feature)" OFF)
-option(BF_INSTALL_EXAMPLES "Install ${CMAKE_PROJECT_NAME} C++ examples" ON)
+option(BF_BUILD_EXAMPLES "Build ${CMAKE_PROJECT_NAME} examples" ON)  # Build cpp examples, defaults is ON
+option(BF_BUILD_TESTS "Build ${CMAKE_PROJECT_NAME} tests" ON)  # Build tests for the BSL, defaults is ON
+option(BF_BUILD_NPM "Build ${CMAKE_PROJECT_NAME} NPM package" ON)  # Build npm package, defaults is ON
+option(BF_BUILD_PYTHON "Build ${CMAKE_PROJECT_NAME} python package" ON)  # Build python package blickfeld_scanner, defaults is ON
+option(BF_ENABLE_SSL "Enable ${CMAKE_PROJECT_NAME} SSL support (internal feature)" OFF)  # Enable SSL support for internal features, defaults is OFF (not needed for open-source BSL compilation)
+option(BF_INSTALL_EXAMPLES "Install ${CMAKE_PROJECT_NAME} C++ examples" ON)  # Install cpp examples like bf_discovery on system, defaults is ON
+option(BF_BUILD_PROTOBUF_PLUGIN "Build ${CMAKE_PROJECT_NAME} protobuf plugin" OFF)  # Build protobuf plugin for develop mode. The binary is also provided in the repository.
 
+# Get version of BSL
 if(EXISTS "${PROJECT_SOURCE_DIR}/version.txt")
     file (READ "${PROJECT_SOURCE_DIR}/version.txt" PROJECT_VERSION)  
     file (READ "${PROJECT_SOURCE_DIR}/version.txt" PROJECT_GIT_DESCRIBE)    
@@ -89,10 +91,11 @@ check_include_files (GL/glut.h HAVE_GLUT_H)
 check_include_files (inttypes.h HAVE_INTTYPES_H)
 check_include_files (winsock.h HAVE_WINSOCK_H)
 
-IF(MSVC)
+# Check for Windows Build
+if(MSVC)
     set(CMAKE_CXX_FLAGS "/EHsc")
-ENDIF(MSVC)
-IF(WIN32)
+endif(MSVC)
+if(WIN32)
 	macro(get_WIN32_WINNT version)
 	    if (WIN32 AND CMAKE_SYSTEM_VERSION)
 	        set(ver ${CMAKE_SYSTEM_VERSION})
@@ -105,9 +108,11 @@ IF(WIN32)
     get_WIN32_WINNT(ver)
 	add_definitions(-D_WIN32_WINNT=${ver})
 endif(WIN32)
-IF(CMAKE_COMPILER_IS_GNUCC)
+
+# Check for GNUCC Cmake compiler
+if(CMAKE_COMPILER_IS_GNUCC)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -std=gnu++11 -static-libgcc -static-libstdc++")
-ENDIF(CMAKE_COMPILER_IS_GNUCC)
+endif(CMAKE_COMPILER_IS_GNUCC)
 
 include (CheckSymbolExists)
 check_symbol_exists(clock_gettime time.h HAVE_CLOCK_GETTIME)
@@ -115,13 +120,7 @@ check_symbol_exists(MSG_NOSIGNAL "sys/types.h;sys/socket.h" HAVE_MSG_NOSIGNAL)
 
 set(DEFAULT_LOG_MSGS_KEPT_IN_MEM 50)
 
-execute_process(
-  COMMAND git describe --tags
-  WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}"
-  OUTPUT_VARIABLE PROJECT_GIT_TAG
-  OUTPUT_STRIP_TRAILING_WHITESPACE
-  )
-
+# Set lib include directories
 set (LIBINCLUDEDIR "include/blickfeld")
 set (LIBINCLUDEDIR_TOP "${PROJECT_BINARY_DIR}/include")
 
@@ -130,7 +129,7 @@ set(PROTOBUF_SRC_DIR "${PROJECT_SOURCE_DIR}/thirdparty/protobuf")
 if(BF_USE_SYSTEM_PROTOBUF)
   find_package(Protobuf REQUIRED)
 
-  # Check version
+  # Check version of protobuf
   if(PROTOBUF_FOUND AND Protobuf_PROTOC_EXECUTABLE)
 		execute_process(COMMAND ${Protobuf_PROTOC_EXECUTABLE} --version OUTPUT_VARIABLE Protobuf_Compiler_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
 		string(REGEX REPLACE "^libprotoc " "" Protobuf_Compiler_VERSION "${Protobuf_Compiler_VERSION}")
@@ -147,17 +146,17 @@ if(BF_USE_SYSTEM_PROTOBUF)
   
   if(PROTOBUF_FOUND)
     message("Full protobuf support active.")
-    set(BSL_STANDALONE OFF)
+    set(BSL_STANDALONE OFF)  # Set BSL standalone build on off. This will activate more features.
   else()
     message(FATAL_ERROR "Could not find suitable protobuf on this system.")
   endif()
-else()
+else()  # protobuf not on system and has to be compiled from source
   message("Protobuf is compiled from source. Functionality is reduced. Install protobuf in the system to activate full support.")
   option(protobuf_BUILD_TESTS OFF)
   option(protobuf_BUILD_EXAMPLES OFF)
   option(protobuf_BUILD_PROTOC_BINARIES ON)
   option(protobuf_BUILD_SHARED_LIBS OFF)
-  option(protobuf_MSVC_STATIC_RUNTIME OFF) 
+  option(protobuf_MSVC_STATIC_RUNTIME OFF)
   add_subdirectory("${PROTOBUF_SRC_DIR}/cmake" EXCLUDE_FROM_ALL)
   set(Protobuf_LIBRARY libprotobuf libprotobuf-lite)
   set(Protobuf_INCLUDE_DIRS ${PROTOBUF_SRC_DIR}/src)
@@ -208,6 +207,8 @@ include_directories(${BLICKFELD_SCANNER_INCLUDES})
 
 # Protocols
 add_subdirectory(protocol)
+
+# NPM
 if(BF_BUILD_NPM)
   add_subdirectory(npm)
 endif()
@@ -217,13 +218,13 @@ add_library (blickfeld-scanner SHARED ${BLICKFELD_SCANNER_SOURCES} $<TARGET_OBJE
 add_library (blickfeld-scanner-static STATIC EXCLUDE_FROM_ALL ${BLICKFELD_SCANNER_SOURCES} $<TARGET_OBJECTS:blickfeld-scanner-protocol-static>)
 target_include_directories(blickfeld-scanner-static PUBLIC ${BLICKFELD_SCANNER_INCLUDES})
 
-IF(WIN32)
+if(WIN32)
   	# https://msdn.microsoft.com/en-us/library/windows/desktop/ms738520(v=vs.85).aspx
   	
-  	target_link_libraries(blickfeld-scanner PUBLIC ws2_32 wsock32)
+  target_link_libraries(blickfeld-scanner PUBLIC ws2_32 wsock32)
 	target_compile_definitions(blickfeld-scanner PRIVATE "BF_DLLEXPORT=__declspec(dllexport)")
 	target_compile_definitions(blickfeld-scanner-static PUBLIC "BF_DLLEXPORT=__declspec(dllexport)")
-ENDIF(WIN32)
+endif(WIN32)
 
 add_dependencies(blickfeld-scanner blickfeld-scanner-protocol)
 add_dependencies(blickfeld-scanner-static blickfeld-scanner-protocol)
@@ -259,6 +260,7 @@ target_include_directories(blickfeld-scanner INTERFACE
   $<INSTALL_INTERFACE:include>
 )
 
+# Install BSL
 install(TARGETS blickfeld-scanner EXPORT blickfeld-scanner
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}

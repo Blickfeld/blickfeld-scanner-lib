@@ -7,7 +7,7 @@
 ##
 cmake_minimum_required (VERSION 3.9)
 
-project(bf_protocol_plugin)
+project(blickfeld-protocol-plugin)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -28,12 +28,12 @@ endif()
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
-add_executable(bf_protocol_plugin ${SOURCES})
+add_executable(blickfeld-protocol-plugin ${SOURCES})
 
 option(BF_PLUGIN_USE_OLD_CXX11_ABI "Compile with old C++11 ABI for Petalinux compatibility" OFF)
 if(BF_PLUGIN_USE_OLD_CXX11_ABI)
-	target_compile_options(bf_protocol_plugin PRIVATE "SHELL:-D _GLIBCXX_USE_CXX11_ABI=0")
+	target_compile_options(blickfeld-protocol-plugin PRIVATE "SHELL:-D _GLIBCXX_USE_CXX11_ABI=0")
 endif()
 
-target_link_libraries(bf_protocol_plugin PRIVATE ${Protobuf_PROTOC_LIBRARIES} ${Protobuf_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
-install(TARGETS bf_protocol_plugin DESTINATION bin)
+target_link_libraries(blickfeld-protocol-plugin PRIVATE ${Protobuf_PROTOC_LIBRARIES} ${Protobuf_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+install(TARGETS blickfeld-protocol-plugin DESTINATION bin)

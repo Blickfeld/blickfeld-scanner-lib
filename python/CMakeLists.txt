@@ -45,7 +45,7 @@ if(Python_Interpreter_FOUND)
 	    DEPENDS ${DEPS}
     )
 
-    add_custom_target(python_blickfeld_scanner ALL DEPENDS ${OUTPUT})
+    add_custom_target(blickfeld-scanner-python ALL DEPENDS ${OUTPUT})
 
     install(CODE "execute_process(WORKING_DIRECTORY \"${CMAKE_CURRENT_BINARY_DIR}\" COMMAND ${Python_EXECUTABLE} ${SETUP_PY} install)")
 endif()

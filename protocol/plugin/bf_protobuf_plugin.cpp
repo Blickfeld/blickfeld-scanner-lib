@@ -10,7 +10,15 @@
 using namespace std;
 using namespace google::protobuf;
 
-const string file_template = "#pragma once\n\
+const string file_template = "/*\n\
+ * Copyright (c) 2020 Blickfeld GmbH.\n\
+ * All rights reserved.\n\
+ *\n\
+ * This source code is licensed under the BSD-style license found in the\n\
+ * LICENSE.md file in the root directory of this source tree.\n\
+ */\n\
+\n\
+#pragma once\n\
 #include <blickfeld/protocol_exception.h>\n\
 @namespace_top@\n\
     @construct@\n\
