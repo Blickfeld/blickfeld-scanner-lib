@@ -34,21 +34,21 @@ Debian packages with BSL standalone mode are available for older systems.
 
         sudo apt update
         sudo apt install -y wget libprotobuf-dev libprotobuf17
-        wget https://github.com/Blickfeld/blickfeld-scanner-lib/releases/download/latest/blickfeld-scanner-lib-dev-Linux.deb
+        wget https://github.com/Blickfeld/blickfeld-scanner-lib/releases/latest/download/blickfeld-scanner-lib-dev-Linux.deb
         sudo dpkg -i blickfeld-scanner-lib-dev-Linux.deb
 
     .. code-tab:: bash Latest ..
 
         sudo apt update
         sudo apt install -y wget libprotobuf-dev libprotobuf22
-        wget https://github.com/Blickfeld/blickfeld-scanner-lib/releases/download/latest/blickfeld-scanner-lib-dev-testing-Linux.deb
+        wget https://github.com/Blickfeld/blickfeld-scanner-lib/releases/latest/download/blickfeld-scanner-lib-dev-testing-Linux.deb
         sudo dpkg -i blickfeld-scanner-lib-dev-testing-Linux.deb
 
     .. code-tab:: bash & older debian-based systems
 
         sudo apt update
         sudo apt install -y wget
-        wget https://github.com/Blickfeld/blickfeld-scanner-lib/releases/download/latest/blickfeld-scanner-lib-dev-standalone-Linux.deb
+        wget https://github.com/Blickfeld/blickfeld-scanner-lib/releases/latest/download/blickfeld-scanner-lib-dev-standalone-Linux.deb
         sudo dpkg -i blickfeld-scanner-lib-dev-standalone-Linux.deb
 
 Follow the :ref:`BSL Getting started` guide to write your first application.

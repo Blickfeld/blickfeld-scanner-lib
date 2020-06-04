@@ -23,7 +23,7 @@ To install the BSL the debian packet or the pypi packet can be used.
 
         sudo apt update
         sudo apt install -y wget libprotobuf-dev libprotobuf17
-        wget https://github.com/Blickfeld/blickfeld-scanner-lib/releases/download/latest/blickfeld-scanner-lib-dev-Linux.deb
+        wget https://github.com/Blickfeld/blickfeld-scanner-lib/releases/latest/download/blickfeld-scanner-lib-dev-Linux.deb
         sudo dpkg -i blickfeld-scanner-lib-dev-Linux.deb
 
     .. code-tab:: py

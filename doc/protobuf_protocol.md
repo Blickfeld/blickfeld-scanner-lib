@@ -135,6 +135,14 @@ The data, such as a point cloud, are also packed in protobuf messages.
   
   
 
+- [blickfeld/file/general.proto](#blickfeld/file/general.proto)
+    - [Client](#blickfeld.protocol.file.Client)
+  
+    - [Client.Language](#blickfeld.protocol.file.Client.Language)
+  
+  
+  
+
 - [blickfeld/file/point_cloud.proto](#blickfeld/file/point_cloud.proto)
     - [PointCloud](#blickfeld.protocol.file.PointCloud)
     - [PointCloud.Data](#blickfeld.protocol.file.PointCloud.Data)
@@ -1212,6 +1220,52 @@ Change the operation mode and try again if no one else is using it.
 
 
  <!-- end messages -->
+
+ <!-- end enums -->
+
+ <!-- end HasExtensions -->
+
+ <!-- end services -->
+
+
+
+<a name="blickfeld/file/general.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## blickfeld/file/general.proto
+
+
+
+<a name="blickfeld.protocol.file.Client"></a>
+
+### Client
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| library_version | [string](#string) | optional | Library version |
+| file_time_ns | [uint64](#uint64) | optional | Unit: [ns] - File time stamp |
+| language | [Client.Language](#blickfeld.protocol.file.Client.Language) | optional | Used library language for file creation |
+
+
+
+
+
+ <!-- end messages -->
+
+
+<a name="blickfeld.protocol.file.Client.Language"></a>
+
+### Client.Language
+
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| CPP | 1 |  |
+| PYTHON | 2 |  |
+| TYPESCRIPT | 3 |  |
+
 
  <!-- end enums -->
 

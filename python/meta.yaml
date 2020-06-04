@@ -16,3 +16,4 @@ requirements:
   run:
     - python
     - protobuf>=3.6.1
+    - zeroconf

@@ -9,9 +9,12 @@
 
 from __future__ import print_function
 
-from zeroconf import ServiceBrowser, Zeroconf, InterfaceChoice
-import time
+try:
+    from zeroconf import ServiceBrowser, Zeroconf, InterfaceChoice
+except:
+    Zeroconf = None
 
+import time
 
 __all__ = [
     "search_and_connect",
@@ -31,6 +34,9 @@ def __discover(duration):
             info = zeroconf.get_service_info(type, name)
             infos.append(info)
             zeroconf.notify_all()
+            
+    if Zeroconf is None:
+        raise Exception("Either not supported with this python version or package `zeroconf` is broken.")
 
     zeroconf = Zeroconf(interfaces=InterfaceChoice.All)
     ServiceBrowser(zeroconf, "_blickfeld-lidar._tcp.local.", ServiceListener())

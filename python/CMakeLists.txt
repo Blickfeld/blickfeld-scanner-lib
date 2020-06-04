@@ -9,9 +9,8 @@
 find_package(Python COMPONENTS Interpreter)
 
 # Note that PYTHON_VERSION is not the python version but the version of the package blickfeld_scanner
-set(CONDA_RELEASE_VERSION "${PROJECT_GIT_DESCRIBE}")
-string(REGEX REPLACE "-" "_" CONDA_RELEASE_VERSION "${CONDA_RELEASE_VERSION}")
-string(REGEX REPLACE "/" "_" CONDA_RELEASE_VERSION "${CONDA_RELEASE_VERSION}")
+string(REGEX REPLACE "/" "-" PYTHON_RELEASE_VERSION "${PROJECT_GIT_DESCRIBE}")
+string(REGEX REPLACE "-" "_" CONDA_RELEASE_VERSION "${PYTHON_RELEASE_VERSION}")
 
 if(Python_Interpreter_FOUND)
     set(SETUP_PY_IN "${CMAKE_CURRENT_SOURCE_DIR}/setup.py.in")
@@ -23,7 +22,7 @@ if(Python_Interpreter_FOUND)
       ${PYTHON_SOURCE_FILES}
       ${PROTOBUF_GENERATED_PY}
     )
-    set(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/build/timestamp")
+    set(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/dist/blickfeld_scanner.tar.gz")
 
     file(RELATIVE_PATH CMAKE_CURRENT_SOURCE_DIR_REL "${CMAKE_CURRENT_BINARY_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}")
     configure_file(${SETUP_PY_IN} ${SETUP_PY})
@@ -34,15 +33,16 @@ if(Python_Interpreter_FOUND)
     configure_file(${CMAKE_CURRENT_SOURCE_DIR}/version.py.in ${CMAKE_CURRENT_BINARY_DIR}/blickfeld_scanner/version.py)
 
     add_custom_command( 
-	  OUTPUT ${OUTPUT}
-	  COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/blickfeld_scanner ${CMAKE_CURRENT_BINARY_DIR}/blickfeld_scanner
-	  COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROTOBUF_GENERATED_PY_DIR}/blickfeld ${CMAKE_CURRENT_BINARY_DIR}/blickfeld_scanner/protocol
-	  COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/tests ${CMAKE_CURRENT_BINARY_DIR}/tests
-	  COMMAND ${Python_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/fix_protobuf_imports.py ${CMAKE_CURRENT_BINARY_DIR}/blickfeld_scanner/protocol
-	  COMMAND ${Python_EXECUTABLE} ${SETUP_PY} build
+	    OUTPUT ${OUTPUT}
+	    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/blickfeld_scanner ${CMAKE_CURRENT_BINARY_DIR}/blickfeld_scanner
+	    COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROTOBUF_GENERATED_PY_DIR}/blickfeld ${CMAKE_CURRENT_BINARY_DIR}/blickfeld_scanner/protocol
+	    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/tests ${CMAKE_CURRENT_BINARY_DIR}/tests
+	    COMMAND ${Python_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/fix_protobuf_imports.py ${CMAKE_CURRENT_BINARY_DIR}/blickfeld_scanner/protocol
+	    COMMAND ${Python_EXECUTABLE} ${SETUP_PY} build
+	    COMMAND ${CMAKE_COMMAND} -E remove_directory ${CMAKE_CURRENT_BINARY_DIR}/dist
   	  COMMAND ${Python_EXECUTABLE} ${SETUP_PY} sdist
-	  COMMAND ${CMAKE_COMMAND} -E touch ${OUTPUT}
-	  DEPENDS ${DEPS}
+  	  COMMAND ${CMAKE_COMMAND} -E rename ${CMAKE_CURRENT_BINARY_DIR}/dist/blickfeld_scanner-${PYTHON_RELEASE_VERSION}.tar.gz ${OUTPUT}
+	    DEPENDS ${DEPS}
     )
 
     add_custom_target(python_blickfeld_scanner ALL DEPENDS ${OUTPUT})

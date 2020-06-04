@@ -358,4 +358,5 @@ endif()
 message("Debian package dependencies: ${CPACK_DEBIAN_PACKAGE_DEPENDS}")
 
 set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Blickfeld GmbH")
+set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${CMAKE_SYSTEM_NAME}")
 include(CPack)

@@ -13,6 +13,14 @@ influence the resulting point cloud.
 
 ### Removed
 
+## [2.8.1] - 2020.06.03
+
+### Changed
+* Doc: Correct artifacts URL of debian packages
+* Python: Gracefully handle broken `zeroconf` package, as Python 2 support is missing
+* Doc: Add missing doumentation for client file header
+* CI: Provide python package without version information in filename
+
 ## [2.8.0] - 2020.06.02
 
 ### Added
