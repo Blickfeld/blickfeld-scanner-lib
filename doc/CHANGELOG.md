@@ -13,6 +13,11 @@ influence the resulting point cloud.
 
 ### Removed
 
+## [2.8.4] - 2020.06.04
+
+### Changed
+* CI: Correct squashed commits 
+
 ## [2.8.3] - 2020.06.04
 
 ### Added
