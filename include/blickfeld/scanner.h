@@ -25,39 +25,39 @@
 #endif
 
 namespace asio {
-	class io_context;
+class io_context;
     #ifdef HAVE_OPENSSL
-    // asio/ssl.hpp
-    namespace ssl {
-        class context;
-    }
+// asio/ssl.hpp
+namespace ssl {
+class context;
+}
     #endif
 }
 
 namespace google {
-	namespace protobuf {
-		namespace io {
-			class IstreamInputStream;
-			class OstreamOutputStream;
-			class GzipInputStream;
-			class GzipOutputStream;
-			class CodedInputStream;
-			class CodedOutputStream;
-		}
-	}
+namespace protobuf {
+namespace io {
+class IstreamInputStream;
+class OstreamOutputStream;
+class GzipInputStream;
+class GzipOutputStream;
+class CodedInputStream;
+class CodedOutputStream;
+}
+}
 }
 
 namespace blickfeld {
 
 namespace protocol {
-	class Response;
-	namespace data {
-		class Frame;
-	}
-	namespace file {
-		class PointCloud_Metadata;
-		class PointCloud_Data;
-	}
+class Response;
+namespace data {
+class Frame;
+}
+namespace file {
+class PointCloud_Metadata;
+class PointCloud_Data;
+}
 }
 
 class connection;
@@ -96,7 +96,7 @@ public:
 		google::protobuf::io::CodedOutputStream* pb_ocstream = nullptr;
 #endif
 
-	public:
+public:
 		/**
 		 * Internal use. Use scanner::get_point_cloud_stream or scanner::get_simple_point_cloud_stream.
 		 *
@@ -255,7 +255,7 @@ public:
 	 *
 	 * @return Shared pointer of stream instance. Use the recv_frame method to get Point Cloud Frames.
 	 */
-	std::shared_ptr<scanner::point_cloud_stream<protocol::data::frame_t>> get_simple_point_cloud_stream();
+	std::shared_ptr<scanner::point_cloud_stream<protocol::data::frame_t> > get_simple_point_cloud_stream();
 #ifdef BSL_RECORDING
 
 	/**
@@ -264,7 +264,7 @@ public:
 	 *
 	 * @return Shared pointer of stream instance. Use the recv_frame method to fetch Point Cloud Frames.
 	 */
-	static std::shared_ptr<scanner::point_cloud_stream<protocol::data::frame_t>> simple_file_point_cloud_stream(std::istream* istream);
+	static std::shared_ptr<scanner::point_cloud_stream<protocol::data::frame_t> > simple_file_point_cloud_stream(std::istream* istream);
 #endif
 
 #ifndef BSL_STANDALONE
@@ -276,7 +276,7 @@ public:
 	 *
 	 * @return Shared pointer of stream instance. Use the recv_frame method to get Point Cloud Frames.
 	 */
-	std::shared_ptr<scanner::point_cloud_stream<protocol::data::Frame>> get_point_cloud_stream();
+	std::shared_ptr<scanner::point_cloud_stream<protocol::data::Frame> > get_point_cloud_stream();
 #ifdef BSL_RECORDING
 
 	/**
@@ -286,7 +286,7 @@ public:
 	 * @param istream Input stream with Point Cloud Recording. The file format is described in the technical documentation: "Blickfeld Scanner Library : File Format".
 	 * @return Shared pointer of stream instance. Use the recv_frame method to read Point Cloud Frames.
 	 */
-	static std::shared_ptr<scanner::point_cloud_stream<protocol::data::Frame>> file_point_cloud_stream(std::istream* istream);
+	static std::shared_ptr<scanner::point_cloud_stream<protocol::data::Frame> > file_point_cloud_stream(std::istream* istream);
 #endif
 
 	/**

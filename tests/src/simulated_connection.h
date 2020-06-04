@@ -22,7 +22,7 @@ namespace blickfeld {
 class simulated_connection: public connection {
 
 	std::ifstream dump_file;
-	std::shared_ptr<scanner::point_cloud_stream<protocol::data::Frame>> dump_stream;
+	std::shared_ptr<scanner::point_cloud_stream<protocol::data::Frame> > dump_stream;
 	std::shared_ptr<asio::thread> dump_thread;
 
 	std::list<protocol::Response> response_buffer;
@@ -39,9 +39,11 @@ public:
 	void async_run() {
 		throw protocol_exception<protocol::Error::NotImplemented>();
 	}
+
 	void subscribe(const protocol::stream::Event::DataCase event_id, event_callback_t cb) {
 		throw protocol_exception<protocol::Error::NotImplemented>();
 	}
+
 };
 
 }

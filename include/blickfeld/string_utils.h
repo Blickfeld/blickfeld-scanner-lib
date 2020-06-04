@@ -25,30 +25,30 @@
 		va_start(ap, format); /* needed for gcc 4.8.2 on x86_64 */      \
 		lenret = vsnprintf(p + offset, size - offset, format, ap);      \
 		va_end(ap);                                                     \
-		if (lenret > -1 && (unsigned)lenret < (size - offset)) {        \
-			len = lenret;                                           \
+		if (lenret > -1 && static_cast<unsigned>(lenret) < (size - offset)) {        \
+			len = static_cast<unsigned>(lenret);                                           \
 			break;                                                  \
 		}                                                               \
 		if (lenret > -1)    /* glibc 2.1 */                             \
-			size = offset + lenret + 1;                             \
+			size = offset + static_cast<unsigned>(lenret) + 1;                             \
 		else           /* glibc 2.0 */                                  \
 			size *= 2;  /* twice the old size */                    \
 		char* np;                                                       \
-		if ((np = (char*)realloc(p, size)) == NULL) {                   \
+		if ((np = static_cast<char *>(realloc(p, size))) == NULL) {                   \
 			free(p);                                                \
 			throw std::bad_alloc();                                 \
 		}                                                               \
 		p = np;                                                         \
 	}                                                                       \
-	len = lenret + offset
+	len = static_cast<unsigned>(lenret) + offset
 
 #define vsn_format(format, size, len, p)                                        \
-	unsigned int size = strlen(format);                                     \
+	unsigned int size = static_cast<unsigned>(strlen(format));                                     \
 	if(size < 256)                                                          \
 		size = 256;                                                     \
                                                                                 \
 	char* p;                                                                \
-	if ((p = (char*)malloc(size)) == NULL)                                  \
+	if ((p = static_cast<char*>(malloc(size))) == NULL)                                  \
 		throw std::bad_alloc();                                         \
                                                                                 \
 	unsigned int len = 0;                                                   \

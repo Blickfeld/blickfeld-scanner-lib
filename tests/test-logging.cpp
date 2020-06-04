@@ -16,10 +16,10 @@ public:
 		log_warning("warning!\n");
 		log_error("error!\n");
 	}
+
 };
 
 int main(int argc, char* argv[]) {
 	test_class tst;
-	return 0;		
+	return 0;
 }
-

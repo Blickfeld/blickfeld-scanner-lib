@@ -38,13 +38,14 @@ class str_exception : public std::exception {
 protected:
 	std::string msg;
 	str_exception() {
-	};
+	}
+
 public:
 	str_exception(const char* format, ...) FORMAT_CHECK_ATTR(2, 3);
-	~str_exception() throw() {
-	};
+	~str_exception() noexcept{
+	}
 
-	virtual const char* what() const throw() {
+	virtual const char* what() const noexcept {
 		return msg.c_str();
 	}
 

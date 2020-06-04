@@ -20,9 +20,9 @@ std::list<discover::result_t> discover::search(float duration) {
 	return impl.results;
 }
 
-std::list<std::shared_ptr<scanner>> discover::search_and_connect(float duration) {
+std::list<std::shared_ptr<scanner> > discover::search_and_connect(float duration) {
 	auto results = search(duration);
-	std::list<std::shared_ptr<scanner>> scanners;
+	std::list<std::shared_ptr<scanner> > scanners;
 	for (auto& result : results) {
 		try {
 			auto scanner = scanner::connect(format_string("%u.%u.%u.%u", result.ipv4[0], result.ipv4[1], result.ipv4[2], result.ipv4[3]));

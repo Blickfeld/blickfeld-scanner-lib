@@ -27,13 +27,14 @@ class connection {
 
 protected:
 	using event_callback_t = std::function<void(const protocol::stream::Event& event)>;
-	std::map<const protocol::stream::Event::DataCase, std::list<event_callback_t>> event_callbacks;
+	std::map<const protocol::stream::Event::DataCase, std::list<event_callback_t> > event_callbacks;
 
 	connection() {
-	};
+	}
+
 public:
-	virtual ~connection() {
-	};
+	virtual ~connection(){
+	}
 
 	virtual void recv(protocol::Response &resp) = 0;
 	virtual void send(const protocol::Request &req) = 0;

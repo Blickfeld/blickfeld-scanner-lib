@@ -21,28 +21,28 @@ class socket_stream_merger
 {
 protected:
 	std::shared_ptr<socket_t> socket = NULL;
-	std::shared_ptr<stream_t<socket_t>> stream = NULL;
+	std::shared_ptr<stream_t<socket_t> > stream = NULL;
 
-	#define OPERATE_ON_SOCKET(functor)  							\
-	if(socket != NULL) {											\
-		return socket->functor;										\
-	} else if(stream != NULL) {										\
-		return stream->next_layer().functor;						\
-	} else {  														\
+	#define OPERATE_ON_SOCKET(functor)                                                      \
+	if(socket != NULL) {                                                                                    \
+		return socket->functor;                                                                         \
+	} else if(stream != NULL) {                                                                             \
+		return stream->next_layer().functor;                                            \
+	} else {                                                                                                                \
 		throw std::runtime_error("socket_stream_merger in empty state");  \
 	}
 
 	#define OPERATE_ON_STREAM_T(functor) \
-	if(stream != NULL) {				 \
-		return stream->functor;			 \
-	}									 \
+	if(stream != NULL) {                             \
+		return stream->functor;                  \
+	}                                                                        \
 
-	#define OPERATE_ON_SOCKET_OR_STREAM(functor) 					\
-	if(socket != NULL) {						 					\
-		return socket->functor;					 					\
-	} else if(stream != NULL) {					 					\
-		return stream->functor;					 					\
-	} else {  														\
+	#define OPERATE_ON_SOCKET_OR_STREAM(functor)                                    \
+	if(socket != NULL) {                                                                                    \
+		return socket->functor;                                                                         \
+	} else if(stream != NULL) {                                                                             \
+		return stream->functor;                                                                         \
+	} else {                                                                                                                \
 		throw std::runtime_error("socket_stream_merger in empty state");  \
 	}
 
@@ -55,7 +55,7 @@ public:
 	{
 	}
 
-	explicit socket_stream_merger(std::shared_ptr<stream_t<socket_t>> stream) :
+	explicit socket_stream_merger(std::shared_ptr<stream_t<socket_t> > stream) :
 		stream(stream)
 	{
 	}
@@ -118,7 +118,7 @@ public:
 	}
 
 	template<typename ... Args>
-	std::size_t write_some(Args&&... args)
+	std::size_t write_some(Args&& ... args)
 	{
 		OPERATE_ON_SOCKET_OR_STREAM(write_some(std::forward<Args>(args) ...));
 	}
@@ -132,7 +132,7 @@ public:
 	}
 
 	template<typename ... Args>
-	std::size_t read_some(Args&&... args)
+	std::size_t read_some(Args&& ... args)
 	{
 		OPERATE_ON_SOCKET_OR_STREAM(read_some(std::forward<Args>(args) ...));
 	}

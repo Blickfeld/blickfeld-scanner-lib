@@ -47,7 +47,7 @@ int example(int argc, char* argv[]) {
 			frame.scan_pattern().frame_rate().target(),
 			frame.start_time_ns() / 1e9,
 			asctime(timepoint)
-		);
+			);
 
 		// Example for scanline and point iteration
 		for (int s_ind = 0; s_ind < frame.scanlines_size(); s_ind++) {
@@ -76,4 +76,3 @@ int main(int argc, char* argv[]) {
 	}
 	return 1;
 }
-     

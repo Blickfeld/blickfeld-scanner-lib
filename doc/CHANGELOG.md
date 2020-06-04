@@ -13,6 +13,15 @@ influence the resulting point cloud.
 
 ### Removed
 
+## [2.8.3] - 2020.06.04
+
+### Added
+* General README with an external link to docs.blickfeld.com
+
+### Changed
+* CI: Fix auto generator for tagged builds
+* Run code formatter on CPP source code
+
 ## [2.8.2] - 2020.06.04
 
 ### Changed

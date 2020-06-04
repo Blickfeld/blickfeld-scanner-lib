@@ -24,12 +24,13 @@ public:
 	explicit protocol_exception_base(const protocol::Error error) : error(error) {
 	}
 
-	virtual ~protocol_exception_base() throw () {
+	virtual ~protocol_exception_base() noexcept {
 	}
 
-	virtual const char* what() const throw () {
-		   return protocol::Error::descriptor()->FindFieldByNumber((int)error.error_case())->message_type()->full_name().c_str();
+	virtual const char* what() const noexcept {
+		return protocol::Error::descriptor()->FindFieldByNumber(static_cast<int>(error.error_case()))->message_type()->full_name().c_str();
 	}
+
 };
 
 template<class T>
@@ -61,14 +62,14 @@ class protocol_exception : public protocol_exception_base {
 		std::smatch match;
 		std::stringstream message;
 
-		auto type = protocol::Error::descriptor()->FindFieldByNumber((int)error.error_case())->message_type();
+		auto type = protocol::Error::descriptor()->FindFieldByNumber(static_cast<int>(error.error_case()))->message_type();
 		auto refl = instance.GetReflection();
 		std::string e_desc = type->options().GetExtension(protocol::e_desc);
 
-		message << type->full_name() << ": (errno: " << (int)(error.error_case()) << ")" << std::endl << "\t";
-        while(std::regex_search(e_desc, match, regex)) {
-            message << match.prefix().str();
-            if(type->FindFieldByName(match[1])) {
+		message << type->full_name() << ": (errno: " << static_cast<int>(error.error_case()) << ")" << std::endl << "\t";
+		while(std::regex_search(e_desc, match, regex)) {
+			message << match.prefix().str();
+			if(type->FindFieldByName(match[1])) {
 				switch(type->FindFieldByName(match[1])->cpp_type()) {
 				case google::protobuf::FieldDescriptor::CPPTYPE_STRING:
 					message << format_string(match[2].str().c_str(), refl->GetString(instance, type->FindFieldByName(match[1])).c_str());
@@ -85,11 +86,11 @@ class protocol_exception : public protocol_exception_base {
 				default:
 					break;
 				}
-            } else {
-                message << "{" << match[1].str() << ":absent}";
-            }
-            e_desc = match.suffix().str();
-        }
+			} else {
+				message << "{" << match[1].str() << ":absent}";
+			}
+			e_desc = match.suffix().str();
+		}
 		message << e_desc << std::endl;
 		whatmessage = std::string(message.str().c_str());
 	}
@@ -98,11 +99,14 @@ public:
 	explicit protocol_exception(T error) : protocol_exception_base(reflect(error)), instance(error) {
 		prepare();
 	}
+
 	explicit protocol_exception() : protocol_exception(T()) {
 	}
-	virtual const char* what() const throw () {
+
+	virtual const char* what() const noexcept {
 		return whatmessage.c_str();
 	}
+
 };
 
 } // namespace blickfeld

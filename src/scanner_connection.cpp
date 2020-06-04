@@ -70,7 +70,7 @@ void scanner_connection::send(const protocol::Request &req) {
 	auto msg_size = req.ByteSizeLong();
 
 	std::ostream send_stream(&output_buffer);
-	send_stream.write((const char*) &msg_size, sizeof(uint32_t));
+	send_stream.write(reinterpret_cast<const char*>(&msg_size), sizeof(uint32_t));
 	req.SerializeToOstream(&send_stream);
 
 	asio::write(socket, output_buffer);
@@ -94,7 +94,7 @@ void scanner_connection::recv(protocol::Response &resp) {
 
 		uint32_t size;
 		asio::read(socket, input_buffer, asio::transfer_exactly(sizeof(uint32_t)));
-		recv_stream.read((char*)&size, sizeof(uint32_t));
+		recv_stream.read(reinterpret_cast<char*>(&size), sizeof(uint32_t));
 		asio::read(socket, input_buffer, asio::transfer_exactly(size));
 
 		parse_response(recv_stream, resp);
@@ -132,24 +132,24 @@ void scanner_connection::subscribe(const protocol::stream::Event::DataCase event
 
 void scanner_connection::async_recv() {
 	asio::async_read(socket, input_buffer, asio::transfer_exactly(sizeof(uint32_t)), [this](const std::error_code& ec, std::size_t length) {
-		if (ec) {
-			throw str_exception("Failed to read size.");
-		}
-		std::istream recv_stream_size(&input_buffer);
-
-		uint32_t size;
-		recv_stream_size.read((char*)&size, sizeof(uint32_t));
-		asio::async_read(socket, input_buffer, asio::transfer_exactly(size), [this, size](const std::error_code& ec, std::size_t length) {
 			if (ec) {
-				throw str_exception("Failed to read message.");
+				throw str_exception("Failed to read size.");
 			}
-			std::istream recv_stream(&input_buffer);
+			std::istream recv_stream_size(&input_buffer);
 
-			parse_response(recv_stream, async_resp);
+			uint32_t size;
+			recv_stream_size.read(reinterpret_cast<char*>(&size), sizeof(uint32_t));
+			asio::async_read(socket, input_buffer, asio::transfer_exactly(size), [this](const std::error_code& ec, std::size_t length) {
+				if (ec) {
+					throw str_exception("Failed to read message.");
+				}
+				std::istream recv_stream(&input_buffer);
 
-			async_recv();
+				parse_response(recv_stream, async_resp);
+
+				async_recv();
+			});
 		});
-	});
 }
 
 void scanner_connection::async_run() {

@@ -28,7 +28,7 @@ double get_time() {
 #if defined(HAVE_CLOCK_GETTIME)
 	struct timespec ts;
 	clock_gettime(CLOCK_REALTIME, &ts);
-	return (double)ts.tv_sec + (double)ts.tv_nsec / 1e9;
+	return static_cast<double>(ts.tv_sec) + static_cast<double>(ts.tv_nsec) / 1e9;
 
 #elif defined(HAVE_WINDOWS_H)
 	SYSTEMTIME t;
@@ -45,7 +45,7 @@ uint64_t get_time_ns() {
 #if defined(HAVE_CLOCK_GETTIME)
 	struct timespec ts;
 	clock_gettime(CLOCK_REALTIME, &ts);
-	return (uint64_t)ts.tv_sec * NS_PER_SEC + (uint64_t)ts.tv_nsec;
+	return static_cast<uint64_t>(ts.tv_sec) * NS_PER_SEC + static_cast<uint64_t>(ts.tv_nsec);
 
 #elif defined(HAVE_WINDOWS_H)
 	SYSTEMTIME t;
@@ -58,8 +58,8 @@ uint64_t get_time_ns() {
 }
 
 string get_time_string(double ts) {
-	time_t seconds = (time_t)ts;
-	unsigned int milliseconds = (unsigned int)((ts - seconds) * 1e3);
+	time_t seconds = static_cast<time_t>(ts);
+	unsigned int milliseconds = static_cast<unsigned int>((ts - seconds) * 1e3);
 	if(milliseconds >= 1000) {
 		seconds++;
 		milliseconds -= 1000;
@@ -78,12 +78,10 @@ string read_file(string filename) {
 	std::stringstream ss;
 	while(true) {
 		char buffer[FS_BUFFER_SIZE];
-		int n = fread(buffer, 1, FS_BUFFER_SIZE, fp);
-		if(n == -1)
-			throw errno_exception_tb("read_file(%s): error reading!", filename.c_str());
+		size_t n = fread(buffer, 1, FS_BUFFER_SIZE, fp);
 		if(n == 0)
 			break;
-		ss.write(buffer, n);
+		ss.write(buffer, static_cast<long>(n));
 	}
 	fclose(fp);
 	return ss.str();
@@ -92,7 +90,7 @@ string read_file(string filename) {
 void write_file(string filename, string data) {
 	fstream file(filename, ios::out | ios::binary);
 	file.exceptions(ifstream::failbit | ifstream::badbit);
-	file.write(data.c_str(), data.size());
+	file.write(data.c_str(), static_cast<long>(data.size()));
 }
 
 } // namespace os

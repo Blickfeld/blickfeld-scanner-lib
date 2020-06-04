@@ -29,24 +29,24 @@ namespace blickfeld {
 
 void convert_point_cloud(const protocol::data::Frame& frame_i, protocol::data::frame_t& frame_o) {
 	frame_o.id = frame_i.id();
-	frame_o.frame_rate = frame_i.scan_pattern().frame_rate().maximum();
+	frame_o.frame_rate = static_cast<float>(frame_i.scan_pattern().frame_rate().maximum());
 	frame_o.start_time_ns = frame_i.start_time_ns();
 
 	frame_o.points.resize(frame_i.total_number_of_returns());
 
-	int i = 0;
+	size_t i = 0;
 	for (int s_ind = 0; s_ind < frame_i.scanlines_size(); s_ind++) {
 		for (int p_ind = 0; p_ind < frame_i.scanlines(s_ind).points_size(); p_ind++) {
 			auto& point = frame_i.scanlines(s_ind).points(p_ind);
 			for (int r_ind = 0; r_ind < point.returns_size(); r_ind++) {
 				auto& ret = point.returns(r_ind);
-				frame_o.points[i].id = point.id();
+				frame_o.points[i].id = static_cast<unsigned int>(point.id());
 				frame_o.points[i].x = ret.cartesian(0);
 				frame_o.points[i].y = ret.cartesian(1);
 				frame_o.points[i].z = ret.cartesian(2);
 				frame_o.points[i].range = ret.range();
-				frame_o.points[i].intensity = ret.intensity();
-				frame_o.points[i].ambient_light_level = point.ambient_light_level();
+				frame_o.points[i].intensity = static_cast<uint16_t>(ret.intensity());
+				frame_o.points[i].ambient_light_level = static_cast<uint16_t>(point.ambient_light_level());
 
 				i++;
 			}
@@ -88,17 +88,17 @@ scanner::point_cloud_stream<frame_t>::point_cloud_stream(std::istream* istream) 
 	// Helper methods
 	auto stream_start = istream->tellg();
 	auto stream_init_and_skip = [this, stream_start] (int offset = 0) {
-		if (pb_icstream)
-			delete pb_icstream;
-		if (pb_istream)
-			delete pb_istream;
-		this->istream->clear();
-		this->istream->seekg(stream_start);
-		pb_istream = new google::protobuf::io::IstreamInputStream(this->istream);
-		pb_izstream = new google::protobuf::io::GzipInputStream(pb_istream);
-		pb_icstream = new google::protobuf::io::CodedInputStream(pb_izstream);
-		pb_icstream->Skip(offset);
-	};
+			if (pb_icstream)
+				delete pb_icstream;
+			if (pb_istream)
+				delete pb_istream;
+			this->istream->clear();
+			this->istream->seekg(stream_start);
+			pb_istream = new google::protobuf::io::IstreamInputStream(this->istream);
+			pb_izstream = new google::protobuf::io::GzipInputStream(pb_istream);
+			pb_icstream = new google::protobuf::io::CodedInputStream(pb_izstream);
+			pb_icstream->Skip(offset);
+		};
 
 	// Read header
 	stream_init_and_skip();
@@ -134,6 +134,7 @@ scanner::point_cloud_stream<frame_t>::point_cloud_stream(std::istream* istream) 
 	// Go back to data
 	stream_init_and_skip(offset_data);
 }
+
 #endif
 
 template<class frame_t>
@@ -163,18 +164,18 @@ template<class frame_t>
 const frame_t& scanner::point_cloud_stream<frame_t>::recv_frame() {
 	if (conn) {
 		// Previous frame
-		auto frame_prev = ((protocol::Response&)*resp).event().point_cloud().frame();
+		auto frame_prev = (static_cast<protocol::Response&>(*resp)).event().point_cloud().frame();
 
 		// Receive and extract frame
 		conn->recv(*resp);
-		auto frame_i = ((protocol::Response&)*resp).event().point_cloud().frame();
+		auto frame_i = (static_cast<protocol::Response&>(*resp)).event().point_cloud().frame();
 
 #ifdef BSL_RECORDING
 		// Record frame to stream
 		if (pb_ocstream) {
 			auto data = protocol::file::PointCloud_Data();
 			data.mutable_frame()->CopyFrom(frame_i);
-			pb_ocstream->WriteVarint32(data.ByteSize());
+			pb_ocstream->WriteVarint32(static_cast<unsigned int>(data.ByteSizeLong()));
 			data.SerializeWithCachedSizes(pb_ocstream);
 
 			// Add events for changed scan pattern to footer
@@ -209,9 +210,9 @@ const frame_t& scanner::point_cloud_stream<frame_t>::recv_frame() {
 template<class frame_t>
 void scanner::point_cloud_stream<frame_t>::subscribe(subscribe_callback_t cb) {
 	conn->subscribe(protocol::stream::Event::DataCase::kPointCloud, [this, cb](const protocol::stream::Event& event) {
-		convert_point_cloud(event.point_cloud().frame(), *frame);
-		cb(*frame);
-	});
+			convert_point_cloud(event.point_cloud().frame(), *frame);
+			cb(*frame);
+		});
 	conn->async_run();
 }
 
@@ -231,7 +232,7 @@ void scanner::point_cloud_stream<frame_t>::record_to_stream(std::ostream* ostrea
 	pb_ozstream = new google::protobuf::io::GzipOutputStream(pb_ostream);
 	pb_ocstream = new google::protobuf::io::CodedOutputStream(pb_ozstream);
 
-	pb_ocstream->WriteVarint32(metadata->header().ByteSize());
+	pb_ocstream->WriteVarint32(metadata->header().ByteSizeLong());
 	metadata->header().SerializeWithCachedSizes(pb_ocstream);
 }
 
@@ -240,7 +241,7 @@ void scanner::point_cloud_stream<frame_t>::stop_recording() {
 	if (pb_ocstream) {
 		auto data = protocol::file::PointCloud_Data();
 		data.mutable_footer()->CopyFrom(metadata->footer());
-		pb_ocstream->WriteVarint32(data.ByteSize());
+		pb_ocstream->WriteVarint32(static_cast<unsigned int>(data.ByteSizeLong()));
 		data.SerializeWithCachedSizes(pb_ocstream);
 
 		delete pb_ocstream;
@@ -337,7 +338,7 @@ scanner::~scanner() {
 #ifdef HAVE_OPENSSL
 	if(ssl_context)
 		delete ssl_context;
-#endif 
+#endif
 }
 
 std::shared_ptr<scanner> scanner::connect(string hostname_or_ip) {
@@ -349,6 +350,7 @@ std::shared_ptr<scanner> scanner::connect(std::string hostname_or_ip, std::strin
 {
 	return std::shared_ptr<scanner>(new scanner(hostname_or_ip, cert_key_file));
 }
+
 #endif
 
 const std::string scanner::name() {
@@ -362,8 +364,8 @@ void scanner::async_run_blocking() {
 
 std::shared_ptr<std::thread> scanner::async_run_thread() {
 	return std::make_shared<std::thread>([this]() {
-		async_run_blocking();
-	});
+			async_run_blocking();
+		});
 }
 
 std::shared_ptr<connection> scanner::create_connection() {
@@ -376,16 +378,17 @@ std::shared_ptr<connection> scanner::create_connection() {
 		return std::make_shared<scanner_connection>(*io_context, hostname_or_ip);
 	}
 #endif
-} 
+}
 
 std::shared_ptr<scanner::point_cloud_stream<protocol::data::frame_t> > scanner::get_simple_point_cloud_stream() {
 	return std::make_shared<point_cloud_stream<protocol::data::frame_t> >(create_connection());
 }
 
 #ifdef BSL_RECORDING
-std::shared_ptr<scanner::point_cloud_stream<protocol::data::frame_t>> scanner::simple_file_point_cloud_stream(std::istream* istream) {
-	return std::make_shared<point_cloud_stream<protocol::data::frame_t>>(istream);
+std::shared_ptr<scanner::point_cloud_stream<protocol::data::frame_t> > scanner::simple_file_point_cloud_stream(std::istream* istream) {
+	return std::make_shared<point_cloud_stream<protocol::data::frame_t> >(istream);
 }
+
 #endif
 
 #ifndef BSL_STANDALONE
@@ -395,9 +398,10 @@ std::shared_ptr<scanner::point_cloud_stream<protocol::data::Frame> > scanner::ge
 }
 
 #ifdef BSL_RECORDING
-std::shared_ptr<scanner::point_cloud_stream<protocol::data::Frame>> scanner::file_point_cloud_stream(std::istream* istream) {
-	return std::make_shared<point_cloud_stream<protocol::data::Frame>>(istream);
+std::shared_ptr<scanner::point_cloud_stream<protocol::data::Frame> > scanner::file_point_cloud_stream(std::istream* istream) {
+	return std::make_shared<point_cloud_stream<protocol::data::Frame> >(istream);
 }
+
 #endif
 
 const protocol::Status scanner::get_status() {
@@ -438,9 +442,9 @@ void scanner::subscribe(subscribe_status_callback_t cb) {
 	req.mutable_subscribe()->mutable_status();
 	conn->send_request(req, resp);
 
-	conn->subscribe(protocol::stream::Event::DataCase::kStatus, [this, cb](const protocol::stream::Event& event) {
-		cb(event.status());
-	});
+	conn->subscribe(protocol::stream::Event::DataCase::kStatus, [cb](const protocol::stream::Event& event) {
+			cb(event.status());
+		});
 	conn->async_run();
 }
 
@@ -454,6 +458,7 @@ std::ostream& operator<<(std::ostream &strm, const protocol::data::frame_t& fram
 std::ostream& operator<<(std::ostream &strm, const protocol::data::Frame& frame) {
 	return strm << "<Blickfeld Frame " << frame.id() << ">";
 }
+
 #endif
 
 }

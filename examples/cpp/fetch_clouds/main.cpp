@@ -13,7 +13,7 @@
 #include <blickfeld/scanner.h>
 #include <blickfeld/utils.h>
 
-std::shared_ptr<blickfeld::scanner::point_cloud_stream<blickfeld::protocol::data::Frame>> stream;
+std::shared_ptr<blickfeld::scanner::point_cloud_stream<blickfeld::protocol::data::Frame> > stream;
 
 void sigint_handler(int signal) {
 	stream = nullptr;
@@ -63,7 +63,7 @@ int example(int argc, char* argv[]) {
 			frame.scan_pattern().frame_rate().target(),
 			frame.start_time_ns() / 1e9,
 			asctime(timepoint)
-		);
+			);
 
 		// Example for scanline and point iteration
 		// Iterate through all the scanlines in a frame
@@ -80,9 +80,9 @@ int example(int argc, char* argv[]) {
 					// ret.cartesian(0) equals frame.scanlines(s_ind).points(p_ind).returns(r_ind).cartesian(0)
 					if (p_ind < 10 && s_ind == 0)
 						printf("Point %u -ret %u [x: %4.2f, y: %4.2f, z: %4.2f] - intensity: %u\n",
-							point.id(), ret.id(),
-							ret.cartesian(0), ret.cartesian(1), ret.cartesian(2),
-							ret.intensity());
+						       point.id(), ret.id(),
+						       ret.cartesian(0), ret.cartesian(1), ret.cartesian(2),
+						       ret.intensity());
 				}
 			}
 		}
@@ -102,4 +102,3 @@ int main(int argc, char* argv[]) {
 	}
 	return 1;
 }
-     

@@ -10,7 +10,6 @@
 #include <blickfeld/scanner.h>
 #include <blickfeld/utils.h>
 
-
 int example(int argc, char* argv[]) {
 	std::string scanner_ip_or_host = "localhost";
 	std::string dump_fn;
@@ -34,7 +33,7 @@ int example(int argc, char* argv[]) {
 			frame.frame_rate,
 			frame.start_time_ns / 1e9,
 			asctime(timepoint)
-		);
+			);
 
 		// Example for point iteration
 		for (unsigned int i = 0; i < frame.points.size(); i++) {
@@ -42,9 +41,9 @@ int example(int argc, char* argv[]) {
 
 			if (i < 10)
 				printf("Point %u [x: %4.2f, y: %4.2f, z: %4.2f] - intensity: %u\n",
-					point.id,
-					point.x, point.y, point.z,
-					point.intensity);
+				       point.id,
+				       point.x, point.y, point.z,
+				       point.intensity);
 		}
 	}
 	return 0;
@@ -58,4 +57,3 @@ int main(int argc, char* argv[]) {
 	}
 	return 1;
 }
-     

@@ -36,9 +36,9 @@ void throw_eagain() {
 	errno = EAGAIN;
 	throw blickfeld::errno_exception_tb("something did set errno");
 }
+
 TEST(exceptions, errno_text) {
 #ifndef HAVE_WINDOWS_H
 	ASSERT_ANY_THROW(({ throw_eagain(); }));
 #endif
 }
-

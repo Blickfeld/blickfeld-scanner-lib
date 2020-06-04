@@ -1,4 +1,4 @@
-# General
+# blickfeld-scanner-lib
 
 The blickfeld-scanner-lib (BSL) is the interface for communicating with Blickfeld LiDAR devices.
 
@@ -10,35 +10,30 @@ For some of these functions, parameters packed into a Protocol Buffer object are
 
 ## Installation
 
-Follow the [installation guide](install).
+Follow the [installation guide](https://docs.blickfeld.com/external/blickfeld-scanner-lib/install.html).
 
-## Protocol
+### Python
 
-The following sections describe the current state of the TCP/IP protocol that is used to communicate with Blickfeld’s LiDAR devices.
-It is based on Protocol Buffers. For a more detailed description of Protocol Buffers,
-please refer to [https://developers.google.com/protocol-buffers](https://developers.google.com/protocol-buffers)
+```bash
+pip install blickfeld_scanner
+```
 
-Client implementations are currently available for C++, Python, and TypeScript.
-It is recommended to read through the examples and the client wrapper.
+### CPP
 
-### Connection
+```bash
+sudo apt update
+sudo apt install -y wget libprotobuf-dev libprotobuf17
+wget https://github.com/Blickfeld/blickfeld-scanner-lib/releases/download/latest/blickfeld-scanner-lib-dev-Linux.deb
+sudo dpkg -i blickfeld-scanner-lib-dev-Linux.deb
+```
 
-The TCP/IPv4 connection to the device is established at TCP port 8000.
-The connection is used to send control requests to the device – simple requests are client-initiated.
+Follow the [getting started guide](https://docs.blickfeld.com/external/blickfeld-scanner-lib/getting_started.html).
 
-Each request sent by the client will trigger a response to be sent by the device.
+## Documentation
 
-The available requests are documented in the [Connection Protocol Documentation](protobuf_protocol.html#blickfeld/connection.proto).
+The technical documentation can be found at [docs.blickfeld.com](https://docs.blickfeld.com).
 
-### Stream Requests
-
-In addition to the control requests, there are also special stream requests.
-
-To initiate a stream, a subscribe command has to be sent, e.g., for point cloud data. For every recorded frame, an event response is passed on to the client.
-As the events are sent asynchronously, the client has to handle events and normal responses. In order to terminate a subscription, the stream has to be closed.
-For non-permanent streams or data-intensive streams, it is recommended to open a separate connection.
-
-The available stream requests are documented in the [Connection Protocol Documentation](protobuf_protocol.html#blickfeld/stream/connection.proto).
+The BSL part can be found at https://docs.blickfeld.com/external/blickfeld-scanner-lib/README.html.
 
 ## License
 

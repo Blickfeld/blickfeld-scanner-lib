@@ -38,7 +38,7 @@ void logged_object::set_modules_loglevel(logged_object::level ll, std::string mo
 }
 
 logged_object::logged_object(string ident) : ident(ident){
-	msg_buffer = NULL;
+	msg_buffer = nullptr;
 	msg_buffer_size = 0;
 	msg_buffer_len = 0;
 	did_openlog = false;
@@ -61,7 +61,7 @@ logged_object::~logged_object() {
 	msg_buffer_lock.lock();
 	if(msg_buffer) {
 		free(msg_buffer);
-		msg_buffer = NULL;
+		msg_buffer = nullptr;
 		msg_buffer_size = 0;
 	}
 	msg_buffer_lock.unlock();

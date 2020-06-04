@@ -38,7 +38,7 @@ public:
 	 * @param duration Search duration in seconds.
 	 * @return List of found devices as \ref scanner instances.
 	 */
-	static std::list<std::shared_ptr<scanner>> search_and_connect(float duration = 0.5);
+	static std::list<std::shared_ptr<scanner> > search_and_connect(float duration = 0.5);
 
 	/**
 	 * Searches for one Blickfeld device in the network.
