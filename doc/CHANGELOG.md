@@ -13,6 +13,11 @@ influence the resulting point cloud.
 
 ### Removed
 
+## [2.8.6] - 2020.06.05
+
+### Changed
+* CI: Re-add git related files
+
 ## [2.8.5] - 2020.06.05
 
 ### Changed
