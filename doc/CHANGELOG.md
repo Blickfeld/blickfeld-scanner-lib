@@ -13,6 +13,16 @@ influence the resulting point cloud.
 
 ### Removed
 
+## [2.8.5] - 2020.06.05
+
+### Changed
+* CPP code examples
+
+### Removed
+* NPM module. Release is postponed for 6-8 weeks.
+* Unused commented code
+* Old documentation files
+
 ## [2.8.4] - 2020.06.04
 
 ### Changed

@@ -124,8 +124,6 @@ public:
 	}
 
 	template<typename ConstBufferSequence, typename WriteHandler>
-	// typename std::result_of<decltype(socket->async_write_some)(const typename ConstBufferSequence&, WriteHandler&&)>::type
-	// asio::async_result<std::decay<CompletionToken>::type, async_write_some(const typename ConstBufferSequence&, WriteHandler&&)>::return_type
 	void async_write_some(const ConstBufferSequence& buffers, WriteHandler && handler)
 	{
 		OPERATE_ON_SOCKET_OR_STREAM(async_write_some(std::forward<const ConstBufferSequence>(buffers), std::forward<WriteHandler>(handler)));

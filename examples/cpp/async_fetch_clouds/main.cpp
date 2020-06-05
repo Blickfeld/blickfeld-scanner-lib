@@ -34,7 +34,7 @@ int example(int argc, char* argv[]) {
 
 	std::shared_ptr<std::thread> scanner_thread = scanner->async_run_thread();
 
-	// TODO Example for application logic
+	// Subscribe for point cloud stream
 	auto stream = scanner->get_point_cloud_stream();
 	stream->subscribe([scanner](const blickfeld::protocol::data::Frame& frame) {
 		// Format of frame is described in protocol/blickfeld/data/frame.proto or doc/protocol.md
@@ -52,12 +52,20 @@ int example(int argc, char* argv[]) {
 		// Example for scanline and point iteration
 		for (int s_ind = 0; s_ind < frame.scanlines_size(); s_ind++) {
 			for (int p_ind = 0; p_ind < frame.scanlines(s_ind).points_size(); p_ind++) {
-//				auto& point = frame.scanlines(s_ind).points(p_ind);
-//
-//				printf("Point %u [x: %4.2f, y: %4.2f, z: %4.2f] - intensity: %u\n",
-//					point.id(),
-//					point.returns(0).cartesian(0), point.returns(0).cartesian(1), point.returns(0).cartesian(2),
-//					point.returns(0).intensity());
+				auto& point = frame.scanlines(s_ind).points(p_ind);
+
+				// Iterate through all the returns for each points
+				for (int r_ind = 0; r_ind < point.returns_size(); r_ind++) {
+					auto& ret = point.returns(r_ind);
+
+					// Print information for the first 10 points in the first scanline of each frame
+					// ret.cartesian(0) equals frame.scanlines(s_ind).points(p_ind).returns(r_ind).cartesian(0)
+					if (p_ind < 10 && s_ind == 0)
+						printf("Point %u -ret %u [x: %4.2f, y: %4.2f, z: %4.2f] - intensity: %u\n",
+						       point.id(), ret.id(),
+						       ret.cartesian(0), ret.cartesian(1), ret.cartesian(2),
+						       ret.intensity());
+				}
 			}
 		}
 	});

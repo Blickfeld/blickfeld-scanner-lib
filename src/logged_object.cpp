@@ -51,13 +51,11 @@ logged_object::logged_object(string ident) : ident(ident){
 		print_to_screen = modules_loglevel[ident];
 
 	keep_in_mem = LEVEL_VERBOSE;
-	// keep_in_mem = LEVEL_INFO;
 
 	max_kept = DEFAULT_LOG_MSGS_KEPT_IN_MEM;
 }
 
 logged_object::~logged_object() {
-	// printf("logged_object %p detor: %s\n", this, ident.c_str());
 	msg_buffer_lock.lock();
 	if(msg_buffer) {
 		free(msg_buffer);

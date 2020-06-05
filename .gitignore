@@ -1,9 +1,0 @@
-build*
-test_*dump*
-.cproject
-.project
-.externalToolBuilders
-.settings
-.pydevproject
-*.idea*
-*__pycache__*

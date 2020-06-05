@@ -58,11 +58,6 @@ int example(int argc, char* argv[]) {
 				}
 			}
 		}
-
-		//		uint64_t previous_timestamp = frame->has_start_time_ns() ? frame->start_time_ns() : 0;
-		//		convert_point_cloud(data.frame(), *frame);
-		//		if (previous_timestamp)
-		//			usleep((frame->start_time_ns() - previous_timestamp) / 1e3);
 	}
 
 	return 0;

@@ -22,11 +22,17 @@ else()
 endif()
 option(BF_BUILD_EXAMPLES "Build ${CMAKE_PROJECT_NAME} examples" ON)  # Build cpp examples, defaults is ON
 option(BF_BUILD_TESTS "Build ${CMAKE_PROJECT_NAME} tests" ON)  # Build tests for the BSL, defaults is ON
-option(BF_BUILD_NPM "Build ${CMAKE_PROJECT_NAME} NPM package" ON)  # Build npm package, defaults is ON
 option(BF_BUILD_PYTHON "Build ${CMAKE_PROJECT_NAME} python package" ON)  # Build python package blickfeld_scanner, defaults is ON
 option(BF_ENABLE_SSL "Enable ${CMAKE_PROJECT_NAME} SSL support (internal feature)" OFF)  # Enable SSL support for internal features, defaults is OFF (not needed for open-source BSL compilation)
 option(BF_INSTALL_EXAMPLES "Install ${CMAKE_PROJECT_NAME} C++ examples" ON)  # Install cpp examples like bf_discovery on system, defaults is ON
 option(BF_BUILD_PROTOBUF_PLUGIN "Build ${CMAKE_PROJECT_NAME} protobuf plugin" OFF)  # Build protobuf plugin for develop mode. The binary is also provided in the repository.
+
+# NPM is not yet released. Folder may be missing.
+if (EXISTS ${PROJECT_SOURCE_DIR}/npm)
+    option(BF_BUILD_NPM "Build ${CMAKE_PROJECT_NAME} NPM package" ON)  # Build npm package, defaults is ON
+else()
+    set(BF_BUILD_NPM OFF)
+endif()
 
 # Get version of BSL
 if(EXISTS "${PROJECT_SOURCE_DIR}/version.txt")
@@ -87,7 +93,6 @@ check_include_files (netdb.h HAVE_NETDB_H)
 check_include_files (unistd.h HAVE_UNISTD_H)
 check_include_files (syslog.h HAVE_SYSLOG_H)
 check_include_files (time.h HAVE_TIME_H)
-check_include_files (GL/glut.h HAVE_GLUT_H)
 check_include_files (inttypes.h HAVE_INTTYPES_H)
 check_include_files (winsock.h HAVE_WINSOCK_H)
 
