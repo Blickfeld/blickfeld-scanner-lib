@@ -1,0 +1,30 @@
+syntax = "proto2";
+
+import "blickfeld/options.proto";
+
+package blickfeld.protocol.status;
+
+/**
+ * This section describes the temperature of the hardware modules in the device.
+ */
+message Temperature {
+	/**
+	 * This section describes the hardware modules in the device.
+	 */
+	enum Sensor {
+		UNKNOWN = 0;
+		LDM = 1;  // Laser and detector module
+		ETHERNET = 2;  // Ethernet adapter
+		MSB = 3;  // Mixed signal board
+		PL = 4;  // Programmable logic
+		PS = 5;  // Processing system
+		SCANNER_SMALL = 6;  // Vertical mirror
+		SCANNER_BIG = 7;  // Horizontal mirror
+	}
+
+	optional Sensor sensor = 1;  // Refer to [Temperature.Sensor](#blickfeld.protocol.status.Temperature.Sensor)
+	oneof data {
+		float value = 2; // Unit: [degrees Celsius] – temperature value of the module.
+		string failed_reason = 3;  // Error reason why the temperature cannot be read out.
+	}
+}

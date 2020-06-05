@@ -1,0 +1,29 @@
+syntax = "proto2";
+
+import "blickfeld/options.proto";
+import "blickfeld/error.proto";
+import "blickfeld/config/scan_pattern.proto";
+
+package blickfeld.protocol.status;
+
+
+/**
+ * This section defines the status of the device.
+ */
+message Scanner {
+	enum State {
+		INITIALIZING = 1;  // Device is initializing the hardware.
+		READY = 2;  // Device is ready to start and no error occurred.
+		STARTING = 3;  // Device is starting a point cloud recording, but is not yet recording.
+		RUNNING = 4;  // Device is recording a point cloud.
+		STOPPING = 5;  // Device stops point cloud recording; it is no longer recording.
+		ERRORED = 6;  // Device is in an error state; it can no longer operate.
+		SELF_TEST = 7;  // Device is testing the hardware.
+	}
+
+	optional State state = 1;  // Refer to [Scanner.State](#blickfeld.protocol.status.Scanner.State)
+    optional config.ScanPattern scan_pattern = 4 [(allow_sparse)=true, (legacy_field_id)=2];  // Refer to [ScanPattern](#blickfeld.protocol.config.ScanPattern)
+	optional Error error = 3 [(optional)=true];  // Refer to [Error](#blickfeld.protocol.Error)
+
+    optional config.ScanPattern legacy_scan_pattern = 2 [(allow_sparse)=true, (optional)=true];  // Deprecated old ´scan_pattern´ definition
+}

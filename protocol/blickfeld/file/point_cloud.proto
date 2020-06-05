@@ -1,0 +1,52 @@
+syntax = "proto2";
+
+import "blickfeld/options.proto";
+import "blickfeld/data/point_cloud.proto";
+import "blickfeld/data/frame.proto";
+import "blickfeld/config/scan_pattern.proto";
+import "blickfeld/file/general.proto";
+
+package blickfeld.protocol.file;
+
+/**
+ * This section describes the contents of a point cloud. The first message in a Blickfeld protobuf pointcloud should always be the 
+ * [PointCloud.Header](#blickfeld.protocol.data.PointCloud.Header) message followed by [PointCloud.Data](#blickfeld.protocol.data.PointCloud.Data) messages.
+ */
+message PointCloud {
+    message Header {
+        optional data.PointCloud.Header device = 1 [(optional)=true]; // Refer to [PointCloud.Header](#blickfeld.protocol.data.PointCloud.Header)
+        optional Client client = 2;
+    }
+
+    message Footer {
+        message Stats {
+            message Counter {
+                optional uint64 frames = 1;
+                optional uint64 points = 2;
+                optional uint64 returns = 3;
+            }
+
+            optional Counter counter = 1;
+        }
+
+        message Event {
+            optional uint64 from_frame_id = 1;
+
+            optional config.ScanPattern scan_pattern = 2;
+        }
+
+        optional Stats stats = 1;
+        repeated Event events = 2;
+        optional uint64 stop_time_ns = 3; // Unit: [ns] - Stop timestamp of the requested pointcloud stream
+    }
+
+    message Metadata {
+        optional Header header = 1;
+        optional Footer footer = 2;
+    }
+
+    message Data {
+        optional data.Frame frame = 1; // Refer to [PointCloud](#blickfeld.protocol.data.Frame)
+        optional Footer footer = 2;
+    }
+}

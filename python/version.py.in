@@ -1,0 +1,1 @@
+__version__ = "@PYTHON_RELEASE_VERSION@"

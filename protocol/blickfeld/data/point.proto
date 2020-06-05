@@ -1,0 +1,39 @@
+syntax = "proto2";
+
+package blickfeld.protocol.data;
+
+/**
+ * This section describes the contents of a single point of a point cloud frame or scan line.
+ * Each point resembles a direction in which the laser has fired.
+ * From each point (direction) the device can receive several responses/returns, see [Point.Return](#blickfeld.protocol.data.Point.Return).
+ */
+message Point {
+
+	/**
+	 * This section describes the contents of a single return of a point, sorted by intensity.
+	 * A return is created when the LiDAR detects the laser light of the reflection off an object.
+	 */
+	message Return {
+		optional uint32 id = 1;  // ID of the return in the point
+		repeated float cartesian = 2 [packed=true];  // Unit: [m] – Cartesian coordinates of the target [x,y,z]
+		optional float range = 3;  // Unit: [m] – distance of target to the origin
+		optional uint32 intensity = 4;  // Intensity of the returned laser pulse
+	}
+
+	/**
+	 * This section describes the direction and the origin of a point.
+	 * Use these polar coordinates combined with the range information of a given return, if you want to locate the reflection in the spherical coordinatesystem.
+	 */
+	message Direction {
+		optional float azimuth = 1;  // Unit: [rad] - azimuth angle: Angle with respect to y-z plane
+		optional float elevation = 2;  // Unit: [rad] - elevation angle: Angle with respect to x-y plane
+		repeated float origin = 3 [packed=true]; // Unit: [m] - origin of the laser beam [x,y,z]
+	}
+
+	optional uint32 id = 1;  // Point ID in the corresponding frame
+	repeated Return returns = 2;  // Refer to [Point.Return](#blickfeld.protocol.data.Point.Return)
+    optional uint64 start_offset_ns = 3; // Unit: [ns] - starting time of the point in relation to [Frame.start_time_ns](#blickfeld.protocol.data.Frame.start_time_ns)
+	optional uint32 ambient_light_level = 4;  // Ambient light level in the direction of the point
+	optional Direction direction = 5;  // Refer to [Point.Direction](#blickfeld.protocol.data.Point.Direction)
+	optional uint32 channel_id = 6;  // ID of the channel that detected the point
+}

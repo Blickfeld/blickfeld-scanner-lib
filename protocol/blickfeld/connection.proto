@@ -1,0 +1,152 @@
+syntax = "proto2";
+
+import "blickfeld/options.proto";
+import "blickfeld/error.proto";
+import "blickfeld/config/scan_pattern.proto";
+import "blickfeld/stream/connection.proto";
+import "blickfeld/status/main.proto";
+import "blickfeld/config/secure.proto";
+
+package blickfeld.protocol;
+
+/**
+ * This section describes the different requests a client can send to the server.
+ * A request is always answered with a response. For every response, there is a request with the same name.
+ */
+message Request {
+
+	/**
+	 * This request is used for initial communication after connecting to a device and testing the established connection.
+	 */
+	message Hello {
+		optional uint32 protocol_version = 1;  // Version of the Blickfeld protocol
+		// @exclude TODO: Version information about client build
+	}
+
+	/**
+	 * Internal use only
+	 */
+	message Developer {
+		extensions 1 to max;  // Internal developer requests
+		option (secure) = {permissions: DEVELOPER, cert_type: CLIENT};
+	}
+	
+	/**
+	 * This request is used for configuring a Scan Pattern.
+	 */
+	message SetScanPattern {
+		optional config.ScanPattern config = 3 [(legacy_field_id) = 1];  // Refer to [ScanPattern](#blickfeld.protocol.config.ScanPattern)
+		optional bool persist = 2 [default = false];  // Persists with the scan pattern and sets it after a power cycle. Default: False
+
+		optional config.ScanPattern legacy_config = 1 [(optional) = true];  // Deprecated old 'config' due to horizontal field of view definition
+	}
+	
+	/**
+	 * This request is used to fill an empty or partially filled scan pattern with the required parameters.
+	 * It will fill the given scan pattern with default values and return the filled scan pattern to the client.
+	 * The filled scan pattern can then be set as input for  [Request.SetScanPattern](#blickfeld.protocol.Request.SetScanPattern).
+	 */
+	message FillScanPattern {
+		optional config.ScanPattern config = 2 [(allow_sparse)=true, (legacy_field_id) = 1];  // Refer to [ScanPattern](#blickfeld.protocol.config.ScanPattern)
+
+		optional config.ScanPattern legacy_config = 1 [(allow_sparse)=true, (optional) = true];  // Deprecated
+	}
+	
+	/**
+	 * This request is used to retrieve the currently set [ScanPattern](#blickfeld.protocol.config.ScanPattern).
+	 */
+	message GetScanPattern {
+	}
+	
+	/**
+	 * This request is used for receiving the current [Status](#blickfeld.protocol.status.Status).
+	 */
+	message Status {
+	}
+
+	oneof data {
+		Hello hello = 11;  // Refer to [Request.Hello](#blickfeld.protocol.Request.Hello)
+		Developer developer = 13;  // Refer to [Request.Developer](#blickfeld.protocol.Request.Developer)
+		SetScanPattern set_scan_pattern = 15;  // Refer to [Request.SetScanPattern](#blickfeld.protocol.Request.SetScanPattern)
+		FillScanPattern fill_scan_pattern = 16;  // Refer to [Request.FillScanPattern](#blickfeld.protocol.Request.FillScanPattern)
+		GetScanPattern get_scan_pattern = 17;  // Refer to [Request.GetScanPattern](#blickfeld.protocol.Request.GetScanPattern)
+		stream.Subscribe subscribe = 18;  // Refer to [Subscribe](#blickfeld.protocol.stream.Subscribe)
+		Status status = 19;  // Refer to [Request.Status](#blickfeld.protocol.Request.Status)
+
+		string _asJSON = 100; // Internal use only
+	}
+
+	optional Format accept_format = 101 [default = PROTOBUF]; // Internal use only
+}
+
+/**
+ * This section describes the responses a client receives after sending a request to the server.
+ * For the request that corresponds to a given response, please refer to [Request](#blickfeld.protocol.Request).
+ * Each response has the same name as the request.
+ */
+message Response {
+	optional uint64 timestamp_ns = 1;  // Unit: [ns] - timestamp when the response is sent out
+
+	/**
+	 * This response is sent out after establishing a connection.
+	 */
+	message Hello {
+		// @exclude TODO: Greeting and version information
+		optional uint32 protocol_version = 1;  // Version of the Blickfeld Protocol
+	}
+	
+	/**
+	 * Internal use only
+	 */
+	message Developer {
+		extensions 1 to max;  // Internal developer responses
+	}
+
+	/**
+	 * This response is sent out after setting a scan pattern.
+	 */
+	message SetScanPattern {
+	}
+
+	/**
+	 * This response is given after a request to fill a sparse [ScanPattern](#blickfeld.protocol.config.ScanPattern) has been transmitted.
+	 * It returns a scan pattern, the unset fields are filled with default values.
+	 */
+	message FillScanPattern {
+		option (help) = "..";
+		
+		optional config.ScanPattern config = 2 [(legacy_field_id) = 1];  // Refer to [ScanPattern](#blickfeld.protocol.config.ScanPattern)
+
+		optional config.ScanPattern legacy_config = 1 [(optional) = true];  // Deprecated
+	}
+
+	/**
+	 * This response is returned after a request to get the current [ScanPattern](#blickfeld.protocol.config.ScanPattern).
+	 */
+	message GetScanPattern {
+		optional config.ScanPattern config = 2 [(legacy_field_id) = 1];  // Refer to [ScanPattern](#blickfeld.protocol.config.ScanPattern)
+
+		optional config.ScanPattern legacy_config = 1 [(optional) = true]; // Deprecated
+	}
+
+	oneof data {
+		Error error = 10;  // Refer to [Error](#blickfeld.protocol.Error)
+		Hello hello = 11;  // Refer to [Response.Hello](#blickfeld.protocol.Response.Hello)
+		Developer developer = 13;  // Refer to [Response.Developer](#blickfeld.protocol.Response.Developer)
+		SetScanPattern set_scan_pattern = 15;  // Refer to [Response.SetScanPattern](#blickfeld.protocol.Response.SetScanPattern)
+		FillScanPattern fill_scan_pattern = 16;  // Refer to [Response.FillScanPattern](#blickfeld.protocol.Response.FillScanPattern)
+		GetScanPattern get_scan_pattern = 17;  // Refer to [Response.GetScanPattern](#blickfeld.protocol.Response.GetScanPattern)
+		stream.Event event = 18;  // Refer to [Event](#blickfeld.protocol.stream.Event)
+		Status status = 19;  // Refer to [Response.Status](#blickfeld.protocol.Response.Status)
+
+		string _asJSON = 100; // Internal use only
+	}
+}
+
+/**
+ * The format type of response is an undocumented, internal feature required for the REST API.
+ */
+enum Format {
+	PROTOBUF = 1;
+	JSON = 2;
+}

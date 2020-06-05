@@ -1,0 +1,26 @@
+syntax = "proto2";
+
+package blickfeld.protocol.config;
+
+message Secure
+{
+
+    // do NOT change enum labels, they are used as strings in ssl certs
+    enum Permissions
+    {
+        PUBLIC = 0;
+        DEVELOPER = 1;
+    }
+
+    enum CertType
+    {
+        CLIENT = 0;
+        CUBE = 1;
+    }
+
+    repeated Permissions permissions = 1;
+    optional CertType cert_type = 2;
+    optional uint32 version_major = 3;
+    optional uint32 version_minor = 4;
+    optional uint32 version_patch = 5;
+}

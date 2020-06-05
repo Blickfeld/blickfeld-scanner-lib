@@ -1,0 +1,9 @@
+[submodule "tests/googletest"]
+	path = tests/googletest
+	url = https://github.com/google/googletest.git
+[submodule "thirdparty/protobuf"]
+	path = thirdparty/protobuf
+	url = https://github.com/protocolbuffers/protobuf
+[submodule "thirdparty/asio"]
+	path = thirdparty/asio
+	url = https://github.com/chriskohlhoff/asio
