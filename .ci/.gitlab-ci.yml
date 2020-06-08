@@ -13,4 +13,4 @@ publish:
       - python .ci/upload_release_artifacts.py
     # Run on docker runner
     tags:
-      - docker
+      - docker-secure
