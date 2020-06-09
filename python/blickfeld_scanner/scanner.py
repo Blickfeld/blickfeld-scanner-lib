@@ -14,11 +14,12 @@ import re
 import socket
 import struct
 import ssl
+import tempfile
+import os
 
 from .protocol import connection_pb2
 from .protocol import options_pb2
 from . import stream
-
 
 log = logging.getLogger(__name__)
 
@@ -34,17 +35,25 @@ class scanner(object):
     :type name: str
     :param key_and_cert_file: Filename containing a private key and certificate for SSL connection
     :type key_and_cert_file: str
+    :param key_and_cert: String containing a private key and certificate for SSL connection
+    :type key_and_cert: str
     """
     protocol_version = 1
     _default_port = 8000
     _default_ssl_port = 8800
     
-    def __init__(self, hostname_or_ip="localhost", port=None, name=None, key_and_cert_file=None):
+    def __init__(self, hostname_or_ip="localhost", port=None, name=None, key_and_cert_file=None, key_and_cert=None):
         self.hostname_or_ip = hostname_or_ip
         self.name = name if name is not None else self.hostname_or_ip
         self.api_path = "http://" + hostname_or_ip + "/api/v1/"
-        self._key_and_cert_file = key_and_cert_file
-        self.has_ssl = self._key_and_cert_file != None
+        
+        self._key_and_cert = None
+        if key_and_cert_file:
+            with open(key_and_cert_file,'r') as f:
+                self._key_and_cert = f.read()
+        elif key_and_cert:
+            self._key_and_cert = key_and_cert
+        self.has_ssl = self._key_and_cert != None
 
         if port != None:
             self.port = port
@@ -182,16 +191,13 @@ class scanner(object):
             req.raise_for_status()
             log.info("Configured NTP server to '%s'. Please power cycle the device to apply changes." % (self.get_ntp_server()))
         
-    def create_connection(self, other_key_and_cert_file=None):
+    def create_connection(self):
         """Function to create a new connection
-
-        :param other_key_and_cert_file: Filename containing another private key and certificate for this SSL connection
-        :type other_key_and_cert_file: str 
+        
         :return: New created connection
         :rtype: :py:class:`blickfeld_scanner.scanner.connection`
         """
-        return connection(self.hostname_or_ip, self.port, 
-            key_and_cert_file=other_key_and_cert_file or self._key_and_cert_file)
+        return connection(self.hostname_or_ip, self.port, self._key_and_cert)
  
     @staticmethod
     def sync(devices, scan_pattern = None, target_frame_rate = None, max_time_difference = 0.1):
@@ -294,18 +300,29 @@ class connection(object):
     :type hostname_or_ip: str
     :param port: port on which the connection should be established
     :type port: int
-    :param key_and_cert_file: Filename containing a private key and certificate for SSL connection
-    :type key_and_cert_file: str
+    :param key_and_cert: String containing a private key and certificate for SSL connection
+    :type key_and_cert: str
     :param ssl_protocol: The protocol used for an SSL connection
     :type ssl_protocol: see ssl lib: `ssl.PROTOCOL_...`
     """
-    def __init__(self, hostname_or_ip, port, key_and_cert_file=None, ssl_protocol=ssl.PROTOCOL_TLS):
-        self._key_and_cert_file = key_and_cert_file
-        self.has_ssl = self._key_and_cert_file != None
+    def __init__(self, hostname_or_ip, port, key_and_cert=None, ssl_protocol=ssl.PROTOCOL_TLS):
+        self._key_and_cert = key_and_cert
+        self.has_ssl = self._key_and_cert != None
         if self.has_ssl:
             self._ssl_context = ssl.SSLContext(ssl_protocol)
-            self._ssl_context.load_cert_chain(key_and_cert_file)
-            self._ssl_context.load_verify_locations(key_and_cert_file)
+            
+            # Write cert in temporary file
+            fd, key_and_cert_file = tempfile.mkstemp()
+            with open(fd, 'w') as f:
+                f.write(self._key_and_cert)
+            try:
+                self._ssl_context.load_cert_chain(key_and_cert_file)
+                self._ssl_context.load_verify_locations(key_and_cert_file)
+            except:
+                os.unlink(key_and_cert_file)
+                raise
+            os.unlink(key_and_cert_file)
+            
             self._ssl_context.verify_mode = ssl.CERT_REQUIRED
             self.socket = self._ssl_context.wrap_socket(socket.create_connection((hostname_or_ip, port)), server_hostname=hostname_or_ip)
         else:
@@ -315,21 +332,21 @@ class connection(object):
     def __del__(self):
         self.close()
 
-    def clone(self, other_hostname_or_ip=None, other_port=None, other_key_and_cert_file=None):
+    def clone(self, other_hostname_or_ip=None, other_port=None, other_key_and_cert=None):
         """ Copies connection object.
         
         :param other_hostname_or_ip: a different hostname or ip to use for the clone
         :type other_hostname_or_ip: str
         :param other port: a different port to use for the clone
         :type other port: int
-        :param other_key_and_cert_file: a different filename containing a private key and certificate for the clone
-        :type other_key_and_cert_file: str
+        :param other_key_and_cert: a different string containing a private key and certificate for the clone
+        :type other_key_and_cert: str
         """
         (old_hostname_or_ip, old_port) = self.socket.getpeername()
 
         return connection(other_hostname_or_ip or old_hostname_or_ip, 
                           other_port or old_port,
-                          other_key_and_cert_file or self._key_and_cert_file)
+                          other_key_and_cert or self._key_and_cert)
         
     def send_request(self, req):
         """ Send request to the device

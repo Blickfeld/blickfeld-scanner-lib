@@ -13,6 +13,11 @@ influence the resulting point cloud.
 
 ### Removed
 
+## [2.8.7] - 2020.06.09
+
+### Changed
+* Python: Use temporary cert file for SSL connections
+
 ## [2.8.6] - 2020.06.05
 
 ### Changed
