@@ -29,6 +29,7 @@ message Subscribe {
 	 */
 	message Developer {
 		extensions 1 to max;  // Internal developer requests
+		option (secure) = {permissions: DEVELOPER, cert_type: CLIENT};
 	}
 
 	/**

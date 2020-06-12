@@ -2,15 +2,42 @@
 
 The blickfeld-scanner-lib (BSL) is the interface for communicating with Blickfeld LiDAR devices.
 
+## Quick start
+
+Follow the [installation guide](install.rst) or find the most common installation commands below.
+
+### Python
+
+```bash
+pip install blickfeld_scanner
+```
+
+### Ubuntu / Debian
+
+```bash
+sudo apt update
+sudo apt install -y wget libprotobuf-dev libprotobuf17
+wget https://github.com/Blickfeld/blickfeld-scanner-lib/releases/latest/download/blickfeld-scanner-lib-dev-Linux.deb
+sudo dpkg -i blickfeld-scanner-lib-dev-Linux.deb
+```
+
+Discover Cube devices in the local network:
+
+```bash
+bf-discover
+```
+
+Follow the [getting started guide](getting_started.rst).
+
+## Dependencies
+
 There are some built-in functions, which provide basic functionality. For more advanced use, Protocol Buffers (protobuf) is required.
 Protocol Buffers is a language-neutral, platform-neutral, extensible mechanism for serializing structured data.
 
 The BSL uses, Protocol Buffers to communicate  with the LiDAR device. The main communication features have corresponding functions in the BSL.
 For some of these functions, parameters packed into a Protocol Buffer object are required.
 
-## Installation
-
-Follow the [installation guide](install).
+Find further dependency information in the [installation guide](install.rst).
 
 ## Protocol
 

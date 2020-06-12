@@ -13,6 +13,21 @@ influence the resulting point cloud.
 
 ### Removed
 
+## [2.8.9] - 2020.06.12
+
+### Changed
+* Doc: Fix copy-paste error in general guide
+
+## [2.8.8] - 2020.06.12
+
+### Changed
+* Doc: Temporarily link to local documentation as full technical documentation is not yet available 
+
+## [2.8.7] - 2020.06.09
+
+### Changed
+* Python: Use temporary cert file for SSL connections
+
 ## [2.8.6] - 2020.06.05
 
 ### Changed
