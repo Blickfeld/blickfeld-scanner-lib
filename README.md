@@ -2,15 +2,13 @@
 
 The blickfeld-scanner-lib (BSL) is the interface for communicating with Blickfeld LiDAR devices.
 
-There are some built-in functions, which provide basic functionality. For more advanced use, Protocol Buffers (protobuf) is required.
-Protocol Buffers is a language-neutral, platform-neutral, extensible mechanism for serializing structured data.
+The library is currently available for Python and C++.
+With it, Blickfeld [Cube 1](https://www.blickfeld.com/products/cube-1/) and [Cube Range 1](https://www.blickfeld.com/products/cube-range-1/) devices, can be configured and point clouds can be fetched.
+Additionally, it supports NTP time synchronization and point cloud recordings.
 
-The BSL uses, Protocol Buffers to communicate  with the LiDAR device. The main communication features have corresponding functions in the BSL.
-For some of these functions, parameters packed into a Protocol Buffer object are required.
+## Quick start
 
-## Installation
-
-Follow the [installation guide](https://docs.blickfeld.com/external/blickfeld-scanner-lib/install.html).
+Follow the [installation guide](doc/install.rst) or find the most common installation commands below.
 
 ### Python
 
@@ -18,22 +16,22 @@ Follow the [installation guide](https://docs.blickfeld.com/external/blickfeld-sc
 pip install blickfeld_scanner
 ```
 
-### CPP
+### Ubuntu / Debian
 
 ```bash
 sudo apt update
 sudo apt install -y wget libprotobuf-dev libprotobuf17
-wget https://github.com/Blickfeld/blickfeld-scanner-lib/releases/download/latest/blickfeld-scanner-lib-dev-Linux.deb
+wget https://github.com/Blickfeld/blickfeld-scanner-lib/releases/latest/download/blickfeld-scanner-lib-dev-Linux.deb
 sudo dpkg -i blickfeld-scanner-lib-dev-Linux.deb
 ```
 
-Follow the [getting started guide](https://docs.blickfeld.com/external/blickfeld-scanner-lib/getting_started.html).
+Follow the [getting started guide](doc/getting_started.rst).
 
 ## Documentation
 
-The technical documentation can be found at [docs.blickfeld.com](https://docs.blickfeld.com).
+The technical documentation with further information about available Blickfeld tools and the technology will be available soon.
 
-The BSL part can be found at https://docs.blickfeld.com/external/blickfeld-scanner-lib/README.html.
+For now, the BSL part can be found at [general](doc/README.md).
 
 ## License
 

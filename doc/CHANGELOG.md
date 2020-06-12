@@ -13,6 +13,11 @@ influence the resulting point cloud.
 
 ### Removed
 
+## [2.8.8] - 2020.06.12
+
+### Changed
+* Doc: Temporarily link to local documentation as full technical documentation is not yet available 
+
 ## [2.8.7] - 2020.06.09
 
 ### Changed

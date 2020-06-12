@@ -28,30 +28,37 @@ Linux
 Debian packages with full Protobuf support are available for Ubuntu 19+ and Debian 10+.
 Debian packages with BSL standalone mode are available for older systems.
 
-.. tabs::
+Ubuntu 19+ and Debian 10
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    .. code-tab:: bash Ubuntu 19+ and Debian 10+
+.. code-block:: bash
 
-        sudo apt update
-        sudo apt install -y wget libprotobuf-dev libprotobuf17
-        wget https://github.com/Blickfeld/blickfeld-scanner-lib/releases/latest/download/blickfeld-scanner-lib-dev-Linux.deb
-        sudo dpkg -i blickfeld-scanner-lib-dev-Linux.deb
+    sudo apt update
+    sudo apt install -y wget libprotobuf-dev libprotobuf17
+    wget https://github.com/Blickfeld/blickfeld-scanner-lib/releases/latest/download/blickfeld-scanner-lib-dev-Linux.deb
+    sudo dpkg -i blickfeld-scanner-lib-dev-Linux.deb
 
-    .. code-tab:: bash Latest ..
+Latest debian-based systems
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-        sudo apt update
-        sudo apt install -y wget libprotobuf-dev libprotobuf22
-        wget https://github.com/Blickfeld/blickfeld-scanner-lib/releases/latest/download/blickfeld-scanner-lib-dev-testing-Linux.deb
-        sudo dpkg -i blickfeld-scanner-lib-dev-testing-Linux.deb
+.. code-block:: bash
 
-    .. code-tab:: bash & older debian-based systems
+    sudo apt update
+    sudo apt install -y wget libprotobuf-dev libprotobuf22
+    wget https://github.com/Blickfeld/blickfeld-scanner-lib/releases/latest/download/blickfeld-scanner-lib-dev-testing-Linux.deb
+    sudo dpkg -i blickfeld-scanner-lib-dev-testing-Linux.deb
 
-        sudo apt update
-        sudo apt install -y wget
-        wget https://github.com/Blickfeld/blickfeld-scanner-lib/releases/latest/download/blickfeld-scanner-lib-dev-standalone-Linux.deb
-        sudo dpkg -i blickfeld-scanner-lib-dev-standalone-Linux.deb
+Older debian-based systems
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Follow the :ref:`BSL Getting started` guide to write your first application.
+.. code-block:: bash
+
+    sudo apt update
+    sudo apt install -y wget
+    wget https://github.com/Blickfeld/blickfeld-scanner-lib/releases/latest/download/blickfeld-scanner-lib-dev-standalone-Linux.deb
+    sudo dpkg -i blickfeld-scanner-lib-dev-standalone-Linux.deb
+
+Follow the :doc:`getting_started.rst` guide to write your first application.
 
 Python (cross-platform)
 -----------------------
@@ -59,11 +66,11 @@ Python (cross-platform)
 The BSL is also available as python package for fast prototyping.
 For high performance environments, it is recommended to use the C++ implementation.
 
-.. code-block:: python
+.. code-block:: bash
 
     pip install blickfeld_scanner
 
-Follow the :ref:`BSL Getting started` guide to write your first application.
+Follow the :doc:`getting_started.rst` guide to write your first application.
 
 Windows
 -------
@@ -91,22 +98,26 @@ CMake is required as build system.
 
 Install Protocol Buffers from source or install available packages.
 
-.. tabs::
+Packages
+********
 
-    .. code-tab:: bash Packages
+.. code-block:: bash
 
-        sudo apt update
-        sudo apt install -y git build-essential libprotobuf-dev libprotoc-dev protobuf-compiler
+    sudo apt update
+    sudo apt install -y git build-essential libprotobuf-dev libprotoc-dev protobuf-compiler
+    
+From source
+***********
 
-    .. code-tab:: bash From Source
+.. code-block:: bash
 
-        sudo apt update
-        sudo apt install -y git build-essential autoconf automake libtool curl unzip
-        git clone --recursive https://github.com/protocolbuffers/protobuf.git
-        cd protobuf/cmake
-        cmake . -Dprotobuf_BUILD_SHARED_LIBS=ON
-        make -j8
-        sudo make install
+    sudo apt update
+    sudo apt install -y git build-essential autoconf automake libtool curl unzip
+    git clone --recursive https://github.com/protocolbuffers/protobuf.git
+    cd protobuf/cmake
+    cmake . -Dprotobuf_BUILD_SHARED_LIBS=ON
+    make -j8
+    sudo make install
 
 Build library
 ~~~~~~~~~~~~~
@@ -147,7 +158,7 @@ Build library
     
 .. note:: The `BF_USE_SYSTEM_PROTOBUF=OFF` flag builds the BSL with reduced functionality. Read :ref:`BSL Installation Dependencies` for more information.
 
-Follow the :ref:`BSL Getting started` guide to write your first application.
+Follow the :doc:`getting_started.rst` guide to write your first application.
 
 Compile options
 ---------------

@@ -30,7 +30,7 @@ To install the BSL the debian packet or the pypi packet can be used.
 
         pip install blickfeld_scanner
 
-.. note:: For manual compilation instructions and further installation information refer to :ref:`BSL_Installation`.
+.. note:: For manual compilation instructions and further installation information refer to [BSL Installation](install.md).
 
 Import Library
 ~~~~~~~~~~~~~~
