@@ -9,7 +9,8 @@ Follow the [installation guide](install.rst) or find the most common installatio
 ### Python
 
 ```bash
-pip in
+pip install blickfeld_scanner
+```
 
 ### Ubuntu / Debian
 
