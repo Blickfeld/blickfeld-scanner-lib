@@ -1,4 +1,4 @@
-.. _BSL Getting started:
+.. _BSL_Getting_started:
 
 Getting started
 ===============
@@ -9,13 +9,13 @@ Getting started
 How to fetch Point Clouds
 -------------------------
 
-In this example the BSL will first be installed (compiled) and then a connection to a Blickfeld LiDAR device is established and a pointcloud stream is created.
-Finally the Blickfeld Point Cloud Frames are received.
+In this example the BSL will first be installed (compiled) and then a connection to a Blickfeld LiDAR device will be established and a pointcloud stream created.
+Finally the Blickfeld Point Cloud Frames will be received.
 
-Installation of the BSL
-~~~~~~~~~~~~~~~~~~~~~~~
+Installing the BSL
+~~~~~~~~~~~~~~~~~~
 
-To install the BSL the debian packet or the pypi packet can be used.
+To install the BSL, either the Debian package or the PyPI package can be used.
 
 .. tabs::
 
@@ -30,12 +30,12 @@ To install the BSL the debian packet or the pypi packet can be used.
 
         pip install blickfeld_scanner
 
-.. note:: For manual compilation instructions and further installation information refer to [BSL Installation](install.md).
+.. note:: For manual compilation instructions and further installation information refer to :ref:`BSL_Installation`.
 
-Import Library
-~~~~~~~~~~~~~~
+Importing the library
+~~~~~~~~~~~~~~~~~~~~~
 
-To get a pointcloud the BSL has to be installed and the Blickfeld Scanner Library has to be imported.
+To get a point cloud, the BSL has to be installed and the Blickfeld Scanner Library has to be imported.
 
 .. tabs::
 
@@ -47,8 +47,8 @@ To get a pointcloud the BSL has to be installed and the Blickfeld Scanner Librar
 
         >>> import blickfeld_scanner
 
-Connect
-~~~~~~~
+Connecting
+~~~~~~~~~~
 
 A connection to the device has to be created.
 In order to connect to a Blickfeld LiDAR device, a TCP connection must first be established.
@@ -71,10 +71,10 @@ We can use an IP address or a hostname, depending on the connection to the devic
 With this scanner object it is possible to perform different types of tasks, such as getting the status of a device (function :code:`get_status`) and
 getting and setting the scan pattern (function :code:`get_scan_pattern` and :code:`set_scan_pattern`).
 
-Stream Point Clouds
-~~~~~~~~~~~~~~~~~~~
+Streaming point clouds
+~~~~~~~~~~~~~~~~~~~~~~
 
-To receive a pointcloud a stream object has to be generated. With this :code:`point_cloud_stream` object point cloud frames can be received.
+To receive a pointcloud, a stream object has to be generated. With this :code:`point_cloud_stream` object, point cloud frames can be received.
 
 .. tabs::
 
@@ -88,7 +88,7 @@ To receive a pointcloud a stream object has to be generated. With this :code:`po
         >>> stream
         <blickfeld_scanner.scanner.point_cloud_stream object at 0x000002A61289D1D0>
 
-To receive a pointcloud frame the :code:`recv_frame` function of the :code:`point_cloud_stream` object has to be called.
+To receive a pointcloud frame, the :code:`recv_frame` function of the :code:`point_cloud_stream` object has to be called.
 This can be done in a while loop.
 
 .. tabs::
@@ -108,18 +108,18 @@ This can be done in a while loop.
 
 .. note::
     The device will drop frames if the client is unable to fetch the frames quickly enough.
-    For this reason, the network connection and the processing of the frame in the while loop needs to be fast enough.
-    To detect missing frames the frame ID can be used. If the IDs are not consecutive, so if IDs are missing, the receiving and processing pipeline is too slow.
+    For this reason, the network connection and frame processing in the while loop need to be fast enough.
+    To detect missing frames, the frame ID can be used. If the IDs are not consecutive, i.e., if IDs are missing, the receiving and processing pipeline will be too slow.
 
 Format
 ~~~~~~
 
-Each frame is a protobuf object. It consists of several nested protobuf objects. The following figure provides an overview:
+Each frame is a protobuf object that consists of several nested protobuf objects. The following figure provides an overview:
 
 .. image:: protobuf-frame-visualisation.png
    :width: 800
 
-The following examples showcase some examples how to get the values of protobuf fields. For further information on protobufs see: `https://developers.google.com/protocol-buffers <https://developers.google.com/protocol-buffers>`_
+The following examples show how to get the values of protobuf fields. For further information on protobufs, see: `https://developers.google.com/protocol-buffers <https://developers.google.com/protocol-buffers>`_
 
 .. tabs::
 
@@ -145,7 +145,7 @@ The following examples showcase some examples how to get the values of protobuf 
         }
 
 To get values of the repeated nested protobuf objects, a loop can be used.
-For example to get values of the single returns, it is necessary to loop through the scanlines, points and returns in a frame.
+For example, to get values of the single returns it is necessary to loop through the scanlines, points and returns in a frame.
 
 .. tabs::
 
@@ -179,8 +179,8 @@ For example to get values of the single returns, it is necessary to loop through
 
 For example, the x, y, and z coordinates are saved in "ret.cartesian(0)", which is equal to frame.scanlines(s_ind).points(p_ind).returns(r_ind).cartesian(0).
 
-Close stream
-~~~~~~~~~~~~
+Closing a stream
+~~~~~~~~~~~~~~~~
 
 To close a stream, the :code:`point_cloud_stream` object must be deleted.
 

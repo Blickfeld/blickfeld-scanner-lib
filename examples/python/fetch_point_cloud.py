@@ -14,11 +14,11 @@ import blickfeld_scanner
 def fetch_point_cloud(args):
     """Fetch the point cloud of a device and print the frame ID and number of returns in the received frame.
 
-    If the record_to_file parameter is set with a path and a filename the stream will be recorded to this file.
+    If the record_to_file parameter is set with a path and a filename, the stream will be recorded to this file.
 
     Stop this example with CTRL+C. The file should be closed in a correct way.
 
-    :param args: arguments to parse out the host name or IP address of the device and optional file path to record to.
+    :param args: arguments to parse out the hostname or IP address of the device and an optional file path to record to.
     """
     device = blickfeld_scanner.scanner(args.target)  # Connect to the device
     

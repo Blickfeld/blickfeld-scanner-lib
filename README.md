@@ -3,12 +3,12 @@
 The blickfeld-scanner-lib (BSL) is the interface for communicating with Blickfeld LiDAR devices.
 
 The library is currently available for Python and C++.
-With it, Blickfeld [Cube 1](https://www.blickfeld.com/products/cube-1/) and [Cube Range 1](https://www.blickfeld.com/products/cube-range-1/) devices, can be configured and point clouds can be fetched.
+With it, Blickfeld [Cube 1](https://www.blickfeld.com/products/cube-1/) and [Cube Range 1](https://www.blickfeld.com/products/cube-range-1/) devices can be configured and point clouds can be fetched.
 Additionally, it supports NTP time synchronization and point cloud recordings.
 
 ## Quick start
 
-Follow the [installation guide](doc/install.rst) or find the most common installation commands below.
+Follow the [installation guide](https://docs.blickfeld.com/cube/external/blickfeld-scanner-lib/install.html) or find the most common installation commands below.
 
 ### Python
 
@@ -25,13 +25,11 @@ wget https://github.com/Blickfeld/blickfeld-scanner-lib/releases/latest/download
 sudo dpkg -i blickfeld-scanner-lib-dev-Linux.deb
 ```
 
-Follow the [getting started guide](doc/getting_started.rst).
+Follow the [getting started guide](https://docs.blickfeld.com/cube/external/blickfeld-scanner-lib/getting_started.html).
 
 ## Documentation
 
-The technical documentation with further information about available Blickfeld tools and the technology will be available soon.
-
-For now, the BSL part can be found at [general](doc/README.md).
+The Blickfeld software manual, which includes the BSL documentation, can be found at [docs.blickfeld.com/cube](https://docs.blickfeld.com/cube/external/blickfeld-scanner-lib/README.html).
 
 ## License
 

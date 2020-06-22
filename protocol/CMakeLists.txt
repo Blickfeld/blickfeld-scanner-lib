@@ -44,9 +44,9 @@ if(NOT BF_USE_SYSTEM_PROTOBUF)
 	  	"-DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/protobuf"
 	)
 	set(Protobuf_PROTOC_EXECUTABLE ${CMAKE_CURRENT_BINARY_DIR}/protobuf/bin/protoc)
+	set(BF_PROTOBUF_TARGET blickfeld-protobuf)
 else()
 	message("Existing protobuf compiler is used: ${Protobuf_PROTOC_EXECUTABLE}")
-	add_custom_target( blickfeld-protobuf )
 endif()
 set(Protobuf_PROTOC_EXECUTABLE ${Protobuf_PROTOC_EXECUTABLE} PARENT_SCOPE)
 
@@ -61,7 +61,7 @@ if(BF_BUILD_PROTOBUF_PLUGIN)
 		ExternalProject_Add(
 			blickfeld-protocol-plugin
 			SOURCE_DIR ${PROJECT_SOURCE_DIR}/plugin
-			DEPENDS blickfeld-protobuf
+			DEPENDS ${BF_PROTOBUF_TARGET}
 			CMAKE_ARGS
 				"-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"
 				"-DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/protobuf"
@@ -131,7 +131,7 @@ foreach(FILE ${PROTOBUF_SOURCES})
 		COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_BINARY_DIR}/${FILE_H} ${LIBINCLUDEDIR_TOP}/${FILE_H}
 		COMMAND ${CMAKE_COMMAND} -E remove ${PROJECT_BINARY_DIR}/${FILE_H}
 		
-		DEPENDS blickfeld-protobuf
+		DEPENDS $<TARGET_NAME_IF_EXISTS:blickfeld-protobuf>
 		DEPENDS ${FILE}
 		WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
 	)
@@ -147,7 +147,7 @@ foreach(FILE ${PROTOBUF_SOURCES})
 			COMMAND ${CMAKE_COMMAND} -E make_directory ${PROJECT_BINARY_DIR}/python
 			COMMAND ${Protobuf_PROTOC_EXECUTABLE} ${PROTOBUF_DEFS_DIR}/${FILE} --python_out=${PROTOBUF_GENERATED_PY_DIR} --proto_path=${PROTOBUF_DEFS_DIR}
 		
-			DEPENDS blickfeld-protobuf
+			DEPENDS $<TARGET_NAME_IF_EXISTS:blickfeld-protobuf>
 			DEPENDS ${FILE}
 			WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
 		)
@@ -163,7 +163,7 @@ foreach(FILE ${PROTOBUF_SOURCES})
 			COMMAND ${CMAKE_COMMAND} -E make_directory ${PROJECT_BINARY_DIR}/npm
 			COMMAND ${Protobuf_PROTOC_EXECUTABLE} ${PROTOBUF_DEFS_DIR}/${FILE} --plugin="protoc-gen-ts=${PROTOC_GEN_TS_PATH}" --js_out="import_style=commonjs,binary:${PROJECT_BINARY_DIR}/npm" --ts_out="${PROJECT_BINARY_DIR}/npm" --proto_path=${PROTOBUF_DEFS_DIR}
 			
-			DEPENDS blickfeld-protobuf
+			DEPENDS $<TARGET_NAME_IF_EXISTS:blickfeld-protobuf>
 			DEPENDS blickfeld-protocol-npm
 			DEPENDS ${FILE}
 			WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
@@ -184,7 +184,7 @@ foreach(FILE ${PROTOBUF_SOURCES_CUSTOM})
 			COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_BINARY_DIR}/${FILE_H} ${LIBINCLUDEDIR_TOP}/${FILE_H}
 			COMMAND ${CMAKE_COMMAND} -E remove ${PROJECT_BINARY_DIR}/${FILE_H}
 
-			DEPENDS blickfeld-protobuf
+			DEPENDS $<TARGET_NAME_IF_EXISTS:blickfeld-protobuf>
 			DEPENDS ${BF_PROTOCOL_PLUGIN}
 			DEPENDS ${FILE}
 			WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
@@ -202,7 +202,7 @@ endforeach()
 
 add_library(blickfeld-scanner-protocol-static OBJECT ${PROTOBUF_GENERATED_CUSTOM} ${PROTOBUF_GENERATED_CPP})
 target_include_directories(blickfeld-scanner-protocol-static PRIVATE ${LIBINCLUDEDIR_TOP})
-target_link_libraries(blickfeld-scanner-protocol-static PUBLIC ${blickfeld-protobuf_LIBRARY})
+target_link_libraries(blickfeld-scanner-protocol-static PUBLIC ${Protobuf_LIBRARY})
 target_compile_definitions(blickfeld-scanner-protocol-static PRIVATE "BF_DLLEXPORT=__declspec(dllexport)")
 set_property(TARGET blickfeld-scanner-protocol-static PROPERTY POSITION_INDEPENDENT_CODE ON)
 
