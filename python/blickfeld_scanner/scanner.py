@@ -25,17 +25,17 @@ log = logging.getLogger(__name__)
 
 class scanner(object):
     """
-    Class to connect to a device, get a point cloud stream, get a status stream and set a scan pattern.
+    Scanner is a class to connect to a device, get a point cloud stream, get a status stream and set a scan pattern.
 
-    :param hostname_or_ip: Device, to which the connection should be established.
+    :param hostname_or_ip: Device to which the connection should be established.
     :type hostname_or_ip: str
-    :param port: Port on which the device is reachable, default is 8000.
+    :param port: Port on which the device is reachable the default is 8000.
     :type port: int
-    :param name: Name of the device. Used for string representation.
+    :param name: Name of the device used for string representation.
     :type name: str
-    :param key_and_cert_file: Filename containing a private key and certificate for SSL connection
+    :param key_and_cert_file: Filename containing a private key and certificate for SSL connection.
     :type key_and_cert_file: str
-    :param key_and_cert: String containing a private key and certificate for SSL connection
+    :param key_and_cert: String containing a private key and certificate for SSL connection.
     :type key_and_cert: str
     """
     protocol_version = 1
@@ -74,54 +74,49 @@ class scanner(object):
         return "<Blickfeld Scanner '%s'>" % ( self.name )
 
     def get_status(self):
-        """ Request status of device.
+        """ Request status of device
 
-        :returns: Status object
-        :rtype: Status, see :any:`protobuf_protocol` Status
+        :returns: Status object, see :any:`protobuf_protocol` Status
         """
         req = connection_pb2.Request()
         req.status.SetInParent()
         return self._connection.send_request(req).status
 
     def get_status_stream(self):
-        """ Request status stream of device.
+        """ Request status stream of device
 
         This returns a status stream, which only delivers updates when the device has changed.
         Do not use this in a synchronous blocking call. Use the `get_status` method instead.
 
-        :returns: Status stream object
-        :rtype: :py:class:`blickfeld_scanner.scanner.status_stream`
+        :returns: :py:class:`blickfeld_scanner.scanner.status_stream` object
         """
         return status_stream(self.create_connection())
 
     def get_point_cloud_stream(self):
-        """ Request point cloud stream of device.
+        """ Request point cloud stream of device
 
-        :returns: Point cloud stream object
-        :rtype: :py:class:`blickfeld_scanner.scanner.point_cloud_stream`
+        :returns: :py:class:`blickfeld_scanner.scanner.point_cloud_stream` object
         """
         return stream.point_cloud(self.create_connection())
 
     @staticmethod
     def file_point_cloud_stream(dump_filename):
-        """ Request a point_cloud_stream, which streams of a .bfpc file.
+        """ Request a point_cloud_stream, which streams off a .bfpc file.
         No device (and connection to a device) is needed for this operation.
 
         :param dump_filename: path to .bfpc file
-        :return: :py:class:`blickfeld_scanner.scanner.point_cloud_stream`
+        :return: :py:class:`blickfeld_scanner.scanner.point_cloud_stream` object
         """
         return stream.point_cloud(from_file=dump_filename)
     
     def set_scan_pattern(self, config, persist = False):
-        """ Function to set a new ScanPattern, see: :any:`protobuf_protocol`.
-        First call :py:func:`blickfeld_scanner.scanner.scanner.fill_scan_pattern` with the ScanPattern you want to set and
-        then use that returned ScanPattern as a config in this function.
+        """ Function to set a new scan pattern, see: :any:`protobuf_protocol`.
+        First call :py:func:`blickfeld_scanner.scanner.scanner.fill_scan_pattern` with the scan pattern you want to set and
+        then use that returned scan pattern as a config in this function.
 
-        :param config: ScanPattern to be set
-        :param persist: Persist scan pattern on device and reload it after a power-cycle
-        :type config: ScanPattern, see: :any:`protobuf_protocol` ScanPattern
-        :return: response ScanPattern, see :any:`protobuf_protocol` Connection
-        :rtype: response ScanPattern, see :any:`protobuf_protocol` Connection
+        :param config: scan pattern to be set
+        :param persist: Persist scan pattern on device and reload it after a power-cycle, see: :any:`protobuf_protocol` scan pattern
+        :return: response scan pattern, see :any:`protobuf_protocol` Connection, see :any:`protobuf_protocol` Connection
         """
         req = connection_pb2.Request()
         req.set_scan_pattern.config.MergeFrom(config)
@@ -129,22 +124,19 @@ class scanner(object):
         return self._connection.send_request(req).set_scan_pattern
     
     def fill_scan_pattern(self, config):
-        """ Function to fill a ScanPattern, see: :any:`protobuf_protocol`. The device fill the missing fields with default values and return it. After it is filled the ScanPattern can be set with the :py:func:`blickfeld_scanner.scanner.scanner.set_scan_pattern` function.
+        """ Function to fill a scan pattern, see: :any:`protobuf_protocol`. The device fill the missing fields with default values and return it. After it is filled the scan pattern can be set with the :py:func:`blickfeld_scanner.scanner.scanner.set_scan_pattern` function.
 
-        :param config: ScanPattern to be filled by the BSS
-        :type config: ScanPattern, see: :any:`protobuf_protocol` ScanPattern
-        :return: Filled ScanPattern, which can be set
-        :rtype: ScanPattern, see :any:`protobuf_protocol` ScanPattern
+        :param config: scan pattern to be filled by the BSS, see: :any:`protobuf_protocol` scan pattern
+        :return: Filled scan pattern, which can be set, see :any:`protobuf_protocol` scan pattern
         """
         req = connection_pb2.Request()
         req.fill_scan_pattern.config.MergeFrom(config)
         return self._connection.send_request(req).fill_scan_pattern.config
     
     def get_scan_pattern(self):
-        """ Returns the current set ScanPattern, see: :any:`protobuf_protocol`.
+        """ Returns the currently set scan pattern, see: :any:`protobuf_protocol`.
 
-        :return: current set ScanPattern
-        :rtype: ScanPattern, see :any:`protobuf_protocol` ScanPattern
+        :return: Currently set scan pattern, see :any:`protobuf_protocol` scan pattern
         """
         req = connection_pb2.Request()
         req.get_scan_pattern.SetInParent()
@@ -153,21 +145,19 @@ class scanner(object):
     def get_device_timestamp(self):
         """Returns the current device timestamp in seconds.
 
-        :return: current device timestamp in seconds
-        :rtype: float
+        :return: Current device timestamp in seconds
         """
         req = connection_pb2.Request()
         req.hello.protocol_version = self.protocol_version
         return self._connection.send_request(req).timestamp_ns / 1e9
     
     def get_ntp_server(self):
-        """Attention to use this function you need the requests library
+        """Attention: To use this function you need the requests library
         `https://requests.readthedocs.io/en/master/`
 
         Function to get a ntp server
 
-        :return: returns the the ntp server ip adress
-        :rtype: str
+        :return: Returns the ntp server IP address
         """
         import requests
         req = requests.get(self.api_path + "network/ntp")
@@ -175,7 +165,7 @@ class scanner(object):
         return req.json()['data']['server']
     
     def set_ntp_server(self, server):
-        """Attention to use this function you need the requests library
+        """Attention: To use this function you need the requests library
         `https://requests.readthedocs.io/en/master/`
 
         Function to set a ntp server
@@ -194,8 +184,7 @@ class scanner(object):
     def create_connection(self):
         """Function to create a new connection
         
-        :return: New created connection
-        :rtype: :py:class:`blickfeld_scanner.scanner.connection`
+        :return: Newly created :py:class:`blickfeld_scanner.scanner.connection`
         """
         return connection(self.hostname_or_ip, self.port, self._key_and_cert)
  
@@ -205,11 +194,11 @@ class scanner(object):
 
         :param server: list of scanners to sync
         :type server: list of :py:class:`blickfeld_scanner.scanner.scanner`
-        :param scan_pattern: ScanPattern, which the devices should use, if None is given, it will select current ScanPattern
-        :type scan_pattern: ScanPattern, see: :any:`protobuf_protocol`,
-        :param target_frame_rate: Frame rate which the devices should run. Max frame rate is dependend on the ScanPattern. If None is given the max possible frame rate will be used.
+        :param scan_pattern: scan pattern that the devices should use, if None is given, it will select the current scan pattern
+        :type scan_pattern: scan pattern, see: :any:`protobuf_protocol`,
+        :param target_frame_rate: Frame rate that the devices should run. Maximum frame rate is dependent on the scan pattern, if None is given the maximum possible frame rate will be used.
         :type target_frame_rate: float
-        :param max_time_difference: Max time difference which is allowed.
+        :param max_time_difference: Maximum time difference allowed.
         :type max_time_difference: float
         """
         max_frame_rate = None
@@ -246,7 +235,7 @@ class scanner(object):
 class protocol_exception(Exception):
     """ Protocol exception class for errors, see errors in :any:`protobuf_protocol`
 
-    :param value: Exception which occured
+    :param value: Exception that occured
     :type value: Protocol Exception, see: :any:`protobuf_protocol`
     """
     def __init__(self, value):
@@ -269,24 +258,21 @@ class protocol_exception(Exception):
     def errno(self):
         """ Returns error number
 
-        :return: error number
-        :rtype: int
+        :return: Error number
         """
         return self.__field().number
     
     def name(self):
         """ Returns error name as in :any:`protobuf_protocol`
 
-        :return: error name
-        :rtype: str
+        :return: Error name
         """
         return self.__field().message_type.full_name
     
     def description(self):
         """ Returns error description as in :any:`protobuf_protocol`
 
-        :return: error description
-        :rtype: str
+        :return: Error description
         """
         return self.__field().message_type.GetOptions().Extensions[options_pb2.e_desc]
         
@@ -296,7 +282,7 @@ class protocol_exception(Exception):
 class connection(object):
     """ Class to create a connection to the Blickfeld LiDAR device
 
-    :param hostname_or_ip: hostname or ip to which the connection should be established
+    :param hostname_or_ip: hostname or IP to which the connection should be established
     :type hostname_or_ip: str
     :param port: port on which the connection should be established
     :type port: int
@@ -335,7 +321,7 @@ class connection(object):
     def clone(self, other_hostname_or_ip=None, other_port=None, other_key_and_cert=None):
         """ Copies connection object.
         
-        :param other_hostname_or_ip: a different hostname or ip to use for the clone
+        :param other_hostname_or_ip: a different hostname or IP to use for the clone
         :type other_hostname_or_ip: str
         :param other port: a different port to use for the clone
         :type other port: int
@@ -353,8 +339,7 @@ class connection(object):
 
         :param req: Request to the device
         :type req: Request, see: :any:`protobuf_protocol`
-        :return: Response of the device
-        :rtype: Response, see: :any:`protobuf_protocol`
+        :return: Response of the device, see: :any:`protobuf_protocol`
         """
         self.send(req)
         return self.recv()
@@ -373,8 +358,7 @@ class connection(object):
     def recv(self):
         """ Receive response of the device
 
-        :return: response of the device
-        :rtype: Response, see: :any:`protobuf_protocol`
+        :return: Response of the device, see: :any:`protobuf_protocol`
         """
         len = struct.unpack('<I', self.__recv_all(4))[0]
         recv = connection_pb2.Response()
@@ -419,14 +403,13 @@ class status_stream(object):
         self.close()
 
     def close(self):
-        """ Close stream stream and connection
+        """ Close stream and connection
         """
         self._connection.close()
 
     def recv_status(self):
         """ Receive status update
 
-        :return: status messages of the device
-        :rtype: Status, see: :any:`protobuf_protocol`
+        :return: Status messages of the device, see: :any:`protobuf_protocol`
         """
         return self._connection.recv().event.status

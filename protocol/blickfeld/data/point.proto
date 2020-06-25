@@ -1,4 +1,5 @@
 syntax = "proto2";
+option cc_enable_arenas = true;
 
 package blickfeld.protocol.data;
 
@@ -11,7 +12,7 @@ message Point {
 
 	/**
 	 * This section describes the contents of a single return of a point, sorted by intensity.
-	 * A return is created when the LiDAR detects the laser light of the reflection off an object.
+	 * A return is created when the LiDAR detects the laser light of the reflection of an object.
 	 */
 	message Return {
 		optional uint32 id = 1;  // ID of the return in the point
@@ -30,10 +31,21 @@ message Point {
 		repeated float origin = 3 [packed=true]; // Unit: [m] - origin of the laser beam [x,y,z]
 	}
 
+	/**
+	 * Error flag indicating why a point delivers no valid returns.
+	 * If a flag is set, the point should not be interpreted neither processed.
+	 * Flags are only set temporarily for a short period of time.
+	 * If the error state does not recover, the device will stop operation.
+	 */
+	enum ErrorFlag {
+		E_VIBRATION_THRESHOLD_EXCEEDED = 1; // The environmental vibration threshold was exceeded. This should not happen in normal operation.
+	}
+
 	optional uint32 id = 1;  // Point ID in the corresponding frame
 	repeated Return returns = 2;  // Refer to [Point.Return](#blickfeld.protocol.data.Point.Return)
     optional uint64 start_offset_ns = 3; // Unit: [ns] - starting time of the point in relation to [Frame.start_time_ns](#blickfeld.protocol.data.Frame.start_time_ns)
 	optional uint32 ambient_light_level = 4;  // Ambient light level in the direction of the point
 	optional Direction direction = 5;  // Refer to [Point.Direction](#blickfeld.protocol.data.Point.Direction)
 	optional uint32 channel_id = 6;  // ID of the channel that detected the point
+	repeated ErrorFlag error_flags = 7; // Refer to [Point.ErrorFlag](#blickfeld.protocol.data.Point.ErrorFlag)
 }

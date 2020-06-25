@@ -74,6 +74,7 @@ The data, such as a point cloud, are also packed in protobuf messages.
     - [Point.Direction](#blickfeld.protocol.data.Point.Direction)
     - [Point.Return](#blickfeld.protocol.data.Point.Return)
   
+    - [Point.ErrorFlag](#blickfeld.protocol.data.Point.ErrorFlag)
   
   
   
@@ -592,6 +593,7 @@ From each point (direction) the device can receive several responses/returns, se
 | ambient_light_level | [uint32](#uint32) | optional | Ambient light level in the direction of the point |
 | direction | [Point.Direction](#blickfeld.protocol.data.Point.Direction) | optional | Refer to [Point.Direction](#blickfeld.protocol.data.Point.Direction) |
 | channel_id | [uint32](#uint32) | optional | ID of the channel that detected the point |
+| error_flags | [Point.ErrorFlag](#blickfeld.protocol.data.Point.ErrorFlag) | repeated | Refer to [Point.ErrorFlag](#blickfeld.protocol.data.Point.ErrorFlag) |
 
 
 
@@ -620,7 +622,7 @@ Use these polar coordinates combined with the range information of a given retur
 
 ### Point.Return
 This section describes the contents of a single return of a point, sorted by intensity.
-A return is created when the LiDAR detects the laser light of the reflection off an object.
+A return is created when the LiDAR detects the laser light of the reflection of an object.
 
 
 | Field | Type | Label | Description |
@@ -635,6 +637,20 @@ A return is created when the LiDAR detects the laser light of the reflection off
 
 
  <!-- end messages -->
+
+
+<a name="blickfeld.protocol.data.Point.ErrorFlag"></a>
+
+### Point.ErrorFlag
+Error flag indicating why a point delivers no valid returns.
+If a flag is set, the point should not be interpreted neither processed.
+Flags are only set temporarily for a short period of time.
+If the error state does not recover, the device will stop operation.
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| E_VIBRATION_THRESHOLD_EXCEEDED | 1 | The environmental vibration threshold was exceeded. This should not happen in normal operation. |
+
 
  <!-- end enums -->
 

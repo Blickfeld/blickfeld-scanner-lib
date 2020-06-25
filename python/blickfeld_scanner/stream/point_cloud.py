@@ -159,16 +159,14 @@ class point_cloud(object):
     def get_metadata(self):
         """ Get metadata of point cloud stream
 
-        :return: point cloud metadata
-        :rtype: PointCloud.Metadata, see: :any:`protobuf_protocol`
+        :return: Point cloud metadata, see: :any:`protobuf_protocol` PointCloud.Metadata
         """
         return self._metadata
 
     def recv_frame(self):
         """ Receive point cloud frame
 
-        :return: point cloud frame with all the data in it
-        :rtype: Frame, see: :any:`protobuf_protocol`
+        :return: point cloud frame with all the data in it, see: :any:`protobuf_protocol` Frame
         """
         if self._connection:
             frame = self._connection.recv().event.point_cloud.frame
@@ -188,7 +186,7 @@ class point_cloud(object):
         return frame
         
     def end_of_stream(self):
-        """ Check if stream has ended. This function is required for point cloud streams of files
+        """ Check whether stream has ended. This function is required for point cloud streams of files
 
         :return: Bool if end of stream is reached
         """
@@ -199,7 +197,7 @@ class point_cloud(object):
     def record_to_file(self, file_name):
         """ Record point cloud stream to file
 
-        :param file_name: Path to the file to which should be dumped
+        :param file_name: Path to the file where it should be dumped
         """
         self._ofile = gzip.open(file_name, 'wb')
         _EncodeVarint(self._ofile.write, self._metadata.header.ByteSize())

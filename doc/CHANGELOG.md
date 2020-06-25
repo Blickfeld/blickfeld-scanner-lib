@@ -13,6 +13,22 @@ influence the resulting point cloud.
 
 ### Removed
 
+## [2.9.1] - 2020.06.25
+
+### Changed
+* Update links to documentation
+
+## [2.9.0] - 2020.06.22
+
+### Added
+* Protocol: Temporary error flags per point
+* Protocol: Enable Protobuf Arena support for data messages to improve performance
+
+### Changed
+* Documentation: Revise the BSL documentation with feedback of the technical writers
+* CMake: Prevent creation of always out-of-date target with multiple dependencies
+* Documentation: Add links to the GitHub Repo
+
 ## [2.8.9] - 2020.06.12
 
 ### Changed

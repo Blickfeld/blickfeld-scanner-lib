@@ -53,9 +53,8 @@ def __discover(duration):
 def search_and_connect(duration = 3):
     """ Find Blickfeld devices in the network and connect to them.
 
-    :param duration: Network search duration in seconds
-    :return: list of BSL scanner objects
-    :rtype: [:py:class:`blickfeld_scanner.scanner`]
+    :param duration: duration of network search in seconds
+    :return: list of BSL scanner objects, [:py:class:`blickfeld_scanner.scanner`]
     """
     scanners = []
     for info in __discover(duration):
@@ -66,12 +65,11 @@ def search_and_connect(duration = 3):
     return scanners
         
 def search_one_and_connect(duration = 3):
-    """ Find Blickfeld device in the network and connect to it.
-    If multiple devices are available, the first discovered device will be selected.
+    """ Find Blickfeld device in the network and connect to it, 
+    if multiple devices are available, the first device discovered will be selected.
 
-    :param duration: Network search duration in seconds
-    :return: BSL scanner object or None if no device is found
-    :rtype: :py:class:`blickfeld_scanner.scanner`
+    :param duration: duration of network search in seconds
+    :return: :py:class:`blickfeld_scanner.scanner` object or None if no device is found, 
     """
     infos = __discover(duration)
     if not len(infos):

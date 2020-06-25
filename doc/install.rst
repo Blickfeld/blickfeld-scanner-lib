@@ -5,19 +5,21 @@ Installation
 ============
 
 This guide describes the available pre-compiled library packages and instructions for manual builds from source.
-The BSL can be compiled cross-platform and is tested for Linux GCC compilers and Windows MSVC 201x compilers.
+The BSL can be compiled cross-platform and has been tested for Linux GCC compilers and Windows MSVC 201x compilers.
+
+The source code is published on `GitHub <https://github.com/Blickfeld/blickfeld-scanner-lib>`_ .
 
 .. _BSL Installation Dependencies:
 
 Dependencies
 ============
 
-The BSL uses `Protocol Buffers <https://developers.google.com/protocol-buffers>`_ as encoding protocol for the network communication, configuration requests, and file recordings.
+The BSL uses `Protocol Buffers <https://developers.google.com/protocol-buffers>`_ as an encoding protocol for network communication, configuration requests, and file recordings.
 The protocol allows cross-platform, versioned by design, structured, and optimized data transfers.
 
-It is recommended to install a Protobuf Version 3.6.1+ on the build system, as the BSL provides configuration and stream methods directly as Protobuf messages.
+It is recommended to install a Protobuf version 3.6.1+ on the build system, as the BSL provides configuration and stream methods directly as Protobuf messages.
 If the Protobuf dependency conflicts with the existing development environment, the standalone mode (use the CMake flag `-DBF_USE_SYSTEM_PROTOBUF=OFF`) of the BSL can be enabled.
-It offers the core functionality, like streaming simple point clouds, but lacks configuration methods and metadata information.
+It offers the core functionality, such as streaming simple point clouds, but lacks configuration methods and metadata information.
 
 Pre-compiled packages
 =====================
@@ -58,27 +60,27 @@ Older debian-based systems
     wget https://github.com/Blickfeld/blickfeld-scanner-lib/releases/latest/download/blickfeld-scanner-lib-dev-standalone-Linux.deb
     sudo dpkg -i blickfeld-scanner-lib-dev-standalone-Linux.deb
 
-Follow the :doc:`getting_started.rst` guide to write your first application.
+Follow the :ref:`BSL_Getting_started` guide to write your first application.
 
 Python (cross-platform)
 -----------------------
 
-The BSL is also available as python package for fast prototyping.
-For high performance environments, it is recommended to use the C++ implementation.
+The BSL is also available as a Python package for fast prototyping.
+For high-performance environments it is recommended to use the C++ implementation.
 
 .. code-block:: bash
 
     pip install blickfeld_scanner
 
-Follow the :doc:`getting_started.rst` guide to write your first application.
+Follow the :ref:`BSL_Getting_started` guide to write your first application.
 
 Windows
 -------
 
 No pre-compiled binaries are currently available. Please build it from source.
 
-Build from source
-=================
+Building from source
+====================
 
 Linux
 -----
@@ -86,7 +88,7 @@ Linux
 Dependencies
 ~~~~~~~~~~~~
 
-CMake is required as build system.
+CMake is required as a build system.
 
 .. code-block:: bash
 
@@ -130,7 +132,7 @@ Build library
     make -j8
     sudo make install
 
-Follow the :ref:`BSL Getting started` guide to write your first application.
+Follow the :ref:`BSL_Getting_started` guide to write your first application.
 
 Windows
 -------
@@ -138,12 +140,12 @@ Windows
 Dependencies
 ~~~~~~~~~~~~
 
-Building on Windows is tested with MSVC++ and Microsoft nmake.
+Building on Windows has been tested with MSVC++ and Microsoft nmake.
 The minimum requirement is a Microsoft Visual Studio 10 compiler.
-VC++ build tool can be found here: https://visualstudio.microsoft.com/de/downloads/.
-Install an up-to-date CMake from https://cmake.org/download/.
+The VC++ build tool can be found here: https://visualstudio.microsoft.com/de/downloads/.
+Install an up-to-date CMake from: https://cmake.org/download/.
 
-To activate full support, Protocol Buffers is required. It is recommended to use `CMake External Projects <https://cmake.org/cmake/help/latest/module/ExternalProject.html>`_.
+To activate full support, Protocol Buffers are required. It is recommended to use `CMake External Projects <https://cmake.org/cmake/help/latest/module/ExternalProject.html>`_.
 An example will be available soon.
 
 Build library
@@ -158,7 +160,7 @@ Build library
     
 .. note:: The `BF_USE_SYSTEM_PROTOBUF=OFF` flag builds the BSL with reduced functionality. Read :ref:`BSL Installation Dependencies` for more information.
 
-Follow the :doc:`getting_started.rst` guide to write your first application.
+Follow the :ref:`BSL_Getting_started` guide to write your first application.
 
 Compile options
 ---------------

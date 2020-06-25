@@ -1,10 +1,11 @@
 # General
 
-The blickfeld-scanner-lib (BSL) is the interface for communicating with Blickfeld LiDAR devices.
+The Blickfeld Scanner Library (BSL) is the interface for communicating with Blickfeld LiDAR devices.
+The source code is published on [GitHub](https://github.com/Blickfeld/blickfeld-scanner-lib).
 
 ## Quick start
 
-Follow the [installation guide](install.rst) or find the most common installation commands below.
+Follow the [installation guide](BSL_Installation) or find the most common installation commands below.
 
 ### Python
 
@@ -27,7 +28,7 @@ Discover Cube devices in the local network:
 bf-discover
 ```
 
-Follow the [getting started guide](getting_started.rst).
+Follow the [getting started guide](BSL_Getting_started).
 
 ## Dependencies
 
@@ -37,13 +38,13 @@ Protocol Buffers is a language-neutral, platform-neutral, extensible mechanism f
 The BSL uses, Protocol Buffers to communicate  with the LiDAR device. The main communication features have corresponding functions in the BSL.
 For some of these functions, parameters packed into a Protocol Buffer object are required.
 
-Find further dependency information in the [installation guide](install.rst).
+Find further dependency information in the [installation guide](BSL_Installation).
 
 ## Protocol
 
 The following sections describe the current state of the TCP/IP protocol that is used to communicate with Blickfeld’s LiDAR devices.
 It is based on Protocol Buffers. For a more detailed description of Protocol Buffers,
-please refer to [https://developers.google.com/protocol-buffers](https://developers.google.com/protocol-buffers)
+please refer to: [https://developers.google.com/protocol-buffers](https://developers.google.com/protocol-buffers)
 
 Client implementations are currently available for C++, Python, and TypeScript.
 It is recommended to read through the examples and the client wrapper.
@@ -57,7 +58,7 @@ Each request sent by the client will trigger a response to be sent by the device
 
 The available requests are documented in the [Connection Protocol Documentation](protobuf_protocol.html#blickfeld/connection.proto).
 
-### Stream Requests
+### Stream requests
 
 In addition to the control requests, there are also special stream requests.
 
