@@ -8,7 +8,7 @@ Additionally, it supports NTP time synchronization and point cloud recordings.
 
 ## Quick start
 
-Follow the [installation guide](https://docs.blickfeld.com/cube/external/blickfeld-scanner-lib/install.html) or find the most common installation commands below.
+Follow the [installation guide](https://docs.blickfeld.com/cube/latest/external/blickfeld-scanner-lib/install.html) or find the most common installation commands below.
 
 ### Python
 
@@ -25,11 +25,14 @@ wget https://github.com/Blickfeld/blickfeld-scanner-lib/releases/latest/download
 sudo dpkg -i blickfeld-scanner-lib-dev-Linux.deb
 ```
 
-Follow the [getting started guide](https://docs.blickfeld.com/cube/external/blickfeld-scanner-lib/getting_started.html).
+Follow the [getting started guide](https://docs.blickfeld.com/cube/latest/external/blickfeld-scanner-lib/getting_started.html).
 
 ## Documentation
 
-The Blickfeld software manual, which includes the BSL documentation, can be found at [docs.blickfeld.com/cube](https://docs.blickfeld.com/cube/external/blickfeld-scanner-lib/README.html).
+The Blickfeld software manual, which includes the BSL documentation, can be found at [docs.blickfeld.com/cube](https://docs.blickfeld.com/cube/latest/external/blickfeld-scanner-lib/README.html).
+
+To find the matching software manual for a specific BSL version, automatic redirect links are available.
+Use the link `https://docs.blickfeld.com/cube/redirect/blickfeld-scanner-lib/vx.x.x.html` and replace `vx.x.x` with the BSL version.
 
 ## License
 
