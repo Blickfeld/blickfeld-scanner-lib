@@ -17,6 +17,9 @@
 
 #include <string>
 #include <chrono>
+#include <iostream>
+#include <iomanip>
+#include <math.h>
 #include <google/protobuf/io/zero_copy_stream_impl.h>
 #include <google/protobuf/util/message_differencer.h>
 #ifdef BSL_RECORDING
@@ -59,7 +62,7 @@ void convert_point_cloud(const protocol::data::Frame& frame_i, protocol::data::F
 }
 
 template<class frame_t>
-scanner::point_cloud_stream<frame_t>::point_cloud_stream(std::shared_ptr<connection> conn) :
+scanner::point_cloud_stream<frame_t>::point_cloud_stream(std::shared_ptr<connection> conn, const protocol::stream::Subscribe_PointCloud_Filter* filter, const protocol::data::Frame* reference_frame) :
 	conn(conn),
 	resp(new protocol::Response()),
 	metadata(new protocol::file::PointCloud::Metadata()),
@@ -68,6 +71,10 @@ scanner::point_cloud_stream<frame_t>::point_cloud_stream(std::shared_ptr<connect
 	protocol::Request req;
 	protocol::Response resp;
 	req.mutable_subscribe()->mutable_point_cloud();
+	if (filter)
+		req.mutable_subscribe()->mutable_point_cloud()->mutable_filter()->CopyFrom(*filter);
+	if (reference_frame)
+		req.mutable_subscribe()->mutable_point_cloud()->mutable_reference_frame()->CopyFrom(*reference_frame);
 	conn->send_request(req, resp);
 	metadata->mutable_header()->mutable_device()->CopyFrom(resp.event().point_cloud().header());
 
@@ -297,48 +304,96 @@ template class scanner::point_cloud_stream<protocol::data::frame_t>;
 template class scanner::point_cloud_stream<protocol::data::Frame>;
 
 // SCANNER
-scanner::scanner(string hostname_or_ip) :
-	logged_object(hostname_or_ip),
-	hostname_or_ip(hostname_or_ip) {
-	io_context = new asio::io_context();
-	conn = new scanner_connection(*io_context, hostname_or_ip);
-
-	protocol::Request req;
-	protocol::Response resp;
-	req.mutable_hello()->set_protocol_version(scanner_connection::protocol_version);
-	conn->send_request(req, resp);
-}
-
-#ifdef HAVE_OPENSSL
 scanner::scanner(std::string hostname_or_ip, std::string cert_key_file) :
 	logged_object(hostname_or_ip),
-	hostname_or_ip(hostname_or_ip)
-{
-	io_context = new asio::io_context();
-	ssl_context = new asio::ssl::context(asio::ssl::context::sslv23_client);
-	ssl_context->set_options(asio::ssl::context::default_workarounds|asio::ssl::context::no_sslv2|asio::ssl::context::single_dh_use);
-	ssl_context->use_certificate_file(cert_key_file, asio::ssl::context::pem);
-	ssl_context->use_private_key_file(cert_key_file, asio::ssl::context::pem);
-	ssl_context->set_verify_mode(asio::ssl::verify_peer);
-	ssl_context->load_verify_file(cert_key_file);
-	conn = new scanner_connection(*io_context, hostname_or_ip, *ssl_context);
+	#ifndef BSL_STANDALONE
+	REF_FRAME_XYZ([] {
+		protocol::data::Frame ref;
+		ref.mutable_scan_pattern();
+		ref.set_total_number_of_points(0);
+		ref.set_total_number_of_returns(0);
+		ref.add_scanlines()->add_points()->add_returns()->add_cartesian(0);
+		return ref;
+	} ()),
+	REF_FRAME_XYZ_I([] {
+		protocol::data::Frame ref;
+		ref.mutable_scan_pattern();
+		ref.set_total_number_of_points(0);
+		ref.set_total_number_of_returns(0);
+		auto ref_return = ref.add_scanlines()->add_points()->add_returns();
+		ref_return->add_cartesian(0);
+		ref_return->set_intensity(0);
+		return ref;
+	} ()),
+	REF_FRAME_XYZ_I_ID([] {
+		protocol::data::Frame ref;
+		ref.mutable_scan_pattern();
+		ref.set_total_number_of_points(0);
+		ref.set_total_number_of_returns(0);
+		ref.set_id(0);
+		auto ref_scanline = ref.add_scanlines();
+		ref_scanline->set_id(0);
+		auto ref_point = ref_scanline->add_points();
+		ref_point->set_id(0);
+		auto ref_return = ref_point->add_returns();
+		ref_return->set_id(0);
+		ref_return->add_cartesian(0.0f);
+		ref_return->set_intensity(0.0f);
+		return ref;
+	} ()),
+	REF_FRAME_XYZ_I_ID_TS([] {
+		protocol::data::Frame ref;
+		ref.mutable_scan_pattern();
+		ref.set_total_number_of_points(0);
+		ref.set_total_number_of_returns(0);
+		ref.set_id(0);
+		ref.set_start_time_ns(0);
+		auto ref_scanline = ref.add_scanlines();
+		ref_scanline->set_id(0);
+		ref_scanline->set_start_offset_ns(0);
+		auto ref_point = ref_scanline->add_points();
+		ref_point->set_id(0);
+		ref_point->set_start_offset_ns(0);
+		auto ref_return = ref_point->add_returns();
+		ref_return->set_id(0);
+		ref_return->add_cartesian(0.0f);
+		ref_return->set_intensity(0.0f);
+		return ref;
+	} ()),
+	#endif
+	io_context(new asio::io_context()),
+	hostname_or_ip(hostname_or_ip) {
+	if (cert_key_file != "") {
+#ifdef HAVE_OPENSSL
+		ssl_context = new asio::ssl::context(asio::ssl::context::sslv23_client);
+		ssl_context->set_options(asio::ssl::context::default_workarounds|asio::ssl::context::no_sslv2|asio::ssl::context::single_dh_use);
+		ssl_context->use_certificate_file(cert_key_file, asio::ssl::context::pem);
+		ssl_context->use_private_key_file(cert_key_file, asio::ssl::context::pem);
+		ssl_context->set_verify_mode(asio::ssl::verify_peer);
+		ssl_context->load_verify_file(cert_key_file);
+		conn = new scanner_connection(*io_context, hostname_or_ip, *ssl_context);
+#else
+		throw protocol_exception<protocol::Error::NotImplemented>();
+#endif
+	} else {
+		conn = new scanner_connection(*io_context, hostname_or_ip);
+	}
+
 	protocol::Request req;
 	protocol::Response resp;
 	req.mutable_hello()->set_protocol_version(scanner_connection::protocol_version);
 	conn->send_request(req, resp);
 }
-
-#endif
 
 scanner::~scanner() {
 	if(conn)
 		delete conn;
-	if(io_context)
-		delete io_context;
 #ifdef HAVE_OPENSSL
 	if(ssl_context)
 		delete ssl_context;
 #endif
+	if(io_context)
+		delete io_context;
 }
 
 std::shared_ptr<scanner> scanner::connect(string hostname_or_ip) {
@@ -397,6 +452,18 @@ std::shared_ptr<scanner::point_cloud_stream<protocol::data::Frame> > scanner::ge
 	return std::make_shared<point_cloud_stream<protocol::data::Frame> >(create_connection());
 }
 
+std::shared_ptr<scanner::point_cloud_stream<protocol::data::Frame> > scanner::get_point_cloud_stream(const protocol::data::Frame reference_frame) {
+	return std::make_shared<point_cloud_stream<protocol::data::Frame> >(create_connection(), nullptr, &reference_frame);
+}
+
+std::shared_ptr<scanner::point_cloud_stream<protocol::data::Frame> > scanner::get_point_cloud_stream(const protocol::stream::Subscribe::PointCloud::Filter filter) {
+	return std::make_shared<point_cloud_stream<protocol::data::Frame> >(create_connection(), &filter, nullptr);
+}
+
+std::shared_ptr<scanner::point_cloud_stream<protocol::data::Frame> > scanner::get_point_cloud_stream(const protocol::stream::Subscribe::PointCloud::Filter filter, const protocol::data::Frame reference_frame) {
+	return std::make_shared<point_cloud_stream<protocol::data::Frame> >(create_connection(), &filter, &reference_frame);
+}
+
 #ifdef BSL_RECORDING
 std::shared_ptr<scanner::point_cloud_stream<protocol::data::Frame> > scanner::file_point_cloud_stream(std::istream* istream) {
 	return std::make_shared<point_cloud_stream<protocol::data::Frame> >(istream);
@@ -410,6 +477,14 @@ const protocol::Status scanner::get_status() {
 	req.mutable_status();
 	conn->send_request(req, resp);
 	return resp.status();
+}
+
+const protocol::Response::RunSelfTest scanner::run_self_test() {
+	protocol::Request req;
+	protocol::Response resp;
+	req.mutable_run_self_test();
+	conn->send_request(req, resp);
+	return resp.run_self_test();
 }
 
 const protocol::config::ScanPattern scanner::get_scan_pattern() {
@@ -450,15 +525,31 @@ void scanner::subscribe(subscribe_status_callback_t cb) {
 
 #endif
 
-std::ostream& operator<<(std::ostream &strm, const protocol::data::frame_t& frame) {
+}
+
+std::ostream& operator<<(std::ostream &strm, const blickfeld::protocol::data::frame_t& frame) {
 	return strm << "<Blickfeld Frame " << frame.id << ">";
 }
 
 #ifndef BSL_STANDALONE
-std::ostream& operator<<(std::ostream &strm, const protocol::data::Frame& frame) {
-	return strm << "<Blickfeld Frame " << frame.id() << ">";
+std::ostream& operator<<(std::ostream &strm, const blickfeld::protocol::data::Frame& frame) {
+	return strm << "<Blickfeld Frame " << frame.id() << ": " << frame.total_number_of_returns() << " returns, "
+		    << setprecision(1) << fixed << frame.scan_pattern().horizontal().fov() * 180.0f / M_PI << "x" << frame.scan_pattern().vertical().fov() * 180.0f / M_PI << " FoV, "
+		    << setprecision(0) << fixed << frame.scanlines_size() << " scanlines>";
+}
+
+std::ostream& operator<<(std::ostream &strm, const blickfeld::protocol::data::Point& point) {
+	return strm << "<Blickfeld Point " << point.id() << ": " << point.returns_size() << (point.returns_size() == 1 ? " return>" : " returns>");
+}
+
+std::ostream& operator<<(std::ostream &strm, const blickfeld::protocol::data::Point::Return& ret) {
+	return strm << "<Blickfeld Point::Return " << ret.id() << ": "
+		    << setprecision(2) << fixed
+		    << "(x: " << ret.cartesian(0)
+		    << ", y: " << ret.cartesian(1)
+		    << ", z: " << ret.cartesian(0)
+		    << ") [m], "
+		    << setprecision(0) << "intensity of " << ret.intensity() << ">";
 }
 
 #endif
-
-}

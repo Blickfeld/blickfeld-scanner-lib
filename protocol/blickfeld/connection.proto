@@ -65,6 +65,16 @@ message Request {
 	message Status {
 	}
 
+	/**
+	 * > Introduced in BSL v2.9 and firmware v1.9
+	 *
+	 * This request triggers a self test of the device.
+	 * It validates the hardware, operates the device, and generates a report.
+	 * The report is currently only accessible by developers.
+	 */
+	message RunSelfTest {
+	}
+
 	oneof data {
 		Hello hello = 11;  // Refer to [Request.Hello](#blickfeld.protocol.Request.Hello)
 		Developer developer = 13;  // Refer to [Request.Developer](#blickfeld.protocol.Request.Developer)
@@ -73,6 +83,7 @@ message Request {
 		GetScanPattern get_scan_pattern = 17;  // Refer to [Request.GetScanPattern](#blickfeld.protocol.Request.GetScanPattern)
 		stream.Subscribe subscribe = 18;  // Refer to [Subscribe](#blickfeld.protocol.stream.Subscribe)
 		Status status = 19;  // Refer to [Request.Status](#blickfeld.protocol.Request.Status)
+		RunSelfTest run_self_test = 20;  // Refer to [Request.RunSelfTest](#blickfeld.protocol.Request.RunSelfTest)
 
 		string _asJSON = 100; // Internal use only
 	}
@@ -130,6 +141,18 @@ message Response {
 		optional config.ScanPattern legacy_config = 1 [(optional) = true]; // Deprecated
 	}
 
+	/**
+	 * > Introduced in BSL v2.9 and firmware v1.9
+	 *
+	 * This response is returned after a self test.
+	 * The success flag indicates if the hardware is fully operational.
+	 * The generated report is currently only accessible by developers.
+	 */
+	message RunSelfTest {
+		optional bool success = 1;
+		extensions 2;
+	}
+
 	oneof data {
 		Error error = 10;  // Refer to [Error](#blickfeld.protocol.Error)
 		Hello hello = 11;  // Refer to [Response.Hello](#blickfeld.protocol.Response.Hello)
@@ -139,6 +162,7 @@ message Response {
 		GetScanPattern get_scan_pattern = 17;  // Refer to [Response.GetScanPattern](#blickfeld.protocol.Response.GetScanPattern)
 		stream.Event event = 18;  // Refer to [Event](#blickfeld.protocol.stream.Event)
 		Status status = 19;  // Refer to [Response.Status](#blickfeld.protocol.Response.Status)
+		RunSelfTest run_self_test = 20; // Refer to [Response.RunSelfTest](#blickfeld.protocol.Response.RunSelfTest)
 
 		string _asJSON = 100; // Internal use only
 	}

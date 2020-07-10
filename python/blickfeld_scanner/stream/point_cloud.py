@@ -21,7 +21,7 @@ from ..protocol.file import general_pb2, point_cloud_pb2
 from ..protocol.data import frame_pb2
 from .. import version
 
-frame_pb2.Frame.__str__ = lambda self: "<Blickfeld Frame %u: %u returns, %.1fx%.1f FoV, %u scanlines>" % (
+frame_pb2.Frame.__repr__ = frame_pb2.Frame.__str__ = lambda self: "<Blickfeld Frame %u: %u returns, %.1fx%.1f FoV, %u scanlines>" % (
         self.id, 
         self.total_number_of_returns, 
         self.scan_pattern.horizontal.fov * 180 / math.pi, 
@@ -29,13 +29,50 @@ frame_pb2.Frame.__str__ = lambda self: "<Blickfeld Frame %u: %u returns, %.1fx%.
         len(self.scanlines)
     )
 
+""" Reference frame: XYZ coordinates """
+REF_FRAME_XYZ = frame_pb2.Frame()
+REF_FRAME_XYZ.scan_pattern.SetInParent()
+REF_FRAME_XYZ.total_number_of_points = 0
+REF_FRAME_XYZ.total_number_of_returns = 0
+REF_FRAME_XYZ.scanlines.add().points.add().returns.add().cartesian.append(0)
+
+""" Reference frame: XYZ coordinates, intensity """
+REF_FRAME_XYZ_I = frame_pb2.Frame()
+REF_FRAME_XYZ_I.CopyFrom(REF_FRAME_XYZ)
+REF_FRAME_XYZ_I.scanlines[0].points[0].returns[0].intensity = 0
+
+""" Reference frame: XYZ coordinates, intensity, frame id, scanline id, point id, return id """
+REF_FRAME_XYZ_I_ID = frame_pb2.Frame()
+REF_FRAME_XYZ_I_ID.CopyFrom(REF_FRAME_XYZ_I)
+REF_FRAME_XYZ_I_ID.id = 0
+REF_FRAME_XYZ_I_ID.scanlines[0].id = 0
+REF_FRAME_XYZ_I_ID.scanlines[0].points[0].id = 0
+REF_FRAME_XYZ_I_ID.scanlines[0].points[0].returns[0].id = 0
+
+""" Reference frame: XYZ coordinates, intensity, frame id, scanline id, point id, return id, timestamps """
+REF_FRAME_XYZ_I_ID_TS = frame_pb2.Frame()
+REF_FRAME_XYZ_I_ID_TS.CopyFrom(REF_FRAME_XYZ_I_ID)
+REF_FRAME_XYZ_I_ID_TS.start_time_ns = 0
+REF_FRAME_XYZ_I_ID_TS.scanlines[0].start_offset_ns = 0
+REF_FRAME_XYZ_I_ID_TS.scanlines[0].points[0].start_offset_ns = 0
+
 class point_cloud(object):
+
+    """ Reference frame: XYZ coordinates """
+    REF_FRAME_XYZ = REF_FRAME_XYZ
+    """ Reference frame: XYZ coordinates, intensity """
+    REF_FRAME_XYZ_I = REF_FRAME_XYZ_I
+    """ Reference frame: XYZ coordinates, intensity, frame id, scanline id, point id, return id """
+    REF_FRAME_XYZ_I_ID = REF_FRAME_XYZ_I_ID
+    """ Reference frame: XYZ coordinates, intensity, frame id, scanline id, point id, return id, timestamps """
+    REF_FRAME_XYZ_I_ID_TS = REF_FRAME_XYZ_I_ID_TS
+
     """ Class to request a point cloud stream
 
     :param connection: connection to the device
     :type connection: :py:class:`blickfeld_scanner.scanner.connection`
     """
-    def __init__(self, connection=None, from_file=None):
+    def __init__(self, connection=None, from_file=None, filter=None, reference_frame=None):
         self._metadata = point_cloud_pb2.PointCloud.Metadata()
         
         if connection and from_file:
@@ -52,6 +89,11 @@ class point_cloud(object):
 
             req = connection_pb2.Request()
             req.subscribe.point_cloud.SetInParent()
+            if filter:
+                req.subscribe.point_cloud.filter.CopyFrom(filter)
+            if reference_frame:
+                req.subscribe.point_cloud.reference_frame.CopyFrom(reference_frame)
+            
             self._metadata.header.device.CopyFrom(self._connection.send_request(req).event.point_cloud.header)
             
             self._metadata.header.client.library_version = version.__version__

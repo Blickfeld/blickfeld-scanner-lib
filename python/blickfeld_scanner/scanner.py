@@ -92,12 +92,20 @@ class scanner(object):
         """
         return status_stream(self.create_connection())
 
-    def get_point_cloud_stream(self):
+    def get_point_cloud_stream(self, filter=None, reference_frame=None):
         """ Request point cloud stream of device
 
-        :returns: :py:class:`blickfeld_scanner.scanner.point_cloud_stream` object
+        :param filter: 
+            > Introduced in BSL v2.9 and firmware v1.9
+            
+            Filter points and returns by point attributes during the post-processing on the device.
+        :param reference_frame: 
+            > Introduced in BSL v2.9 and firmware v1.9
+            
+            Frame representing the desired data. To request a field, set it to any value (also in submessages). For a repeated field, add at least one element.
+        :returns: :py:class:`blickfeld_scanner.scanner.stream.point_cloud` object
         """
-        return stream.point_cloud(self.create_connection())
+        return stream.point_cloud(self.create_connection(), filter=filter, reference_frame=reference_frame)
 
     @staticmethod
     def file_point_cloud_stream(dump_filename):
@@ -105,7 +113,7 @@ class scanner(object):
         No device (and connection to a device) is needed for this operation.
 
         :param dump_filename: path to .bfpc file
-        :return: :py:class:`blickfeld_scanner.scanner.point_cloud_stream` object
+        :return: :py:class:`blickfeld_scanner.scanner.stream.point_cloud` object
         """
         return stream.point_cloud(from_file=dump_filename)
     
@@ -180,6 +188,18 @@ class scanner(object):
             req = requests.put(self.api_path + "network/ntp/server", data=json.dumps({ "data": server }), headers={"Content-Type": "application/json"})
             req.raise_for_status()
             log.info("Configured NTP server to '%s'. Please power cycle the device to apply changes." % (self.get_ntp_server()))
+            
+    def run_self_test(self):
+        """> Introduced in BSL v2.9 and firmware v1.9
+        
+        Run self test on the device.
+        See :any:`protobuf_protocol` Request.RunSelfTest.
+
+        :return: Self test run response, see :any:`protobuf_protocol` Response.RunSelfTest
+        """
+        req = connection_pb2.Request()
+        req.run_self_test.SetInParent()
+        return self._connection.send_request(req).run_self_test
         
     def create_connection(self):
         """Function to create a new connection

@@ -13,6 +13,20 @@ influence the resulting point cloud.
 
 ### Removed
 
+## [2.10.0] - 2020.07.10
+
+### Added
+* [Introduced in firmware v1.9] Protocol: Request to trigger a self test of the device
+   - Validates the hardware, operates the device, and generates a report.
+   - The report is currently only accessible by developers.
+   - A success flag indicates if the device is functional.
+* [Introduced in firmware v1.9] Configurable point-cloud stream: Used to reduce the network bandwidth and to decrease the Protobuf encoding/decoding effort
+   - The post-processing can be configured with a filter. It allows to increase the number of returns per point and provides min/max filters for point attributes.
+   - The desired frame fields in the stream can be requested by passing a reference frame. Example reference frames are available.
+
+### Changed
+* CI: Improve internal release automation
+
 ## [2.9.1] - 2020.06.25
 
 ### Changed

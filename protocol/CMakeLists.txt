@@ -98,6 +98,7 @@ set(PROTOBUF_SOURCES
 	blickfeld/update/hardware.proto
 	blickfeld/update/manifest.proto
 	
+	blickfeld/common.proto
 	blickfeld/options.proto
 	blickfeld/error.proto
 	blickfeld/connection.proto
