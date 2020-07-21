@@ -5,7 +5,7 @@
  * This source code is licensed under the BSD-style license found in the
  * LICENSE.md file in the root directory of this source tree.
  *
- * > Introduced in BSL v2.9 and firmware v1.9
+ * > Introduced in BSL v2.10 and firmware v1.9
  *
  */
 #include <stdio.h>

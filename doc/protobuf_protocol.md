@@ -357,7 +357,7 @@ This request is used for initial communication after connecting to a device and 
 <a name="blickfeld.protocol.Request.RunSelfTest"></a>
 
 ### Request.RunSelfTest
-> Introduced in BSL v2.9 and firmware v1.9
+> Introduced in BSL v2.10 and firmware v1.9
 
 This request triggers a self test of the device.
 It validates the hardware, operates the device, and generates a report.
@@ -483,7 +483,7 @@ This response is sent out after establishing a connection.
 <a name="blickfeld.protocol.Response.RunSelfTest"></a>
 
 ### Response.RunSelfTest
-> Introduced in BSL v2.9 and firmware v1.9
+> Introduced in BSL v2.10 and firmware v1.9
 
 This response is returned after a self test.
 The success flag indicates if the hardware is fully operational.
@@ -1649,8 +1649,8 @@ This request is used for subscribing to a point cloud stream.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| reference_frame | [blickfeld.protocol.data.Frame](#blickfeld.protocol.data.Frame) | optional | <blockquote>Introduced in BSL v2.9 and firmware v1.9</blockquote> If present, only fields that are set in this message and submessages will be present in the point cloud. If less fields are requested, the Protobuf encoding and network transport time can reduce significantly. |
-| filter | [Subscribe.PointCloud.Filter](#blickfeld.protocol.stream.Subscribe.PointCloud.Filter) | optional | <blockquote>Introduced in BSL v2.9 and firmware v1.9</blockquote> Refer to [PointCloud.Filter](#blickfeld.protocol.stream.Subscribe.PointCloud.Filter) |
+| reference_frame | [blickfeld.protocol.data.Frame](#blickfeld.protocol.data.Frame) | optional | <blockquote>Introduced in BSL v2.10 and firmware v1.9</blockquote> If present, only fields that are set in this message and submessages will be present in the point cloud. If less fields are requested, the Protobuf encoding and network transport time can reduce significantly. |
+| filter | [Subscribe.PointCloud.Filter](#blickfeld.protocol.stream.Subscribe.PointCloud.Filter) | optional | <blockquote>Introduced in BSL v2.10 and firmware v1.9</blockquote> Refer to [PointCloud.Filter](#blickfeld.protocol.stream.Subscribe.PointCloud.Filter) |
 
 
 
@@ -1660,7 +1660,7 @@ This request is used for subscribing to a point cloud stream.
 <a name="blickfeld.protocol.stream.Subscribe.PointCloud.Filter"></a>
 
 ### Subscribe.PointCloud.Filter
-> Introduced in BSL v2.9 and firmware v1.9
+> Introduced in BSL v2.10 and firmware v1.9
 
 Filter points and returns by point attributes during the post-processing on the device.
 This can be used to e.g. filter points with low intensity or to enable secondary returns.
@@ -1751,6 +1751,7 @@ do NOT change enum labels, they are used as strings in code
 | CUBE_V1_0 | 4 |  |
 | AURORA_P3 | 3 |  |
 | APOLLON_A0 | 2 |  |
+| APOLLON_A1_BDU | 8 |  |
 
 
  <!-- end enums -->

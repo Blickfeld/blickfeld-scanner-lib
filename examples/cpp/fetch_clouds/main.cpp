@@ -58,16 +58,15 @@ int example(int argc, char* argv[]) {
 		std::cout << frame << std::endl;
 
 		// Example for available attributes in frame
-//		time_t time_s = frame.start_time_ns() / 1e9;
-//		auto timepoint = localtime(&time_s);
-//		// Print some basic information about this frame
-//		printf ("Frame:  scanlines %u (max %0.2f Hz - current %0.2f Hz) - timestamp %f - %s",
-//			   frame.scanlines_size(),
-//			   frame.scan_pattern().frame_rate().maximum(),
-//			   frame.scan_pattern().frame_rate().target(),
-//			   frame.start_time_ns() / 1e9,
-//			   asctime(timepoint)
-//			   );
+		time_t time_s = frame.start_time_ns() / 1e9;
+		auto timepoint = localtime(&time_s);
+		printf ("Frame attributes:  scanlines %u (max %0.2f Hz - current %0.2f Hz) - timestamp %f - %s",
+			   frame.scanlines_size(),
+			   frame.scan_pattern().frame_rate().maximum(),
+			   frame.scan_pattern().frame_rate().target(),
+			   frame.start_time_ns() / 1e9,
+			   asctime(timepoint)
+			   );
 
 		// Specify number of points printed per frame
 		int print_n_points = 3;
@@ -93,11 +92,11 @@ int example(int argc, char* argv[]) {
 
 					// Example for available attributes
 					// ret.cartesian(0) equals frame.scanlines(s_ind).points(p_ind).returns(r_ind).cartesian(0)
-//					if (p_ind < 10 && s_ind == 0)
-//						printf("Point %u - ret %u [x: %4.2f, y: %4.2f, z: %4.2f] - intensity: %u\n",
-//						       point.id(), ret.id(),
-//						       ret.cartesian(0), ret.cartesian(1), ret.cartesian(2),
-//						       ret.intensity());
+					if (p_ind < print_n_points && s_ind == 0)
+						printf("Point attributes: ret %u [x: %4.2f, y: %4.2f, z: %4.2f] - intensity: %u\n",
+						       ret.id(),
+						       ret.cartesian(0), ret.cartesian(1), ret.cartesian(2),
+						       ret.intensity());
 				}
 				if (p_ind < print_n_points && s_ind == 0)
 					std::cout << std::endl;

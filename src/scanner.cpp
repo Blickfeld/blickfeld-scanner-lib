@@ -360,6 +360,22 @@ scanner::scanner(std::string hostname_or_ip, std::string cert_key_file) :
 		ref_return->set_intensity(0.0f);
 		return ref;
 	} ()),
+	REF_FRAME_DEPTH_MAP([] {
+		protocol::data::Frame ref;
+		ref.mutable_scan_pattern();
+		ref.set_total_number_of_points(0);
+		ref.set_total_number_of_returns(0);
+		ref.set_id(0);
+		auto ref_scanline = ref.add_scanlines();
+		ref_scanline->set_id(0);
+		auto ref_point = ref_scanline->add_points();
+		ref_point->set_id(0);
+		ref_point->set_ambient_light_level(0.0f);
+		auto ref_return = ref_point->add_returns();
+		ref_return->set_intensity(0.0f);
+		ref_return->set_range(0.0f);
+		return ref;
+	} ()),
 	#endif
 	io_context(new asio::io_context()),
 	hostname_or_ip(hostname_or_ip) {

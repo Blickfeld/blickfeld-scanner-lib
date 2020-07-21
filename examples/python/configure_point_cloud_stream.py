@@ -5,6 +5,8 @@
 # This source code is licensed under the BSD-style license found in the
 # LICENSE.md file in the root directory of this source tree.
 #
+# > Introduced in BSL v2.10 and firmware v1.9
+#
 from __future__ import print_function
 
 import argparse
@@ -14,7 +16,8 @@ from blickfeld_scanner.protocol.stream import connection_pb2
 
 
 def configure_point_cloud_stream(args):
-    """Fetch the point cloud of a device and print the frame ID and number of returns in the received frame.
+    """Fetch a basic point cloud. Only get specific fields of each point: X, Y, Z, intensity and ID.
+    Use a filter to filter out points which are closer than 5m or further away than 50m.
 
     :param args: arguments to parse out the hostname or IP address of the device and an optional file path to record to.
     """

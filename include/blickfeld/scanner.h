@@ -76,6 +76,7 @@ public:
 	const protocol::data::Frame REF_FRAME_XYZ_I; // Reference frame: XYZ coordinates, intensity
 	const protocol::data::Frame REF_FRAME_XYZ_I_ID; // Reference frame: XYZ coordinates, intensity, frame id, scanline id, point id, return id
 	const protocol::data::Frame REF_FRAME_XYZ_I_ID_TS; // Reference frame: XYZ coordinates, intensity, frame id, scanline id, point id, return id, timestamps
+	const protocol::data::Frame REF_FRAME_DEPTH_MAP; // Reference frame: ambient_light_level, intensity, range, frame id, scanline id, point id
 #endif
 
 	/**
@@ -281,7 +282,7 @@ public:
 	std::shared_ptr<scanner::point_cloud_stream<protocol::data::Frame> > get_point_cloud_stream();
 
 	/**
-	 * > Introduced in BSL v2.9 and firmware v1.9
+	 * > Introduced in BSL v2.10 and firmware v1.9
 	 *
 	 * Fetches point cloud frames from the device.
 	 * This call already boots up the device.
@@ -294,7 +295,7 @@ public:
 	std::shared_ptr<scanner::point_cloud_stream<protocol::data::Frame> > get_point_cloud_stream(const protocol::stream::Subscribe::PointCloud::Filter filter);
 
 	/**
-	 * > Introduced in BSL v2.9 and firmware v1.9
+	 * > Introduced in BSL v2.10 and firmware v1.9
 	 *
 	 * Fetches point cloud frames from the device.
 	 * This call already boots up the device.
@@ -307,7 +308,7 @@ public:
 	std::shared_ptr<scanner::point_cloud_stream<protocol::data::Frame> > get_point_cloud_stream(const protocol::data::Frame reference_frame);
 
 	/**
-	 * > Introduced in BSL v2.9 and firmware v1.9
+	 * > Introduced in BSL v2.10 and firmware v1.9
 	 *
 	 * Fetches point cloud frames from the device.
 	 * This call already boots up the device.

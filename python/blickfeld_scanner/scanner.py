@@ -96,11 +96,11 @@ class scanner(object):
         """ Request point cloud stream of device
 
         :param filter: 
-            > Introduced in BSL v2.9 and firmware v1.9
+            > Introduced in BSL v2.10 and firmware v1.9
             
             Filter points and returns by point attributes during the post-processing on the device.
         :param reference_frame: 
-            > Introduced in BSL v2.9 and firmware v1.9
+            > Introduced in BSL v2.10 and firmware v1.9
             
             Frame representing the desired data. To request a field, set it to any value (also in submessages). For a repeated field, add at least one element.
         :returns: :py:class:`blickfeld_scanner.scanner.stream.point_cloud` object
@@ -190,7 +190,7 @@ class scanner(object):
             log.info("Configured NTP server to '%s'. Please power cycle the device to apply changes." % (self.get_ntp_server()))
             
     def run_self_test(self):
-        """> Introduced in BSL v2.9 and firmware v1.9
+        """> Introduced in BSL v2.10 and firmware v1.9
         
         Run self test on the device.
         See :any:`protobuf_protocol` Request.RunSelfTest.

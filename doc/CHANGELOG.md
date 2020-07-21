@@ -13,6 +13,17 @@ influence the resulting point cloud.
 
 ### Removed
 
+## [2.10.1] - 2020.07.21
+
+### Added
+* Protocol: HW Variant Apollon A1 BDU
+* Reference frame for depth map
+
+### Changed
+* Doc: Fix rendering of python point cloud stream
+* Doc: Add configure point cloud stream to python examples in the doc
+* Upgrade debian testing package to libprotobuf23
+
 ## [2.10.0] - 2020.07.10
 
 ### Added

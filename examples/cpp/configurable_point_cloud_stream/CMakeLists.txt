@@ -5,6 +5,8 @@
 ## This source code is licensed under the BSD-style license found in the
 ## LICENSE.md file in the root directory of this source tree.
 ##
+## > Introduced in BSL v2.10 and firmware v1.9
+##
 cmake_minimum_required (VERSION 2.6)
 
 set(CMAKE_CXX_STANDARD 11)

@@ -56,7 +56,26 @@ REF_FRAME_XYZ_I_ID_TS.start_time_ns = 0
 REF_FRAME_XYZ_I_ID_TS.scanlines[0].start_offset_ns = 0
 REF_FRAME_XYZ_I_ID_TS.scanlines[0].points[0].start_offset_ns = 0
 
+""" Reference frame: ambient_light_level, intensity, range, frame id, scanline id, point id """
+REF_FRAME_DEPTH_MAP = frame_pb2.Frame()
+REF_FRAME_DEPTH_MAP.scan_pattern.SetInParent()
+REF_FRAME_DEPTH_MAP.total_number_of_points = 0
+REF_FRAME_DEPTH_MAP.total_number_of_returns = 0
+REF_FRAME_DEPTH_MAP.id = 0
+REF_FRAME_DEPTH_MAP.scanlines.add().points.add().returns.add()
+REF_FRAME_DEPTH_MAP.scanlines[0].id = 0
+REF_FRAME_DEPTH_MAP.scanlines[0].points[0].id = 0
+REF_FRAME_DEPTH_MAP.scanlines[0].points[0].ambient_light_level = 0
+REF_FRAME_DEPTH_MAP.scanlines[0].points[0].returns[0].intensity = 0
+REF_FRAME_DEPTH_MAP.scanlines[0].points[0].returns[0].range = 0
+
+
 class point_cloud(object):
+    """ Class to request a point cloud stream
+
+    :param connection: connection to the device
+    :type connection: :py:class:`blickfeld_scanner.scanner.connection`
+    """
 
     """ Reference frame: XYZ coordinates """
     REF_FRAME_XYZ = REF_FRAME_XYZ
@@ -66,12 +85,9 @@ class point_cloud(object):
     REF_FRAME_XYZ_I_ID = REF_FRAME_XYZ_I_ID
     """ Reference frame: XYZ coordinates, intensity, frame id, scanline id, point id, return id, timestamps """
     REF_FRAME_XYZ_I_ID_TS = REF_FRAME_XYZ_I_ID_TS
+    """ Reference frame: ambient_light_level, intensity, range, frame id, scanline id, point id """
+    REF_FRAME_DEPTH_MAP = REF_FRAME_DEPTH_MAP
 
-    """ Class to request a point cloud stream
-
-    :param connection: connection to the device
-    :type connection: :py:class:`blickfeld_scanner.scanner.connection`
-    """
     def __init__(self, connection=None, from_file=None, filter=None, reference_frame=None):
         self._metadata = point_cloud_pb2.PointCloud.Metadata()
         

@@ -17,6 +17,7 @@ enum HardwareVariant {
     AURORA_P3 = 3;
 
     APOLLON_A0 = 2;
+    APOLLON_A1_BDU = 8;
 };
 
 // partial parse of trenz_eeprom_msg
