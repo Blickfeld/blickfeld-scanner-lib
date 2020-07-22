@@ -13,6 +13,11 @@ influence the resulting point cloud.
 
 ### Removed
 
+## [2.10.2] - 2020.07.22
+
+### Changed
+* Bugfix: Frame was recorded multiple times if Python writer was faster than frame receiver
+
 ## [2.10.1] - 2020.07.21
 
 ### Added

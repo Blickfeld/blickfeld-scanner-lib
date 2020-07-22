@@ -187,6 +187,8 @@ class point_cloud(object):
                 
                     _EncodeVarint(self._ofile.write, self._stream_data.ByteSize())
                     self._ofile.write(self._stream_data.SerializeToString())
+                    # Clear data
+                    self._stream_data.ClearField("frame")
 
     def close(self):
         """ Close point cloud stream and connection
