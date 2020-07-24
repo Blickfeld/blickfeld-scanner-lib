@@ -6,6 +6,7 @@
 ## LICENSE.md file in the root directory of this source tree.
 ##
 add_subdirectory(async_fetch_clouds)
+add_subdirectory(configurable_point_cloud_stream)
 add_subdirectory(fetch_clouds)
 add_subdirectory(set_scan_pattern)
 add_subdirectory(error_handling)

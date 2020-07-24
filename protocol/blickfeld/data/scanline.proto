@@ -1,6 +1,7 @@
 syntax = "proto2";
 option cc_enable_arenas = true;
 
+import "blickfeld/options.proto";
 import "blickfeld/data/point.proto";
 
 package blickfeld.protocol.data;
@@ -9,8 +10,8 @@ package blickfeld.protocol.data;
  * This section describes the contents of a single scan line in a point cloud frame.
  */
 message Scanline {
-    optional uint64 id = 1;  // Scan line ID in the corresponding frame
-    optional uint64 frame_id = 2;  // Frame ID of the corresponding frame
-    repeated Point points = 3;  // Refer to [Point](#blickfeld.protocol.data.Point)
-    optional uint64 start_offset_ns = 4; // Unit: [ns] - start time of the scanline in relation to [Frame.start_time_ns](#blickfeld.protocol.data.Frame.start_time_ns)
+    optional uint64 id = 1 [(optional)=true];  // Scan line ID in the corresponding frame
+    optional uint64 frame_id = 2 [(optional)=true];  // Frame ID of the corresponding frame
+    repeated Point points = 3 [(optional)=true];  // Refer to [Point](#blickfeld.protocol.data.Point)
+    optional uint64 start_offset_ns = 4 [(optional)=true]; // Unit: [ns] - start time of the scanline in relation to [Frame.start_time_ns](#blickfeld.protocol.data.Frame.start_time_ns)
 }

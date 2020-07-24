@@ -35,7 +35,7 @@ int example(int argc, char* argv[]) {
 
 	// Create a connection to the device.
 	std::shared_ptr<blickfeld::scanner> scanner = blickfeld::scanner::connect(scanner_ip_or_host);
-	printf("Connected.\n");
+	std::cout << "Connected." << std::endl;
 
 	// Create a pointcloud stream object to receive pointclouds
 	stream = scanner->get_point_cloud_stream();
@@ -54,16 +54,22 @@ int example(int argc, char* argv[]) {
 		// Protobuf API is described in https://developers.google.com/protocol-buffers/docs/cpptutorial
 		const blickfeld::protocol::data::Frame frame = stream->recv_frame();
 
+		// Print information about this frame
+		std::cout << frame << std::endl;
+
+		// Example for available attributes in frame
 		time_t time_s = frame.start_time_ns() / 1e9;
 		auto timepoint = localtime(&time_s);
-		// Print some basic information about this frame
-		printf ("Frame:  scanlines %u (max %0.2f Hz - current %0.2f Hz) - timestamp %f - %s",
-			frame.scanlines_size(),
-			frame.scan_pattern().frame_rate().maximum(),
-			frame.scan_pattern().frame_rate().target(),
-			frame.start_time_ns() / 1e9,
-			asctime(timepoint)
-			);
+		printf ("Frame attributes:  scanlines %u (max %0.2f Hz - current %0.2f Hz) - timestamp %f - %s",
+			   frame.scanlines_size(),
+			   frame.scan_pattern().frame_rate().maximum(),
+			   frame.scan_pattern().frame_rate().target(),
+			   frame.start_time_ns() / 1e9,
+			   asctime(timepoint)
+			   );
+
+		// Specify number of points printed per frame
+		int print_n_points = 3;
 
 		// Example for scanline and point iteration
 		// Iterate through all the scanlines in a frame
@@ -72,18 +78,28 @@ int example(int argc, char* argv[]) {
 			for (int p_ind = 0; p_ind < frame.scanlines(s_ind).points_size(); p_ind++) {
 				auto& point = frame.scanlines(s_ind).points(p_ind);
 
+				// Print information about the first 3 points of the first scanline
+				if (p_ind < print_n_points && s_ind == 0)
+					std::cout << point << (point.returns_size() ? ": " : "");
+
 				// Iterate through all the returns for each points
 				for (int r_ind = 0; r_ind < point.returns_size(); r_ind++) {
 					auto& ret = point.returns(r_ind);
 
-					// Print information for the first 10 points in the first scanline of each frame
+					// Print information about the first 3 points of the first scanline
+					if (p_ind < print_n_points && s_ind == 0)
+						std::cout << (ret.id() > 0 ? ", " : "") << ret;
+
+					// Example for available attributes
 					// ret.cartesian(0) equals frame.scanlines(s_ind).points(p_ind).returns(r_ind).cartesian(0)
-					if (p_ind < 10 && s_ind == 0)
-						printf("Point %u -ret %u [x: %4.2f, y: %4.2f, z: %4.2f] - intensity: %u\n",
-						       point.id(), ret.id(),
+					if (p_ind < print_n_points && s_ind == 0)
+						printf("Point attributes: ret %u [x: %4.2f, y: %4.2f, z: %4.2f] - intensity: %u\n",
+						       ret.id(),
 						       ret.cartesian(0), ret.cartesian(1), ret.cartesian(2),
 						       ret.intensity());
 				}
+				if (p_ind < print_n_points && s_ind == 0)
+					std::cout << std::endl;
 			}
 		}
 	}

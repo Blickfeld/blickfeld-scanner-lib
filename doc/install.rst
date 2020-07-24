@@ -46,7 +46,7 @@ Latest debian-based systems
 .. code-block:: bash
 
     sudo apt update
-    sudo apt install -y wget libprotobuf-dev libprotobuf22
+    sudo apt install -y wget libprotobuf-dev libprotobuf23
     wget https://github.com/Blickfeld/blickfeld-scanner-lib/releases/latest/download/blickfeld-scanner-lib-dev-testing-Linux.deb
     sudo dpkg -i blickfeld-scanner-lib-dev-testing-Linux.deb
 

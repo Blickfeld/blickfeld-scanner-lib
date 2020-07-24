@@ -1,0 +1,15 @@
+syntax = "proto2";
+
+import "blickfeld/options.proto";
+
+package blickfeld.protocol;
+
+message ValueRange {
+	optional float minimum = 1;
+	optional float maximum = 2;
+}
+
+message OptionalValueRange {
+	optional float minimum = 1 [(optional)=true];
+	optional float maximum = 2 [(optional)=true];
+}

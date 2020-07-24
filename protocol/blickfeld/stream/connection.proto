@@ -1,8 +1,10 @@
 syntax = "proto2";
 option cc_enable_arenas = true;
 
+import "blickfeld/common.proto";
 import "blickfeld/options.proto";
 import "blickfeld/data/point_cloud.proto";
+import "blickfeld/data/frame.proto";
 import "blickfeld/status/main.proto";
 
 package blickfeld.protocol.stream;
@@ -17,6 +19,21 @@ message Subscribe {
 	 * This request is used for subscribing to a point cloud stream.
 	 */
 	message PointCloud {
+		/**
+		 * > Introduced in BSL v2.10 and firmware v1.9
+		 *
+		 * Filter points and returns by point attributes during the post-processing on the device.
+		 * This can be used to e.g. filter points with low intensity or to enable secondary returns.
+		 */
+		message Filter {
+			optional uint32 max_number_of_returns_per_point = 1 [default = 1]; // Set maximum number of returns per point. By default, secondary returns are disabled. Set this, e.g. to 2, to enable secondary returns.
+			optional OptionalValueRange intensity = 2; // Filter all points, which intensity values are not within this value range.
+			optional OptionalValueRange ambient_light_level = 3; // Filter all points, which ambient light level values are not within this value range.
+			optional OptionalValueRange range = 4; // Filter all points, which range values are not within this value range.
+		}
+
+		optional data.Frame reference_frame = 1 [(optional)=true, (allow_sparse)=true]; // <blockquote>Introduced in BSL v2.10 and firmware v1.9</blockquote> If present, only fields that are set in this message and submessages will be present in the point cloud. If less fields are requested, the Protobuf encoding and network transport time can reduce significantly.
+		optional Filter filter = 2; // <blockquote>Introduced in BSL v2.10 and firmware v1.9</blockquote> Refer to [PointCloud.Filter](#blickfeld.protocol.stream.Subscribe.PointCloud.Filter)
 	}
 
 	/**

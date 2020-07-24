@@ -58,6 +58,9 @@ namespace file {
 class PointCloud_Metadata;
 class PointCloud_Data;
 }
+namespace stream {
+class Subscribe_PointCloud_Filter;
+}
 }
 
 class connection;
@@ -67,6 +70,14 @@ class connection;
  */
 class scanner : public logged_object {
 public:
+
+#ifndef BSL_STANDALONE
+	const protocol::data::Frame REF_FRAME_XYZ; // Reference frame: XYZ coordinates
+	const protocol::data::Frame REF_FRAME_XYZ_I; // Reference frame: XYZ coordinates, intensity
+	const protocol::data::Frame REF_FRAME_XYZ_I_ID; // Reference frame: XYZ coordinates, intensity, frame id, scanline id, point id, return id
+	const protocol::data::Frame REF_FRAME_XYZ_I_ID_TS; // Reference frame: XYZ coordinates, intensity, frame id, scanline id, point id, return id, timestamps
+	const protocol::data::Frame REF_FRAME_DEPTH_MAP; // Reference frame: ambient_light_level, intensity, range, frame id, scanline id, point id
+#endif
 
 	/**
 	 * Point Cloud Stream class for requesting and recording Blickfeld Point Clouds.
@@ -101,8 +112,10 @@ public:
 		 * Internal use. Use scanner::get_point_cloud_stream or scanner::get_simple_point_cloud_stream.
 		 *
 		 * @param conn Scanner connection which should be used for stream.
+		 * @param filter Filter points and returns by point attributes during the post-processing on the device.
+		 * @param reference_frame Frame representing the desired data. To request a field, set it to any value (also in submessages). For a repeated field, add at least one element.
 		 */
-		point_cloud_stream(std::shared_ptr<connection> conn);
+		point_cloud_stream(std::shared_ptr<connection> conn, const protocol::stream::Subscribe_PointCloud_Filter* filter = nullptr, const protocol::data::Frame* reference_frame = nullptr);
 #ifdef BSL_RECORDING
 		/**
 		 * Internal use. Use the static methods scanner::file_point_cloud_stream or scanner::simple_file_point_cloud_stream.
@@ -169,10 +182,9 @@ public:
 #endif
 
 protected:
-	connection* conn = nullptr;
-
-	std::string hostname_or_ip;
 	asio::io_context* io_context = nullptr;
+	std::string hostname_or_ip;
+	connection* conn = nullptr;
 
 #ifdef HAVE_OPENSSL
 	asio::ssl::context* ssl_context = nullptr;
@@ -181,19 +193,10 @@ protected:
 	/**
 	 * Internal use. Use static method connect.
 	 *
-	 * @param hostname_or_ip Hostname or IPv4 of the device.
-	 */
-	scanner(std::string hostname_or_ip);
-
-#ifdef HAVE_OPENSSL
-	/**
-	 * Internal use. Use static method connect.
-	 *
 	 * @param hostname_or_ip Hostname or IPv4 address of the device.
 	 * @param cert_key_file Filename of the cert file for secured connections.
 	 */
-	scanner(std::string hostname_or_ip, std::string cert_key_file);
-#endif
+	scanner(std::string hostname_or_ip, std::string cert_key_file = "");
 
 	/**
 	 * Duplicate scanner connection.
@@ -277,6 +280,47 @@ public:
 	 * @return Shared pointer of stream instance. Use the recv_frame method to get Point Cloud Frames.
 	 */
 	std::shared_ptr<scanner::point_cloud_stream<protocol::data::Frame> > get_point_cloud_stream();
+
+	/**
+	 * > Introduced in BSL v2.10 and firmware v1.9
+	 *
+	 * Fetches point cloud frames from the device.
+	 * This call already boots up the device.
+	 * It fails if the device is in an errored state.
+	 * Delete the shared reference to stop the stream.
+	 *
+	 * @param filter Filter points and returns by point attributes during the post-processing on the device.
+	 * @return Shared pointer of stream instance. Use the recv_frame method to get Point Cloud Frames.
+	 */
+	std::shared_ptr<scanner::point_cloud_stream<protocol::data::Frame> > get_point_cloud_stream(const protocol::stream::Subscribe::PointCloud::Filter filter);
+
+	/**
+	 * > Introduced in BSL v2.10 and firmware v1.9
+	 *
+	 * Fetches point cloud frames from the device.
+	 * This call already boots up the device.
+	 * It fails if the device is in an errored state.
+	 * Delete the shared reference to stop the stream.
+	 *
+	 * @param reference_frame Frame representing the desired data. To request a field, set it to any value (also in submessages). For a repeated field, add at least one element.
+	 * @return Shared pointer of stream instance. Use the recv_frame method to get Point Cloud Frames.
+	 */
+	std::shared_ptr<scanner::point_cloud_stream<protocol::data::Frame> > get_point_cloud_stream(const protocol::data::Frame reference_frame);
+
+	/**
+	 * > Introduced in BSL v2.10 and firmware v1.9
+	 *
+	 * Fetches point cloud frames from the device.
+	 * This call already boots up the device.
+	 * It fails if the device is in an errored state.
+	 * Delete the shared reference to stop the stream.
+	 *
+	 * @param filter Filter points and returns by point attributes during the post-processing on the device.
+	 * @param reference_frame Frame representing the desired data. To request a field, set it to any value (also in submessages). For a repeated field, add at least one element.
+	 * @return Shared pointer of stream instance. Use the recv_frame method to get Point Cloud Frames.
+	 */
+	std::shared_ptr<scanner::point_cloud_stream<protocol::data::Frame> > get_point_cloud_stream(const protocol::stream::Subscribe::PointCloud::Filter filter, const protocol::data::Frame reference_frame);
+
 #ifdef BSL_RECORDING
 
 	/**
@@ -310,13 +354,18 @@ public:
 	///
 	/// @warning First fill the ScanPattern with fill_scan_pattern(const protocol::config::ScanPattern& config)
 	void set_scan_pattern(const protocol::config::ScanPattern& config, bool persist = false);
+
+	/// Start self test on device
+	const protocol::Response::RunSelfTest run_self_test();
 #endif
 
 };
 
-std::ostream& operator<<(std::ostream &strm, const protocol::data::frame_t& frame);
-#ifndef BSL_STANDALONE
-std::ostream& operator<<(std::ostream &strm, const protocol::data::Frame& frame);
-#endif
-
 }
+
+std::ostream& operator<<(std::ostream &strm, const blickfeld::protocol::data::frame_t& frame);
+#ifndef BSL_STANDALONE
+std::ostream& operator<<(std::ostream &strm, const blickfeld::protocol::data::Frame& frame);
+std::ostream& operator<<(std::ostream &strm, const blickfeld::protocol::data::Point& frame);
+std::ostream& operator<<(std::ostream &strm, const blickfeld::protocol::data::Point::Return& frame);
+#endif

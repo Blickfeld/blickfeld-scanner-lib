@@ -7,3 +7,6 @@ test_*dump*
 .pydevproject
 *.idea*
 *__pycache__*
+# NPM Packages
+node_modules
+package-lock.json

@@ -1,6 +1,7 @@
 syntax = "proto2";
 option cc_enable_arenas = true;
 
+import "blickfeld/options.proto";
 package blickfeld.protocol.data;
 
 /**
@@ -15,10 +16,10 @@ message Point {
 	 * A return is created when the LiDAR detects the laser light of the reflection of an object.
 	 */
 	message Return {
-		optional uint32 id = 1;  // ID of the return in the point
-		repeated float cartesian = 2 [packed=true];  // Unit: [m] – Cartesian coordinates of the target [x,y,z]
-		optional float range = 3;  // Unit: [m] – distance of target to the origin
-		optional uint32 intensity = 4;  // Intensity of the returned laser pulse
+		optional uint32 id = 1 [(optional)=true];  // ID of the return in the point
+		repeated float cartesian = 2 [packed=true, (optional)=true];  // Unit: [m] – Cartesian coordinates of the target [x,y,z]
+		optional float range = 3 [(optional)=true];  // Unit: [m] – distance of target to the origin
+		optional uint32 intensity = 4 [(optional)=true];  // Intensity of the returned laser pulse
 	}
 
 	/**
@@ -26,9 +27,9 @@ message Point {
 	 * Use these polar coordinates combined with the range information of a given return, if you want to locate the reflection in the spherical coordinatesystem.
 	 */
 	message Direction {
-		optional float azimuth = 1;  // Unit: [rad] - azimuth angle: Angle with respect to y-z plane
-		optional float elevation = 2;  // Unit: [rad] - elevation angle: Angle with respect to x-y plane
-		repeated float origin = 3 [packed=true]; // Unit: [m] - origin of the laser beam [x,y,z]
+		optional float azimuth = 1 [(optional)=true];  // Unit: [rad] - azimuth angle: Angle with respect to y-z plane
+		optional float elevation = 2 [(optional)=true];  // Unit: [rad] - elevation angle: Angle with respect to x-y plane
+		repeated float origin = 3 [packed=true, (optional)=true]; // Unit: [m] - origin of the laser beam [x,y,z]
 	}
 
 	/**
@@ -41,11 +42,11 @@ message Point {
 		E_VIBRATION_THRESHOLD_EXCEEDED = 1; // The environmental vibration threshold was exceeded. This should not happen in normal operation.
 	}
 
-	optional uint32 id = 1;  // Point ID in the corresponding frame
-	repeated Return returns = 2;  // Refer to [Point.Return](#blickfeld.protocol.data.Point.Return)
-    optional uint64 start_offset_ns = 3; // Unit: [ns] - starting time of the point in relation to [Frame.start_time_ns](#blickfeld.protocol.data.Frame.start_time_ns)
-	optional uint32 ambient_light_level = 4;  // Ambient light level in the direction of the point
-	optional Direction direction = 5;  // Refer to [Point.Direction](#blickfeld.protocol.data.Point.Direction)
-	optional uint32 channel_id = 6;  // ID of the channel that detected the point
-	repeated ErrorFlag error_flags = 7; // Refer to [Point.ErrorFlag](#blickfeld.protocol.data.Point.ErrorFlag)
+	optional uint32 id = 1 [(optional)=true];  // Point ID in the corresponding frame
+	repeated Return returns = 2 [(optional)=true];  // Refer to [Point.Return](#blickfeld.protocol.data.Point.Return)
+	optional uint64 start_offset_ns = 3 [(optional)=true]; // Unit: [ns] - starting time of the point in relation to [Frame.start_time_ns](#blickfeld.protocol.data.Frame.start_time_ns)
+	optional uint32 ambient_light_level = 4 [(optional)=true];  // Ambient light level in the direction of the point
+	optional Direction direction = 5 [(optional)=true];  // Refer to [Point.Direction](#blickfeld.protocol.data.Point.Direction)
+	optional uint32 channel_id = 6 [(optional)=true];  // ID of the channel that detected the point
+	repeated ErrorFlag error_flags = 7 [(optional)=true]; // Refer to [Point.ErrorFlag](#blickfeld.protocol.data.Point.ErrorFlag)
 }

@@ -18,7 +18,7 @@ message Scanner {
 		RUNNING = 4;  // Device is recording a point cloud.
 		STOPPING = 5;  // Device stops point cloud recording; it is no longer recording.
 		ERRORED = 6;  // Device is in an error state; it can no longer operate.
-		SELF_TEST = 7;  // Device is testing the hardware.
+		SELF_TESTING = 7;  // Device is testing the hardware.
 	}
 
 	optional State state = 1;  // Refer to [Scanner.State](#blickfeld.protocol.status.Scanner.State)

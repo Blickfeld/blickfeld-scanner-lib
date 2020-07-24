@@ -11,70 +11,10 @@ The data, such as a point cloud, are also packed in protobuf messages.
 
 ## Table of Contents
 
-- [blickfeld/status/main.proto](#blickfeld/status/main.proto)
-    - [Status](#blickfeld.protocol.Status)
+- [blickfeld/common.proto](#blickfeld/common.proto)
+    - [OptionalValueRange](#blickfeld.protocol.OptionalValueRange)
+    - [ValueRange](#blickfeld.protocol.ValueRange)
   
-  
-  
-  
-
-- [blickfeld/status/scanner.proto](#blickfeld/status/scanner.proto)
-    - [Scanner](#blickfeld.protocol.status.Scanner)
-  
-    - [Scanner.State](#blickfeld.protocol.status.Scanner.State)
-  
-  
-  
-
-- [blickfeld/status/temperature.proto](#blickfeld/status/temperature.proto)
-    - [Temperature](#blickfeld.protocol.status.Temperature)
-  
-    - [Temperature.Sensor](#blickfeld.protocol.status.Temperature.Sensor)
-  
-  
-  
-
-- [blickfeld/config/scan_pattern.proto](#blickfeld/config/scan_pattern.proto)
-    - [ScanPattern](#blickfeld.protocol.config.ScanPattern)
-    - [ScanPattern.FrameRate](#blickfeld.protocol.config.ScanPattern.FrameRate)
-    - [ScanPattern.Horizontal](#blickfeld.protocol.config.ScanPattern.Horizontal)
-    - [ScanPattern.Pulse](#blickfeld.protocol.config.ScanPattern.Pulse)
-    - [ScanPattern.Vertical](#blickfeld.protocol.config.ScanPattern.Vertical)
-  
-    - [ScanPattern.Pulse.FrameMode](#blickfeld.protocol.config.ScanPattern.Pulse.FrameMode)
-    - [ScanPattern.Pulse.Type](#blickfeld.protocol.config.ScanPattern.Pulse.Type)
-  
-  
-  
-
-- [blickfeld/data/point_cloud.proto](#blickfeld/data/point_cloud.proto)
-    - [PointCloud](#blickfeld.protocol.data.PointCloud)
-    - [PointCloud.Header](#blickfeld.protocol.data.PointCloud.Header)
-  
-  
-  
-  
-
-- [blickfeld/data/frame.proto](#blickfeld/data/frame.proto)
-    - [Frame](#blickfeld.protocol.data.Frame)
-  
-  
-  
-  
-
-- [blickfeld/data/scanline.proto](#blickfeld/data/scanline.proto)
-    - [Scanline](#blickfeld.protocol.data.Scanline)
-  
-  
-  
-  
-
-- [blickfeld/data/point.proto](#blickfeld/data/point.proto)
-    - [Point](#blickfeld.protocol.data.Point)
-    - [Point.Direction](#blickfeld.protocol.data.Point.Direction)
-    - [Point.Return](#blickfeld.protocol.data.Point.Return)
-  
-    - [Point.ErrorFlag](#blickfeld.protocol.data.Point.ErrorFlag)
   
   
   
@@ -85,6 +25,7 @@ The data, such as a point cloud, are also packed in protobuf messages.
     - [Request.FillScanPattern](#blickfeld.protocol.Request.FillScanPattern)
     - [Request.GetScanPattern](#blickfeld.protocol.Request.GetScanPattern)
     - [Request.Hello](#blickfeld.protocol.Request.Hello)
+    - [Request.RunSelfTest](#blickfeld.protocol.Request.RunSelfTest)
     - [Request.SetScanPattern](#blickfeld.protocol.Request.SetScanPattern)
     - [Request.Status](#blickfeld.protocol.Request.Status)
     - [Response](#blickfeld.protocol.Response)
@@ -92,21 +33,10 @@ The data, such as a point cloud, are also packed in protobuf messages.
     - [Response.FillScanPattern](#blickfeld.protocol.Response.FillScanPattern)
     - [Response.GetScanPattern](#blickfeld.protocol.Response.GetScanPattern)
     - [Response.Hello](#blickfeld.protocol.Response.Hello)
+    - [Response.RunSelfTest](#blickfeld.protocol.Response.RunSelfTest)
     - [Response.SetScanPattern](#blickfeld.protocol.Response.SetScanPattern)
   
     - [Format](#blickfeld.protocol.Format)
-  
-  
-  
-
-- [blickfeld/stream/connection.proto](#blickfeld/stream/connection.proto)
-    - [Event](#blickfeld.protocol.stream.Event)
-    - [Event.Developer](#blickfeld.protocol.stream.Event.Developer)
-    - [Subscribe](#blickfeld.protocol.stream.Subscribe)
-    - [Subscribe.Developer](#blickfeld.protocol.stream.Subscribe.Developer)
-    - [Subscribe.PointCloud](#blickfeld.protocol.stream.Subscribe.PointCloud)
-    - [Subscribe.Status](#blickfeld.protocol.stream.Subscribe.Status)
-  
   
   
   
@@ -136,6 +66,81 @@ The data, such as a point cloud, are also packed in protobuf messages.
   
   
 
+- [blickfeld/options.proto](#blickfeld/options.proto)
+  
+  
+    - [File-level Extensions](#blickfeld/options.proto-extensions)
+    - [File-level Extensions](#blickfeld/options.proto-extensions)
+    - [File-level Extensions](#blickfeld/options.proto-extensions)
+    - [File-level Extensions](#blickfeld/options.proto-extensions)
+    - [File-level Extensions](#blickfeld/options.proto-extensions)
+    - [File-level Extensions](#blickfeld/options.proto-extensions)
+    - [File-level Extensions](#blickfeld/options.proto-extensions)
+    - [File-level Extensions](#blickfeld/options.proto-extensions)
+    - [File-level Extensions](#blickfeld/options.proto-extensions)
+    - [File-level Extensions](#blickfeld/options.proto-extensions)
+    - [File-level Extensions](#blickfeld/options.proto-extensions)
+    - [File-level Extensions](#blickfeld/options.proto-extensions)
+    - [File-level Extensions](#blickfeld/options.proto-extensions)
+    - [File-level Extensions](#blickfeld/options.proto-extensions)
+    - [File-level Extensions](#blickfeld/options.proto-extensions)
+  
+  
+
+- [blickfeld/config/scan_pattern.proto](#blickfeld/config/scan_pattern.proto)
+    - [ScanPattern](#blickfeld.protocol.config.ScanPattern)
+    - [ScanPattern.FrameRate](#blickfeld.protocol.config.ScanPattern.FrameRate)
+    - [ScanPattern.Horizontal](#blickfeld.protocol.config.ScanPattern.Horizontal)
+    - [ScanPattern.Pulse](#blickfeld.protocol.config.ScanPattern.Pulse)
+    - [ScanPattern.Vertical](#blickfeld.protocol.config.ScanPattern.Vertical)
+  
+    - [ScanPattern.Pulse.FrameMode](#blickfeld.protocol.config.ScanPattern.Pulse.FrameMode)
+    - [ScanPattern.Pulse.Type](#blickfeld.protocol.config.ScanPattern.Pulse.Type)
+  
+  
+  
+
+- [blickfeld/config/secure.proto](#blickfeld/config/secure.proto)
+    - [Secure](#blickfeld.protocol.config.Secure)
+  
+    - [Secure.CertType](#blickfeld.protocol.config.Secure.CertType)
+    - [Secure.Permissions](#blickfeld.protocol.config.Secure.Permissions)
+  
+  
+  
+
+- [blickfeld/data/frame.proto](#blickfeld/data/frame.proto)
+    - [Frame](#blickfeld.protocol.data.Frame)
+  
+  
+  
+  
+
+- [blickfeld/data/point.proto](#blickfeld/data/point.proto)
+    - [Point](#blickfeld.protocol.data.Point)
+    - [Point.Direction](#blickfeld.protocol.data.Point.Direction)
+    - [Point.Return](#blickfeld.protocol.data.Point.Return)
+  
+    - [Point.ErrorFlag](#blickfeld.protocol.data.Point.ErrorFlag)
+  
+  
+  
+
+- [blickfeld/data/point_cloud.proto](#blickfeld/data/point_cloud.proto)
+    - [PointCloud](#blickfeld.protocol.data.PointCloud)
+    - [PointCloud.Header](#blickfeld.protocol.data.PointCloud.Header)
+  
+  
+  
+  
+
+- [blickfeld/data/scanline.proto](#blickfeld/data/scanline.proto)
+    - [Scanline](#blickfeld.protocol.data.Scanline)
+  
+  
+  
+  
+
 - [blickfeld/file/general.proto](#blickfeld/file/general.proto)
     - [Client](#blickfeld.protocol.file.Client)
   
@@ -158,499 +163,103 @@ The data, such as a point cloud, are also packed in protobuf messages.
   
   
 
+- [blickfeld/status/main.proto](#blickfeld/status/main.proto)
+    - [Status](#blickfeld.protocol.Status)
+  
+  
+  
+  
+
+- [blickfeld/status/scanner.proto](#blickfeld/status/scanner.proto)
+    - [Scanner](#blickfeld.protocol.status.Scanner)
+  
+    - [Scanner.State](#blickfeld.protocol.status.Scanner.State)
+  
+  
+  
+
+- [blickfeld/status/temperature.proto](#blickfeld/status/temperature.proto)
+    - [Temperature](#blickfeld.protocol.status.Temperature)
+  
+    - [Temperature.Sensor](#blickfeld.protocol.status.Temperature.Sensor)
+  
+  
+  
+
+- [blickfeld/stream/connection.proto](#blickfeld/stream/connection.proto)
+    - [Event](#blickfeld.protocol.stream.Event)
+    - [Event.Developer](#blickfeld.protocol.stream.Event.Developer)
+    - [Subscribe](#blickfeld.protocol.stream.Subscribe)
+    - [Subscribe.Developer](#blickfeld.protocol.stream.Subscribe.Developer)
+    - [Subscribe.PointCloud](#blickfeld.protocol.stream.Subscribe.PointCloud)
+    - [Subscribe.PointCloud.Filter](#blickfeld.protocol.stream.Subscribe.PointCloud.Filter)
+    - [Subscribe.Status](#blickfeld.protocol.stream.Subscribe.Status)
+  
+  
+  
+  
+
+- [blickfeld/update/hardware.proto](#blickfeld/update/hardware.proto)
+    - [partial_module_eeprom_msg](#blickfeld.protocol.update.partial_module_eeprom_msg)
+    - [partial_trenz_eeprom_msg](#blickfeld.protocol.update.partial_trenz_eeprom_msg)
+  
+    - [HardwareVariant](#blickfeld.protocol.update.HardwareVariant)
+  
+  
+  
+
+- [blickfeld/update/manifest.proto](#blickfeld/update/manifest.proto)
+    - [manifest_msg](#blickfeld.protocol.update.manifest_msg)
+    - [manifest_msg.CompatibleHardware](#blickfeld.protocol.update.manifest_msg.CompatibleHardware)
+  
+    - [manifest_msg.ImageType](#blickfeld.protocol.update.manifest_msg.ImageType)
+  
+  
+  
+
 - [Scalar Value Types](#scalar-value-types)
 
 
 
-<a name="blickfeld/status/main.proto"></a>
+<a name="blickfeld/common.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
-## blickfeld/status/main.proto
+## blickfeld/common.proto
 
 
 
-<a name="blickfeld.protocol.Status"></a>
+<a name="blickfeld.protocol.OptionalValueRange"></a>
 
-### Status
-This section contains the status messages of the two deflection mirrors and the temperature sensors in the device.
+### OptionalValueRange
+
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| scanner | [status.Scanner](#blickfeld.protocol.status.Scanner) | optional | Refer to [Scanner](#blickfeld.protocol.status.scanner.Scanner) |
-| temperatures | [status.Temperature](#blickfeld.protocol.status.Temperature) | repeated | Refer to [Temperature](#blickfeld.protocol.status.temperature.Temperature) |
+| minimum | [float](#float) | optional |  |
+| maximum | [float](#float) | optional |  |
+
+
+
+
+
+
+<a name="blickfeld.protocol.ValueRange"></a>
+
+### ValueRange
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| minimum | [float](#float) | optional |  |
+| maximum | [float](#float) | optional |  |
 
 
 
 
 
  <!-- end messages -->
-
- <!-- end enums -->
-
- <!-- end HasExtensions -->
-
- <!-- end services -->
-
-
-
-<a name="blickfeld/status/scanner.proto"></a>
-<p align="right"><a href="#top">Top</a></p>
-
-## blickfeld/status/scanner.proto
-
-
-
-<a name="blickfeld.protocol.status.Scanner"></a>
-
-### Scanner
-This section defines the status of the device.
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| state | [Scanner.State](#blickfeld.protocol.status.Scanner.State) | optional | Refer to [Scanner.State](#blickfeld.protocol.status.Scanner.State) |
-| scan_pattern | [blickfeld.protocol.config.ScanPattern](#blickfeld.protocol.config.ScanPattern) | optional | Refer to [ScanPattern](#blickfeld.protocol.config.ScanPattern) |
-| error | [blickfeld.protocol.Error](#blickfeld.protocol.Error) | optional | Refer to [Error](#blickfeld.protocol.Error) |
-| legacy_scan_pattern | [blickfeld.protocol.config.ScanPattern](#blickfeld.protocol.config.ScanPattern) | optional | Deprecated old ´scan_pattern´ definition |
-
-
-
-
-
- <!-- end messages -->
-
-
-<a name="blickfeld.protocol.status.Scanner.State"></a>
-
-### Scanner.State
-
-
-| Name | Number | Description |
-| ---- | ------ | ----------- |
-| INITIALIZING | 1 | Device is initializing the hardware. |
-| READY | 2 | Device is ready to start and no error occurred. |
-| STARTING | 3 | Device is starting a point cloud recording, but is not yet recording. |
-| RUNNING | 4 | Device is recording a point cloud. |
-| STOPPING | 5 | Device stops point cloud recording; it is no longer recording. |
-| ERRORED | 6 | Device is in an error state; it can no longer operate. |
-| SELF_TEST | 7 | Device is testing the hardware. |
-
-
- <!-- end enums -->
-
- <!-- end HasExtensions -->
-
- <!-- end services -->
-
-
-
-<a name="blickfeld/status/temperature.proto"></a>
-<p align="right"><a href="#top">Top</a></p>
-
-## blickfeld/status/temperature.proto
-
-
-
-<a name="blickfeld.protocol.status.Temperature"></a>
-
-### Temperature
-This section describes the temperature of the hardware modules in the device.
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| sensor | [Temperature.Sensor](#blickfeld.protocol.status.Temperature.Sensor) | optional | Refer to [Temperature.Sensor](#blickfeld.protocol.status.Temperature.Sensor) |
-| value | [float](#float) | optional | Unit: [degrees Celsius] – temperature value of the module. |
-| failed_reason | [string](#string) | optional | Error reason why the temperature cannot be read out. |
-
-
-
-
-
- <!-- end messages -->
-
-
-<a name="blickfeld.protocol.status.Temperature.Sensor"></a>
-
-### Temperature.Sensor
-This section describes the hardware modules in the device.
-
-| Name | Number | Description |
-| ---- | ------ | ----------- |
-| UNKNOWN | 0 |  |
-| LDM | 1 | Laser and detector module |
-| ETHERNET | 2 | Ethernet adapter |
-| MSB | 3 | Mixed signal board |
-| PL | 4 | Programmable logic |
-| PS | 5 | Processing system |
-| SCANNER_SMALL | 6 | Vertical mirror |
-| SCANNER_BIG | 7 | Horizontal mirror |
-
-
- <!-- end enums -->
-
- <!-- end HasExtensions -->
-
- <!-- end services -->
-
-
-
-<a name="blickfeld/config/scan_pattern.proto"></a>
-<p align="right"><a href="#top">Top</a></p>
-
-## blickfeld/config/scan_pattern.proto
-
-
-
-<a name="blickfeld.protocol.config.ScanPattern"></a>
-
-### ScanPattern
-The scan pattern defines the movement of the mirrors.
-The key parameters of the pattern are the horizontal and vertical fields of view (FoV) as well as the number of scan lines per frame.
-The frame rate is defined by the total number of scan lines and the oscillation frequency of the mirrors which is fixed and device-spcific.
-
-For a more detailed explanation, see: [Scan Pattern documentation](Scan_Pattern)
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| horizontal | [ScanPattern.Horizontal](#blickfeld.protocol.config.ScanPattern.Horizontal) | optional | Refer to [ScanPattern.Horizontal](#blickfeld.protocol.config.ScanPattern.Horizontal) |
-| vertical | [ScanPattern.Vertical](#blickfeld.protocol.config.ScanPattern.Vertical) | optional | Refer to [ScanPattern.Vertical](#blickfeld.protocol.config.ScanPattern.Vertical) |
-| pulse | [ScanPattern.Pulse](#blickfeld.protocol.config.ScanPattern.Pulse) | optional | Refer to [ScanPattern.Pulse](#blickfeld.protocol.config.ScanPattern.Pulse) |
-| frame_rate | [ScanPattern.FrameRate](#blickfeld.protocol.config.ScanPattern.FrameRate) | optional | Refer to [ScanPattern.FrameRate](#blickfeld.protocol.config.ScanPattern.FrameRate) |
-
-
-
-
-
-
-<a name="blickfeld.protocol.config.ScanPattern.FrameRate"></a>
-
-### ScanPattern.FrameRate
-This section defines the target frame rate for synchronization between several LiDAR devices.
-The feature is described in the [Time synchronization documentation](Sync).
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| target | [double](#double) | optional | Target frame rate during synchronization between several LiDAR devices |
-| maximum | [double](#double) | optional | Read-only parameter for maximum achievable frame rate. |
-| reference_time_offset | [double](#double) | optional | In [s]. Adds a constant value to the Unix reference time, starting from 00:00:00 UTC on January 1, 1970. It can be used to compensate delays or to interleave LiDAR devices. Default: 0 Default: 0 |
-
-
-
-
-
-
-<a name="blickfeld.protocol.config.ScanPattern.Horizontal"></a>
-
-### ScanPattern.Horizontal
-This section defines the movement of the horizontal mirror.
-The mirror moves continuously with its own frequency. Each half-oscillation period of the mirror results in one scan line.
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| fov | [float](#float) | optional | Unit: [rad] – optical field of view of the horizontal mirror. Note: In v2.2* and below, this was defined as a mechanical FoV. |
-
-
-
-
-
-
-<a name="blickfeld.protocol.config.ScanPattern.Pulse"></a>
-
-### ScanPattern.Pulse
-This section defines the pattern in which the laser pulses and captures sample points
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| angle_spacing | [float](#float) | optional | Unit: [rad] – this defines the angle within which the horizontal mirror moves between two laser pulses. This parameter therefore defines the horizontal sampling resolution. |
-| type | [ScanPattern.Pulse.Type](#blickfeld.protocol.config.ScanPattern.Pulse.Type) | optional | Refer to [ScanPattern.Pulse.Type](#blickfeld.protocol.config.ScanPattern.Pulse.Type) Default: EQUI_HORIZONTAL_ANGLE |
-| frame_mode | [ScanPattern.Pulse.FrameMode](#blickfeld.protocol.config.ScanPattern.Pulse.FrameMode) | optional | Refer to [ScanPattern.Pulse.FrameMode](#blickfeld.protocol.config.ScanPattern.Pulse.FrameMode) Default: ONLY_UP |
-| distortion_correction | [bool](#bool) | optional | This parameter defines whether the distortion correction is applied when calculating the laser pulse angles. Default: True Default: true |
-
-
-
-
-
-
-<a name="blickfeld.protocol.config.ScanPattern.Vertical"></a>
-
-### ScanPattern.Vertical
-This section defines the movement of the vertical mirror within one frame.
-The mirror moves for from 0 degrees to the configured target FoV (up-ramping phase) and back to 0 degrees (down-ramping phase) with its eigenfrequency.
-The number of scanlines for each phase can be configured.
-Due to the dynamics of the mirror, a certain number of scan lines are required to reach the target FoV and then to reach 0 degrees again.
-Consequently, if the limit is reached, a lower number of scan lines requires a reduced FoV.
-Thus, a higher number of scan lines allows a larger vertical FoV. The vertical FoV is limited by the optical components.
-
-Note: Due to the time required for one scan line, the rounded even number of scan lines directly scales inverse proportionally with65t the frame rate.
-
-For a more detailed explanation, see: [Scan Pattern documentation](Scan_Pattern)
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| fov | [float](#float) | optional | Unit: [rad] – FoV in the center of the frame. Due to the eye shape of the scan pattern, the vertical FoV decreases the outer boundaries of the horizontal mirror. |
-| scanlines_up | [uint32](#uint32) | optional | Configures the number of scan lines required for the up-ramping phase. During the up-ramping phase, the vertical mirror increases its amplitude from 0 degrees to the target FoV. Default: 200 Default: 200 |
-| scanlines_down | [uint32](#uint32) | optional | Configures the amount of scan lines required for the down-ramping phase. During the down-ramping phase, the vertical mirror decreases its amplitude from the target FoV to 0 degrees. Default: 30 Default: 30 |
-
-
-
-
-
- <!-- end messages -->
-
-
-<a name="blickfeld.protocol.config.ScanPattern.Pulse.FrameMode"></a>
-
-### ScanPattern.Pulse.FrameMode
-Because of the mirrors oscillating and the resulting Lissajous curve, it is not possible to pulse in a completely arbitrary pattern.
-A frame always starts with a phase in which the vertical mirror increases its amplitude (up-ramping).
-It is followed by a second phase, in which it decreases its amplitude until it no longer moves (down-ramping).
-It is possible to pulse in both phases. There are four different options to pulse:
-
-| Name | Number | Description |
-| ---- | ------ | ----------- |
-| NONE | 0 |  |
-| COMBINE_UP_DOWN | 1 | The device pulses in the up-ramping and down-ramping phases and one frame is created by combining the resulting sample points. |
-| ONLY_UP | 2 | The device pulses in the **up-ramping** phase and **does not** pulse in the **down-ramping** phase. |
-| ONLY_DOWN | 3 | The device is **does not** pulse in the **up-ramping** phase and pulses in the **down-ramping** phase. |
-| SEPARATE | 4 | The device pulses in the up-ramping and down-ramping phases and one frame for each phase is created. |
-
-
-
-<a name="blickfeld.protocol.config.ScanPattern.Pulse.Type"></a>
-
-### ScanPattern.Pulse.Type
-The device pulses depending on the mirror positioning.
-Currently, only pulse triggering on the horizontal angle is supported.
-The laser pulses are emittet with the configured angular spacing.
-
-| Name | Number | Description |
-| ---- | ------ | ----------- |
-| EQUI_HORIZONTAL_ANGLE | 0 | The laser is triggered depending on the horizontal angle of the laser beam. |
-| EQUI_DENSITY | 1 | Reserved for future use. Not yet supported. |
-
-
- <!-- end enums -->
-
- <!-- end HasExtensions -->
-
- <!-- end services -->
-
-
-
-<a name="blickfeld/data/point_cloud.proto"></a>
-<p align="right"><a href="#top">Top</a></p>
-
-## blickfeld/data/point_cloud.proto
-
-
-
-<a name="blickfeld.protocol.data.PointCloud"></a>
-
-### PointCloud
-
-A point cloud object can contain either a full frame or a single scan line.
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| header | [PointCloud.Header](#blickfeld.protocol.data.PointCloud.Header) | optional | Refer to [PointCloud.Header](#blickfeld.protocol.data.PointCloud.Header) |
-| frame | [Frame](#blickfeld.protocol.data.Frame) | optional | Refer to [Frame](#blickfeld.protocol.data.Frame) |
-| scanline | [Scanline](#blickfeld.protocol.data.Scanline) | optional | Refer to [Scanline](#blickfeld.protocol.data.Scanline) |
-
-
-
-
-
-
-<a name="blickfeld.protocol.data.PointCloud.Header"></a>
-
-### PointCloud.Header
-
-This section describes the contents of a point cloud header.
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| legacy_cube_serial_number | [string](#string) | optional | Legacy serial number of the device which recorded the pointcloud |
-| cube_serial_number | [string](#string) | optional | Serial number of the device which recorded the pointcloud |
-| start_time_ns | [uint64](#uint64) | optional | Unit: [s] - Start timestamp of the requested pointcloud stream |
-| firmware_version | [string](#string) | optional | Firmware version of the device which recorded the pointcloud |
-| hardware_variant | [blickfeld.protocol.update.HardwareVariant](#blickfeld.protocol.update.HardwareVariant) | optional | Hardware variant of the device which recorded the pointcloud |
-
-
-
-
-
- <!-- end messages -->
-
- <!-- end enums -->
-
- <!-- end HasExtensions -->
-
- <!-- end services -->
-
-
-
-<a name="blickfeld/data/frame.proto"></a>
-<p align="right"><a href="#top">Top</a></p>
-
-## blickfeld/data/frame.proto
-
-
-
-<a name="blickfeld.protocol.data.Frame"></a>
-
-### Frame
-This section describes the contents of a point cloud frame.
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| id | [uint64](#uint64) | optional | Incremental frame ID since startup of the device |
-| scanlines | [Scanline](#blickfeld.protocol.data.Scanline) | repeated | Refer to [Scanline](#blickfeld.protocol.data.Scanline) |
-| start_time_ns | [uint64](#uint64) | optional | Unit: [s] – start frame timestamp |
-| scan_pattern | [blickfeld.protocol.config.ScanPattern](#blickfeld.protocol.config.ScanPattern) | optional | Refer to [ScanPattern](#blickfeld.protocol.config.ScanPattern) |
-| total_number_of_points | [uint32](#uint32) | optional | Number of laser pulses emitted in this frame. |
-| total_number_of_returns | [uint32](#uint32) | optional | Number of returned points recorded:
-
-Each point of the [total_number_of_points](#blickfeld.protocol.data.Frame.total_number_of_points) can produce several returns. |
-
-
-
-
-
- <!-- end messages -->
-
- <!-- end enums -->
-
- <!-- end HasExtensions -->
-
- <!-- end services -->
-
-
-
-<a name="blickfeld/data/scanline.proto"></a>
-<p align="right"><a href="#top">Top</a></p>
-
-## blickfeld/data/scanline.proto
-
-
-
-<a name="blickfeld.protocol.data.Scanline"></a>
-
-### Scanline
-This section describes the contents of a single scan line in a point cloud frame.
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| id | [uint64](#uint64) | optional | Scan line ID in the corresponding frame |
-| frame_id | [uint64](#uint64) | optional | Frame ID of the corresponding frame |
-| points | [Point](#blickfeld.protocol.data.Point) | repeated | Refer to [Point](#blickfeld.protocol.data.Point) |
-| start_offset_ns | [uint64](#uint64) | optional | Unit: [ns] - start time of the scanline in relation to [Frame.start_time_ns](#blickfeld.protocol.data.Frame.start_time_ns) |
-
-
-
-
-
- <!-- end messages -->
-
- <!-- end enums -->
-
- <!-- end HasExtensions -->
-
- <!-- end services -->
-
-
-
-<a name="blickfeld/data/point.proto"></a>
-<p align="right"><a href="#top">Top</a></p>
-
-## blickfeld/data/point.proto
-
-
-
-<a name="blickfeld.protocol.data.Point"></a>
-
-### Point
-This section describes the contents of a single point of a point cloud frame or scan line.
-Each point resembles a direction in which the laser has fired.
-From each point (direction) the device can receive several responses/returns, see [Point.Return](#blickfeld.protocol.data.Point.Return).
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| id | [uint32](#uint32) | optional | Point ID in the corresponding frame |
-| returns | [Point.Return](#blickfeld.protocol.data.Point.Return) | repeated | Refer to [Point.Return](#blickfeld.protocol.data.Point.Return) |
-| start_offset_ns | [uint64](#uint64) | optional | Unit: [ns] - starting time of the point in relation to [Frame.start_time_ns](#blickfeld.protocol.data.Frame.start_time_ns) |
-| ambient_light_level | [uint32](#uint32) | optional | Ambient light level in the direction of the point |
-| direction | [Point.Direction](#blickfeld.protocol.data.Point.Direction) | optional | Refer to [Point.Direction](#blickfeld.protocol.data.Point.Direction) |
-| channel_id | [uint32](#uint32) | optional | ID of the channel that detected the point |
-| error_flags | [Point.ErrorFlag](#blickfeld.protocol.data.Point.ErrorFlag) | repeated | Refer to [Point.ErrorFlag](#blickfeld.protocol.data.Point.ErrorFlag) |
-
-
-
-
-
-
-<a name="blickfeld.protocol.data.Point.Direction"></a>
-
-### Point.Direction
-This section describes the direction and the origin of a point.
-Use these polar coordinates combined with the range information of a given return, if you want to locate the reflection in the spherical coordinatesystem.
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| azimuth | [float](#float) | optional | Unit: [rad] - azimuth angle: Angle with respect to y-z plane |
-| elevation | [float](#float) | optional | Unit: [rad] - elevation angle: Angle with respect to x-y plane |
-| origin | [float](#float) | repeated | Unit: [m] - origin of the laser beam [x,y,z] |
-
-
-
-
-
-
-<a name="blickfeld.protocol.data.Point.Return"></a>
-
-### Point.Return
-This section describes the contents of a single return of a point, sorted by intensity.
-A return is created when the LiDAR detects the laser light of the reflection of an object.
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| id | [uint32](#uint32) | optional | ID of the return in the point |
-| cartesian | [float](#float) | repeated | Unit: [m] – Cartesian coordinates of the target [x,y,z] |
-| range | [float](#float) | optional | Unit: [m] – distance of target to the origin |
-| intensity | [uint32](#uint32) | optional | Intensity of the returned laser pulse |
-
-
-
-
-
- <!-- end messages -->
-
-
-<a name="blickfeld.protocol.data.Point.ErrorFlag"></a>
-
-### Point.ErrorFlag
-Error flag indicating why a point delivers no valid returns.
-If a flag is set, the point should not be interpreted neither processed.
-Flags are only set temporarily for a short period of time.
-If the error state does not recover, the device will stop operation.
-
-| Name | Number | Description |
-| ---- | ------ | ----------- |
-| E_VIBRATION_THRESHOLD_EXCEEDED | 1 | The environmental vibration threshold was exceeded. This should not happen in normal operation. |
-
 
  <!-- end enums -->
 
@@ -683,6 +292,7 @@ A request is always answered with a response. For every response, there is a req
 | get_scan_pattern | [Request.GetScanPattern](#blickfeld.protocol.Request.GetScanPattern) | optional | Refer to [Request.GetScanPattern](#blickfeld.protocol.Request.GetScanPattern) |
 | subscribe | [stream.Subscribe](#blickfeld.protocol.stream.Subscribe) | optional | Refer to [Subscribe](#blickfeld.protocol.stream.Subscribe) |
 | status | [Request.Status](#blickfeld.protocol.Request.Status) | optional | Refer to [Request.Status](#blickfeld.protocol.Request.Status) |
+| run_self_test | [Request.RunSelfTest](#blickfeld.protocol.Request.RunSelfTest) | optional | Refer to [Request.RunSelfTest](#blickfeld.protocol.Request.RunSelfTest) |
 | _asJSON | [string](#string) | optional | Internal use only |
 | accept_format | [Format](#blickfeld.protocol.Format) | optional | Internal use only Default: PROTOBUF |
 
@@ -744,6 +354,20 @@ This request is used for initial communication after connecting to a device and 
 
 
 
+<a name="blickfeld.protocol.Request.RunSelfTest"></a>
+
+### Request.RunSelfTest
+> Introduced in BSL v2.10 and firmware v1.9
+
+This request triggers a self test of the device.
+It validates the hardware, operates the device, and generates a report.
+The report is currently only accessible by developers.
+
+
+
+
+
+
 <a name="blickfeld.protocol.Request.SetScanPattern"></a>
 
 ### Request.SetScanPattern
@@ -790,6 +414,7 @@ Each response has the same name as the request.
 | get_scan_pattern | [Response.GetScanPattern](#blickfeld.protocol.Response.GetScanPattern) | optional | Refer to [Response.GetScanPattern](#blickfeld.protocol.Response.GetScanPattern) |
 | event | [stream.Event](#blickfeld.protocol.stream.Event) | optional | Refer to [Event](#blickfeld.protocol.stream.Event) |
 | status | [Status](#blickfeld.protocol.Status) | optional | Refer to [Response.Status](#blickfeld.protocol.Response.Status) |
+| run_self_test | [Response.RunSelfTest](#blickfeld.protocol.Response.RunSelfTest) | optional | Refer to [Response.RunSelfTest](#blickfeld.protocol.Response.RunSelfTest) |
 | _asJSON | [string](#string) | optional | Internal use only |
 
 
@@ -855,6 +480,25 @@ This response is sent out after establishing a connection.
 
 
 
+<a name="blickfeld.protocol.Response.RunSelfTest"></a>
+
+### Response.RunSelfTest
+> Introduced in BSL v2.10 and firmware v1.9
+
+This response is returned after a self test.
+The success flag indicates if the hardware is fully operational.
+The generated report is currently only accessible by developers.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| success | [bool](#bool) | optional |  |
+
+
+
+
+
+
 <a name="blickfeld.protocol.Response.SetScanPattern"></a>
 
 ### Response.SetScanPattern
@@ -877,97 +521,6 @@ The format type of response is an undocumented, internal feature required for th
 | PROTOBUF | 1 |  |
 | JSON | 2 |  |
 
-
- <!-- end enums -->
-
- <!-- end HasExtensions -->
-
- <!-- end services -->
-
-
-
-<a name="blickfeld/stream/connection.proto"></a>
-<p align="right"><a href="#top">Top</a></p>
-
-## blickfeld/stream/connection.proto
-
-
-
-<a name="blickfeld.protocol.stream.Event"></a>
-
-### Event
-This section describes the events of streams.
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| point_cloud | [blickfeld.protocol.data.PointCloud](#blickfeld.protocol.data.PointCloud) | optional | Refer to [PointCloud](#blickfeld.protocol.data.PointCloud) |
-| status | [blickfeld.protocol.Status](#blickfeld.protocol.Status) | optional | Refer to [Status](#blickfeld.protocol.status.Status) |
-| developer | [Event.Developer](#blickfeld.protocol.stream.Event.Developer) | optional | Refer to [Event.Developer](#blickfeld.protocol.stream.Event.Developer) |
-
-
-
-
-
-
-<a name="blickfeld.protocol.stream.Event.Developer"></a>
-
-### Event.Developer
-Internal use only
-
-
-
-
-
-
-<a name="blickfeld.protocol.stream.Subscribe"></a>
-
-### Subscribe
-This section describes the different streams to which it is possible to subscribe.
-A stream regularly provides data or status updates for the user. The events will not be pushed automatically to the BSL; the client has to retrieve them.
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| point_cloud | [Subscribe.PointCloud](#blickfeld.protocol.stream.Subscribe.PointCloud) | optional | Refer to [Subscribe.PointCloud](#blickfeld.protocol.stream.Subscribe.PointCloud) |
-| status | [Subscribe.Status](#blickfeld.protocol.stream.Subscribe.Status) | optional | Refer to [Subscribe.Status](#blickfeld.protocol.stream.Subscribe.Status) |
-| developer | [Subscribe.Developer](#blickfeld.protocol.stream.Subscribe.Developer) | optional | Refer to [Subscribe.Developer](#blickfeld.protocol.stream.Subscribe.Developer) |
-
-
-
-
-
-
-<a name="blickfeld.protocol.stream.Subscribe.Developer"></a>
-
-### Subscribe.Developer
-Internal use only
-
-
-
-
-
-
-<a name="blickfeld.protocol.stream.Subscribe.PointCloud"></a>
-
-### Subscribe.PointCloud
-This request is used for subscribing to a point cloud stream.
-
-
-
-
-
-
-<a name="blickfeld.protocol.stream.Subscribe.Status"></a>
-
-### Subscribe.Status
-This request is used for subscribing to a status stream.
-
-
-
-
-
- <!-- end messages -->
 
  <!-- end enums -->
 
@@ -1245,6 +798,467 @@ Change the operation mode and try again if no one else is using it.
 
 
 
+<a name="blickfeld/options.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## blickfeld/options.proto
+
+
+ <!-- end messages -->
+
+ <!-- end enums -->
+
+
+<a name="blickfeld/options.proto-extensions"></a>
+
+### File-level Extensions
+| Extension | Type | Base | Number | Description |
+| --------- | ---- | ---- | ------ | ----------- |
+| allow_sparse | bool | .google.protobuf.FieldOptions | 50007 |  Default: `false` |
+| d_max | double | .google.protobuf.FieldOptions | 50001 |  Default: `inf` |
+| d_min | double | .google.protobuf.FieldOptions | 50000 |  Default: `-inf` |
+| i_max | uint64 | .google.protobuf.FieldOptions | 50003 |  Default: `18446744073709551615` |
+| i_min | sint64 | .google.protobuf.FieldOptions | 50002 |  Default: `-9223372036854775808` |
+| legacy_field_id | uint64 | .google.protobuf.FieldOptions | 50010 |  |
+| length | sint32 | .google.protobuf.FieldOptions | 50004 |  Default: `2147483647` |
+| max_length | sint32 | .google.protobuf.FieldOptions | 50009 |  Default: `2147483647` |
+| min_length | sint32 | .google.protobuf.FieldOptions | 50008 |  Default: `0` |
+| optional | bool | .google.protobuf.FieldOptions | 50006 |  Default: `false` |
+| regex | string | .google.protobuf.FieldOptions | 50005 |  Default: `.*` |
+| e_desc | string | .google.protobuf.MessageOptions | 60000 | Error description Default: `No additional error description available.` |
+| help | string | .google.protobuf.MessageOptions | 60001 | Help description |
+| secure | config.Secure | .google.protobuf.MessageOptions | 60002 |  |
+| optional_one_of | bool | .google.protobuf.OneofOptions | 50006 |  Default: `false` |
+
+ <!-- end HasExtensions -->
+
+ <!-- end services -->
+
+
+
+<a name="blickfeld/config/scan_pattern.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## blickfeld/config/scan_pattern.proto
+
+
+
+<a name="blickfeld.protocol.config.ScanPattern"></a>
+
+### ScanPattern
+The scan pattern defines the movement of the mirrors.
+The key parameters of the pattern are the horizontal and vertical fields of view (FoV) as well as the number of scan lines per frame.
+The frame rate is defined by the total number of scan lines and the oscillation frequency of the mirrors which is fixed and device-spcific.
+
+For a more detailed explanation, see: [Scan Pattern documentation](Scan_Pattern)
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| horizontal | [ScanPattern.Horizontal](#blickfeld.protocol.config.ScanPattern.Horizontal) | optional | Refer to [ScanPattern.Horizontal](#blickfeld.protocol.config.ScanPattern.Horizontal) |
+| vertical | [ScanPattern.Vertical](#blickfeld.protocol.config.ScanPattern.Vertical) | optional | Refer to [ScanPattern.Vertical](#blickfeld.protocol.config.ScanPattern.Vertical) |
+| pulse | [ScanPattern.Pulse](#blickfeld.protocol.config.ScanPattern.Pulse) | optional | Refer to [ScanPattern.Pulse](#blickfeld.protocol.config.ScanPattern.Pulse) |
+| frame_rate | [ScanPattern.FrameRate](#blickfeld.protocol.config.ScanPattern.FrameRate) | optional | Refer to [ScanPattern.FrameRate](#blickfeld.protocol.config.ScanPattern.FrameRate) |
+
+
+
+
+
+
+<a name="blickfeld.protocol.config.ScanPattern.FrameRate"></a>
+
+### ScanPattern.FrameRate
+This section defines the target frame rate for synchronization between several LiDAR devices.
+The feature is described in the [Time synchronization documentation](Sync).
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| target | [double](#double) | optional | Target frame rate during synchronization between several LiDAR devices |
+| maximum | [double](#double) | optional | Read-only parameter for maximum achievable frame rate. |
+| reference_time_offset | [double](#double) | optional | In [s]. Adds a constant value to the Unix reference time, starting from 00:00:00 UTC on January 1, 1970. It can be used to compensate delays or to interleave LiDAR devices. Default: 0 Default: 0 |
+
+
+
+
+
+
+<a name="blickfeld.protocol.config.ScanPattern.Horizontal"></a>
+
+### ScanPattern.Horizontal
+This section defines the movement of the horizontal mirror.
+The mirror moves continuously with its own frequency. Each half-oscillation period of the mirror results in one scan line.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| fov | [float](#float) | optional | Unit: [rad] – optical field of view of the horizontal mirror. Note: In v2.2* and below, this was defined as a mechanical FoV. |
+
+
+
+
+
+
+<a name="blickfeld.protocol.config.ScanPattern.Pulse"></a>
+
+### ScanPattern.Pulse
+This section defines the pattern in which the laser pulses and captures sample points
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| angle_spacing | [float](#float) | optional | Unit: [rad] – this defines the angle within which the horizontal mirror moves between two laser pulses. This parameter therefore defines the horizontal sampling resolution. |
+| type | [ScanPattern.Pulse.Type](#blickfeld.protocol.config.ScanPattern.Pulse.Type) | optional | Refer to [ScanPattern.Pulse.Type](#blickfeld.protocol.config.ScanPattern.Pulse.Type) Default: EQUI_HORIZONTAL_ANGLE |
+| frame_mode | [ScanPattern.Pulse.FrameMode](#blickfeld.protocol.config.ScanPattern.Pulse.FrameMode) | optional | Refer to [ScanPattern.Pulse.FrameMode](#blickfeld.protocol.config.ScanPattern.Pulse.FrameMode) Default: ONLY_UP |
+| distortion_correction | [bool](#bool) | optional | This parameter defines whether the distortion correction is applied when calculating the laser pulse angles. Default: True Default: true |
+
+
+
+
+
+
+<a name="blickfeld.protocol.config.ScanPattern.Vertical"></a>
+
+### ScanPattern.Vertical
+This section defines the movement of the vertical mirror within one frame.
+The mirror moves for from 0 degrees to the configured target FoV (up-ramping phase) and back to 0 degrees (down-ramping phase) with its eigenfrequency.
+The number of scanlines for each phase can be configured.
+Due to the dynamics of the mirror, a certain number of scan lines are required to reach the target FoV and then to reach 0 degrees again.
+Consequently, if the limit is reached, a lower number of scan lines requires a reduced FoV.
+Thus, a higher number of scan lines allows a larger vertical FoV. The vertical FoV is limited by the optical components.
+
+Note: Due to the time required for one scan line, the rounded even number of scan lines directly scales inverse proportionally with65t the frame rate.
+
+For a more detailed explanation, see: [Scan Pattern documentation](Scan_Pattern)
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| fov | [float](#float) | optional | Unit: [rad] – FoV in the center of the frame. Due to the eye shape of the scan pattern, the vertical FoV decreases the outer boundaries of the horizontal mirror. |
+| scanlines_up | [uint32](#uint32) | optional | Configures the number of scan lines required for the up-ramping phase. During the up-ramping phase, the vertical mirror increases its amplitude from 0 degrees to the target FoV. Default: 200 Default: 200 |
+| scanlines_down | [uint32](#uint32) | optional | Configures the amount of scan lines required for the down-ramping phase. During the down-ramping phase, the vertical mirror decreases its amplitude from the target FoV to 0 degrees. Default: 30 Default: 30 |
+
+
+
+
+
+ <!-- end messages -->
+
+
+<a name="blickfeld.protocol.config.ScanPattern.Pulse.FrameMode"></a>
+
+### ScanPattern.Pulse.FrameMode
+Because of the mirrors oscillating and the resulting Lissajous curve, it is not possible to pulse in a completely arbitrary pattern.
+A frame always starts with a phase in which the vertical mirror increases its amplitude (up-ramping).
+It is followed by a second phase, in which it decreases its amplitude until it no longer moves (down-ramping).
+It is possible to pulse in both phases. There are four different options to pulse:
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| NONE | 0 |  |
+| COMBINE_UP_DOWN | 1 | The device pulses in the up-ramping and down-ramping phases and one frame is created by combining the resulting sample points. |
+| ONLY_UP | 2 | The device pulses in the **up-ramping** phase and **does not** pulse in the **down-ramping** phase. |
+| ONLY_DOWN | 3 | The device is **does not** pulse in the **up-ramping** phase and pulses in the **down-ramping** phase. |
+| SEPARATE | 4 | The device pulses in the up-ramping and down-ramping phases and one frame for each phase is created. |
+
+
+
+<a name="blickfeld.protocol.config.ScanPattern.Pulse.Type"></a>
+
+### ScanPattern.Pulse.Type
+The device pulses depending on the mirror positioning.
+Currently, only pulse triggering on the horizontal angle is supported.
+The laser pulses are emittet with the configured angular spacing.
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| EQUI_HORIZONTAL_ANGLE | 0 | The laser is triggered depending on the horizontal angle of the laser beam. |
+| EQUI_DENSITY | 1 | Reserved for future use. Not yet supported. |
+
+
+ <!-- end enums -->
+
+ <!-- end HasExtensions -->
+
+ <!-- end services -->
+
+
+
+<a name="blickfeld/config/secure.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## blickfeld/config/secure.proto
+
+
+
+<a name="blickfeld.protocol.config.Secure"></a>
+
+### Secure
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| permissions | [Secure.Permissions](#blickfeld.protocol.config.Secure.Permissions) | repeated |  |
+| cert_type | [Secure.CertType](#blickfeld.protocol.config.Secure.CertType) | optional |  |
+| version_major | [uint32](#uint32) | optional |  |
+| version_minor | [uint32](#uint32) | optional |  |
+| version_patch | [uint32](#uint32) | optional |  |
+
+
+
+
+
+ <!-- end messages -->
+
+
+<a name="blickfeld.protocol.config.Secure.CertType"></a>
+
+### Secure.CertType
+
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| CLIENT | 0 |  |
+| CUBE | 1 |  |
+
+
+
+<a name="blickfeld.protocol.config.Secure.Permissions"></a>
+
+### Secure.Permissions
+do NOT change enum labels, they are used as strings in ssl certs
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| PUBLIC | 0 |  |
+| DEVELOPER | 1 |  |
+
+
+ <!-- end enums -->
+
+ <!-- end HasExtensions -->
+
+ <!-- end services -->
+
+
+
+<a name="blickfeld/data/frame.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## blickfeld/data/frame.proto
+
+
+
+<a name="blickfeld.protocol.data.Frame"></a>
+
+### Frame
+This section describes the contents of a point cloud frame.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| id | [uint64](#uint64) | optional | Incremental frame ID since startup of the device |
+| scanlines | [Scanline](#blickfeld.protocol.data.Scanline) | repeated | Refer to [Scanline](#blickfeld.protocol.data.Scanline) |
+| start_time_ns | [uint64](#uint64) | optional | Unit: [s] – start frame timestamp |
+| scan_pattern | [blickfeld.protocol.config.ScanPattern](#blickfeld.protocol.config.ScanPattern) | optional | Refer to [ScanPattern](#blickfeld.protocol.config.ScanPattern) |
+| total_number_of_points | [uint32](#uint32) | optional | Number of laser pulses emitted in this frame. |
+| total_number_of_returns | [uint32](#uint32) | optional | Number of returned points recorded:
+
+Each point of the [total_number_of_points](#blickfeld.protocol.data.Frame.total_number_of_points) can produce several returns. |
+
+
+
+
+
+ <!-- end messages -->
+
+ <!-- end enums -->
+
+ <!-- end HasExtensions -->
+
+ <!-- end services -->
+
+
+
+<a name="blickfeld/data/point.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## blickfeld/data/point.proto
+
+
+
+<a name="blickfeld.protocol.data.Point"></a>
+
+### Point
+This section describes the contents of a single point of a point cloud frame or scan line.
+Each point resembles a direction in which the laser has fired.
+From each point (direction) the device can receive several responses/returns, see [Point.Return](#blickfeld.protocol.data.Point.Return).
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| id | [uint32](#uint32) | optional | Point ID in the corresponding frame |
+| returns | [Point.Return](#blickfeld.protocol.data.Point.Return) | repeated | Refer to [Point.Return](#blickfeld.protocol.data.Point.Return) |
+| start_offset_ns | [uint64](#uint64) | optional | Unit: [ns] - starting time of the point in relation to [Frame.start_time_ns](#blickfeld.protocol.data.Frame.start_time_ns) |
+| ambient_light_level | [uint32](#uint32) | optional | Ambient light level in the direction of the point |
+| direction | [Point.Direction](#blickfeld.protocol.data.Point.Direction) | optional | Refer to [Point.Direction](#blickfeld.protocol.data.Point.Direction) |
+| channel_id | [uint32](#uint32) | optional | ID of the channel that detected the point |
+| error_flags | [Point.ErrorFlag](#blickfeld.protocol.data.Point.ErrorFlag) | repeated | Refer to [Point.ErrorFlag](#blickfeld.protocol.data.Point.ErrorFlag) |
+
+
+
+
+
+
+<a name="blickfeld.protocol.data.Point.Direction"></a>
+
+### Point.Direction
+This section describes the direction and the origin of a point.
+Use these polar coordinates combined with the range information of a given return, if you want to locate the reflection in the spherical coordinatesystem.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| azimuth | [float](#float) | optional | Unit: [rad] - azimuth angle: Angle with respect to y-z plane |
+| elevation | [float](#float) | optional | Unit: [rad] - elevation angle: Angle with respect to x-y plane |
+| origin | [float](#float) | repeated | Unit: [m] - origin of the laser beam [x,y,z] |
+
+
+
+
+
+
+<a name="blickfeld.protocol.data.Point.Return"></a>
+
+### Point.Return
+This section describes the contents of a single return of a point, sorted by intensity.
+A return is created when the LiDAR detects the laser light of the reflection of an object.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| id | [uint32](#uint32) | optional | ID of the return in the point |
+| cartesian | [float](#float) | repeated | Unit: [m] – Cartesian coordinates of the target [x,y,z] |
+| range | [float](#float) | optional | Unit: [m] – distance of target to the origin |
+| intensity | [uint32](#uint32) | optional | Intensity of the returned laser pulse |
+
+
+
+
+
+ <!-- end messages -->
+
+
+<a name="blickfeld.protocol.data.Point.ErrorFlag"></a>
+
+### Point.ErrorFlag
+Error flag indicating why a point delivers no valid returns.
+If a flag is set, the point should not be interpreted neither processed.
+Flags are only set temporarily for a short period of time.
+If the error state does not recover, the device will stop operation.
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| E_VIBRATION_THRESHOLD_EXCEEDED | 1 | The environmental vibration threshold was exceeded. This should not happen in normal operation. |
+
+
+ <!-- end enums -->
+
+ <!-- end HasExtensions -->
+
+ <!-- end services -->
+
+
+
+<a name="blickfeld/data/point_cloud.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## blickfeld/data/point_cloud.proto
+
+
+
+<a name="blickfeld.protocol.data.PointCloud"></a>
+
+### PointCloud
+
+A point cloud object can contain either a full frame or a single scan line.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| header | [PointCloud.Header](#blickfeld.protocol.data.PointCloud.Header) | optional | Refer to [PointCloud.Header](#blickfeld.protocol.data.PointCloud.Header) |
+| frame | [Frame](#blickfeld.protocol.data.Frame) | optional | Refer to [Frame](#blickfeld.protocol.data.Frame) |
+| scanline | [Scanline](#blickfeld.protocol.data.Scanline) | optional | Refer to [Scanline](#blickfeld.protocol.data.Scanline) |
+
+
+
+
+
+
+<a name="blickfeld.protocol.data.PointCloud.Header"></a>
+
+### PointCloud.Header
+
+This section describes the contents of a point cloud header.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| legacy_cube_serial_number | [string](#string) | optional | Legacy serial number of the device which recorded the pointcloud |
+| cube_serial_number | [string](#string) | optional | Serial number of the device which recorded the pointcloud |
+| start_time_ns | [uint64](#uint64) | optional | Unit: [s] - Start timestamp of the requested pointcloud stream |
+| firmware_version | [string](#string) | optional | Firmware version of the device which recorded the pointcloud |
+| hardware_variant | [blickfeld.protocol.update.HardwareVariant](#blickfeld.protocol.update.HardwareVariant) | optional | Hardware variant of the device which recorded the pointcloud |
+
+
+
+
+
+ <!-- end messages -->
+
+ <!-- end enums -->
+
+ <!-- end HasExtensions -->
+
+ <!-- end services -->
+
+
+
+<a name="blickfeld/data/scanline.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## blickfeld/data/scanline.proto
+
+
+
+<a name="blickfeld.protocol.data.Scanline"></a>
+
+### Scanline
+This section describes the contents of a single scan line in a point cloud frame.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| id | [uint64](#uint64) | optional | Scan line ID in the corresponding frame |
+| frame_id | [uint64](#uint64) | optional | Frame ID of the corresponding frame |
+| points | [Point](#blickfeld.protocol.data.Point) | repeated | Refer to [Point](#blickfeld.protocol.data.Point) |
+| start_offset_ns | [uint64](#uint64) | optional | Unit: [ns] - start time of the scanline in relation to [Frame.start_time_ns](#blickfeld.protocol.data.Frame.start_time_ns) |
+
+
+
+
+
+ <!-- end messages -->
+
+ <!-- end enums -->
+
+ <!-- end HasExtensions -->
+
+ <!-- end services -->
+
+
+
 <a name="blickfeld/file/general.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
@@ -1422,6 +1436,388 @@ This section describes the contents of a point cloud. The first message in a Bli
 
 
  <!-- end messages -->
+
+ <!-- end enums -->
+
+ <!-- end HasExtensions -->
+
+ <!-- end services -->
+
+
+
+<a name="blickfeld/status/main.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## blickfeld/status/main.proto
+
+
+
+<a name="blickfeld.protocol.Status"></a>
+
+### Status
+This section contains the status messages of the two deflection mirrors and the temperature sensors in the device.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| scanner | [status.Scanner](#blickfeld.protocol.status.Scanner) | optional | Refer to [Scanner](#blickfeld.protocol.status.scanner.Scanner) |
+| temperatures | [status.Temperature](#blickfeld.protocol.status.Temperature) | repeated | Refer to [Temperature](#blickfeld.protocol.status.temperature.Temperature) |
+
+
+
+
+
+ <!-- end messages -->
+
+ <!-- end enums -->
+
+ <!-- end HasExtensions -->
+
+ <!-- end services -->
+
+
+
+<a name="blickfeld/status/scanner.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## blickfeld/status/scanner.proto
+
+
+
+<a name="blickfeld.protocol.status.Scanner"></a>
+
+### Scanner
+This section defines the status of the device.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| state | [Scanner.State](#blickfeld.protocol.status.Scanner.State) | optional | Refer to [Scanner.State](#blickfeld.protocol.status.Scanner.State) |
+| scan_pattern | [blickfeld.protocol.config.ScanPattern](#blickfeld.protocol.config.ScanPattern) | optional | Refer to [ScanPattern](#blickfeld.protocol.config.ScanPattern) |
+| error | [blickfeld.protocol.Error](#blickfeld.protocol.Error) | optional | Refer to [Error](#blickfeld.protocol.Error) |
+| legacy_scan_pattern | [blickfeld.protocol.config.ScanPattern](#blickfeld.protocol.config.ScanPattern) | optional | Deprecated old ´scan_pattern´ definition |
+
+
+
+
+
+ <!-- end messages -->
+
+
+<a name="blickfeld.protocol.status.Scanner.State"></a>
+
+### Scanner.State
+
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| INITIALIZING | 1 | Device is initializing the hardware. |
+| READY | 2 | Device is ready to start and no error occurred. |
+| STARTING | 3 | Device is starting a point cloud recording, but is not yet recording. |
+| RUNNING | 4 | Device is recording a point cloud. |
+| STOPPING | 5 | Device stops point cloud recording; it is no longer recording. |
+| ERRORED | 6 | Device is in an error state; it can no longer operate. |
+| SELF_TESTING | 7 | Device is testing the hardware. |
+
+
+ <!-- end enums -->
+
+ <!-- end HasExtensions -->
+
+ <!-- end services -->
+
+
+
+<a name="blickfeld/status/temperature.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## blickfeld/status/temperature.proto
+
+
+
+<a name="blickfeld.protocol.status.Temperature"></a>
+
+### Temperature
+This section describes the temperature of the hardware modules in the device.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| sensor | [Temperature.Sensor](#blickfeld.protocol.status.Temperature.Sensor) | optional | Refer to [Temperature.Sensor](#blickfeld.protocol.status.Temperature.Sensor) |
+| value | [float](#float) | optional | Unit: [degrees Celsius] – temperature value of the module. |
+| failed_reason | [string](#string) | optional | Error reason why the temperature cannot be read out. |
+
+
+
+
+
+ <!-- end messages -->
+
+
+<a name="blickfeld.protocol.status.Temperature.Sensor"></a>
+
+### Temperature.Sensor
+This section describes the hardware modules in the device.
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| UNKNOWN | 0 |  |
+| LDM | 1 | Laser and detector module |
+| ETHERNET | 2 | Ethernet adapter |
+| MSB | 3 | Mixed signal board |
+| PL | 4 | Programmable logic |
+| PS | 5 | Processing system |
+| SCANNER_SMALL | 6 | Vertical mirror |
+| SCANNER_BIG | 7 | Horizontal mirror |
+
+
+ <!-- end enums -->
+
+ <!-- end HasExtensions -->
+
+ <!-- end services -->
+
+
+
+<a name="blickfeld/stream/connection.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## blickfeld/stream/connection.proto
+
+
+
+<a name="blickfeld.protocol.stream.Event"></a>
+
+### Event
+This section describes the events of streams.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| point_cloud | [blickfeld.protocol.data.PointCloud](#blickfeld.protocol.data.PointCloud) | optional | Refer to [PointCloud](#blickfeld.protocol.data.PointCloud) |
+| status | [blickfeld.protocol.Status](#blickfeld.protocol.Status) | optional | Refer to [Status](#blickfeld.protocol.status.Status) |
+| developer | [Event.Developer](#blickfeld.protocol.stream.Event.Developer) | optional | Refer to [Event.Developer](#blickfeld.protocol.stream.Event.Developer) |
+
+
+
+
+
+
+<a name="blickfeld.protocol.stream.Event.Developer"></a>
+
+### Event.Developer
+Internal use only
+
+
+
+
+
+
+<a name="blickfeld.protocol.stream.Subscribe"></a>
+
+### Subscribe
+This section describes the different streams to which it is possible to subscribe.
+A stream regularly provides data or status updates for the user. The events will not be pushed automatically to the BSL; the client has to retrieve them.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| point_cloud | [Subscribe.PointCloud](#blickfeld.protocol.stream.Subscribe.PointCloud) | optional | Refer to [Subscribe.PointCloud](#blickfeld.protocol.stream.Subscribe.PointCloud) |
+| status | [Subscribe.Status](#blickfeld.protocol.stream.Subscribe.Status) | optional | Refer to [Subscribe.Status](#blickfeld.protocol.stream.Subscribe.Status) |
+| developer | [Subscribe.Developer](#blickfeld.protocol.stream.Subscribe.Developer) | optional | Refer to [Subscribe.Developer](#blickfeld.protocol.stream.Subscribe.Developer) |
+
+
+
+
+
+
+<a name="blickfeld.protocol.stream.Subscribe.Developer"></a>
+
+### Subscribe.Developer
+Internal use only
+
+
+
+
+
+
+<a name="blickfeld.protocol.stream.Subscribe.PointCloud"></a>
+
+### Subscribe.PointCloud
+This request is used for subscribing to a point cloud stream.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| reference_frame | [blickfeld.protocol.data.Frame](#blickfeld.protocol.data.Frame) | optional | <blockquote>Introduced in BSL v2.10 and firmware v1.9</blockquote> If present, only fields that are set in this message and submessages will be present in the point cloud. If less fields are requested, the Protobuf encoding and network transport time can reduce significantly. |
+| filter | [Subscribe.PointCloud.Filter](#blickfeld.protocol.stream.Subscribe.PointCloud.Filter) | optional | <blockquote>Introduced in BSL v2.10 and firmware v1.9</blockquote> Refer to [PointCloud.Filter](#blickfeld.protocol.stream.Subscribe.PointCloud.Filter) |
+
+
+
+
+
+
+<a name="blickfeld.protocol.stream.Subscribe.PointCloud.Filter"></a>
+
+### Subscribe.PointCloud.Filter
+> Introduced in BSL v2.10 and firmware v1.9
+
+Filter points and returns by point attributes during the post-processing on the device.
+This can be used to e.g. filter points with low intensity or to enable secondary returns.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| max_number_of_returns_per_point | [uint32](#uint32) | optional | Set maximum number of returns per point. By default, secondary returns are disabled. Set this, e.g. to 2, to enable secondary returns. Default: 1 |
+| intensity | [blickfeld.protocol.OptionalValueRange](#blickfeld.protocol.OptionalValueRange) | optional | Filter all points, which intensity values are not within this value range. |
+| ambient_light_level | [blickfeld.protocol.OptionalValueRange](#blickfeld.protocol.OptionalValueRange) | optional | Filter all points, which ambient light level values are not within this value range. |
+| range | [blickfeld.protocol.OptionalValueRange](#blickfeld.protocol.OptionalValueRange) | optional | Filter all points, which range values are not within this value range. |
+
+
+
+
+
+
+<a name="blickfeld.protocol.stream.Subscribe.Status"></a>
+
+### Subscribe.Status
+This request is used for subscribing to a status stream.
+
+
+
+
+
+ <!-- end messages -->
+
+ <!-- end enums -->
+
+ <!-- end HasExtensions -->
+
+ <!-- end services -->
+
+
+
+<a name="blickfeld/update/hardware.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## blickfeld/update/hardware.proto
+
+
+
+<a name="blickfeld.protocol.update.partial_module_eeprom_msg"></a>
+
+### partial_module_eeprom_msg
+partial parse of {ldm,scanner,msb}_eeprom_msg
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| hardware_version | [string](#string) | optional |  |
+
+
+
+
+
+
+<a name="blickfeld.protocol.update.partial_trenz_eeprom_msg"></a>
+
+### partial_trenz_eeprom_msg
+partial parse of trenz_eeprom_msg
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| hardware_variant | [HardwareVariant](#blickfeld.protocol.update.HardwareVariant) | optional |  |
+
+
+
+
+
+ <!-- end messages -->
+
+
+<a name="blickfeld.protocol.update.HardwareVariant"></a>
+
+### HardwareVariant
+do NOT change enum labels, they are used as strings in code
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| ALL_HARDWARE | 5 |  |
+| UNKNOWN_HARDWARE | 6 |  |
+| NO_HARDWARE | 7 |  |
+| CUBE_V0_2 | 0 |  |
+| CUBE_V0_3 | 1 |  |
+| CUBE_V1_0 | 4 |  |
+| AURORA_P3 | 3 |  |
+| APOLLON_A0 | 2 |  |
+| APOLLON_A1_BDU | 8 |  |
+
+
+ <!-- end enums -->
+
+ <!-- end HasExtensions -->
+
+ <!-- end services -->
+
+
+
+<a name="blickfeld/update/manifest.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## blickfeld/update/manifest.proto
+
+
+
+<a name="blickfeld.protocol.update.manifest_msg"></a>
+
+### manifest_msg
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| min_bus_version | [string](#string) | optional |  |
+| image_type | [manifest_msg.ImageType](#blickfeld.protocol.update.manifest_msg.ImageType) | optional |  |
+| compatible_hardware | [manifest_msg.CompatibleHardware](#blickfeld.protocol.update.manifest_msg.CompatibleHardware) | optional |  |
+| secure | [bool](#bool) | optional |  Default: false |
+
+
+
+
+
+
+<a name="blickfeld.protocol.update.manifest_msg.CompatibleHardware"></a>
+
+### manifest_msg.CompatibleHardware
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| variant | [HardwareVariant](#blickfeld.protocol.update.HardwareVariant) | repeated |  |
+| msb | [string](#string) | repeated |  |
+| scanner_big | [string](#string) | repeated |  |
+| scanner_small | [string](#string) | repeated |  |
+| hsd | [string](#string) | repeated |  |
+
+
+
+
+
+ <!-- end messages -->
+
+
+<a name="blickfeld.protocol.update.manifest_msg.ImageType"></a>
+
+### manifest_msg.ImageType
+
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| PARTITIONED | 0 |  |
+| SYSTEM | 1 |  |
+
 
  <!-- end enums -->
 
