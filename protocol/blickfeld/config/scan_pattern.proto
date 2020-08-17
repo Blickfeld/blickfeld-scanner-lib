@@ -1,5 +1,6 @@
 syntax = "proto2";
 
+import "blickfeld/common.proto";
 import "blickfeld/options.proto";
 
 package blickfeld.protocol.config;
@@ -75,8 +76,15 @@ message ScanPattern {
 		 * The laser pulses are emittet with the configured angular spacing.
 		 */
 		enum Type {
-		    EQUI_HORIZONTAL_ANGLE = 0; // The laser is triggered depending on the horizontal angle of the laser beam.
+		    EQUI_HORIZONTAL_ANGLE = 0; // The laser is triggered depending on the horizontal angle of the laser beam with the configured angle spacing.
 		    EQUI_DENSITY = 1; // Reserved for future use. Not yet supported.
+		    CUSTOM = 2; // Internal feature for custom scan patterns
+		    /*
+		     * The laser is triggered depending on the horizontal angle of the laser beam with the configured angle spacing.
+		     * Scanlines are shifted by angle_spacing/4 with alternate directions.
+		     * This doubles the horizontal density with the COMBINE_UP_DOWN FrameMode and efficiently uses the down-ramp phase in the inner horizontal FoV.
+		     */
+		    INTERLEAVE = 3;
 		}
 		
 		/**
@@ -120,11 +128,12 @@ message ScanPattern {
 		optional float angle_spacing = 2;
 		optional Type type = 3 [default = EQUI_HORIZONTAL_ANGLE];  // Refer to [ScanPattern.Pulse.Type](#blickfeld.protocol.config.ScanPattern.Pulse.Type)
 		optional FrameMode frame_mode = 4 [default = ONLY_UP];  // Refer to [ScanPattern.Pulse.FrameMode](#blickfeld.protocol.config.ScanPattern.Pulse.FrameMode)
+
 		/**
 		 * This parameter defines whether the distortion correction is applied when calculating the laser pulse angles. Default: True
 		 */
 		optional bool distortion_correction = 5 [default = true];
-		extensions 6; // Developer
+		extensions 6, 7; // Developer
 	}
 	
 	/**
@@ -142,11 +151,38 @@ message ScanPattern {
 		optional double reference_time_offset = 3 [default = 0];
 	}
 
+	/**
+	 * > Introduced in BSL v2.10 and firmware v1.9
+	 *
+	 * Filter points and returns by point attributes during the post-processing on the device.
+	 * This can be used to e.g. filter points with low intensity or to enable secondary returns.
+	 */
+	message Filter {
+		/**
+		 * > Introduced in BSL v2.11 and firmware v1.11
+		 *
+		 * This is a preliminary interface to control the noise filter on the device.
+		 * All points, which have a lower intensity than the minimum intensity calculated by this filter will be filtered out.
+		 * The formula is: minimum_intensity = offset + gain * point.ambient_light_level,
+		 * where the point.ambient_light_level is the ambient light level of the point the laser shoots at.
+		 */
+		message Noise {
+			optional uint32 offset = 1 [ (d_min) = 0, (d_max) = 50 ]; // Can be seen as minimum intensity filter, if there is no ambient light.
+			optional float gain = 2 [ (d_min) = 0, (d_max) = 0.5 ]; // The gain will be multiplied with the ambient light level of the point the laser shoots at.
+		}
+
+		optional uint32 max_number_of_returns_per_point = 1 [ default = 1, (d_min) = 1, (d_max) = 3 ]; // Set maximum number of returns per point. By default, secondary returns are disabled. Set this, e.g. to 2, to enable secondary returns.
+		optional OptionalValueRange intensity = 2; // Filter all points, which intensity values are not within this value range.
+		optional OptionalValueRange ambient_light_level = 3; // Filter all points, which ambient light level values are not within this value range.
+		optional OptionalValueRange range = 4; // Filter all points, which range values are not within this value range.
+		optional Noise noise = 5 [(optional) = true]; // <blockquote>Introduced in BSL v2.11 and firmware v1.11</blockquote> Refer to [Filter.Noise](#blickfeld.protocol.config.ScanPattern.Filter.Noise)
+	}
+
 	optional Horizontal horizontal = 1; // Refer to [ScanPattern.Horizontal](#blickfeld.protocol.config.ScanPattern.Horizontal)
 	optional Vertical vertical = 2; // Refer to [ScanPattern.Vertical](#blickfeld.protocol.config.ScanPattern.Vertical)
 	optional Pulse pulse = 3; // Refer to [ScanPattern.Pulse](#blickfeld.protocol.config.ScanPattern.Pulse)
 	optional FrameRate frame_rate = 4; // Refer to [ScanPattern.FrameRate](#blickfeld.protocol.config.ScanPattern.FrameRate)
 	extensions 5; // Developer
 	extensions 6; // Developer
-
+	optional Filter filter = 7; // <blockquote>Introduced in BSL v2.11 and firmware v1.11</blockquote> Refer to [Filter](#blickfeld.protocol.config.ScanPattern.Filter)
 }

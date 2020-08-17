@@ -150,6 +150,32 @@ class scanner(object):
         req.get_scan_pattern.SetInParent()
         return self._connection.send_request(req).get_scan_pattern.config
     
+    def set_advanced_config(self, config, persist = False):
+        """> Introduced in BSL v2.11 and firmware v1.11
+        
+        Function to set advanced config, see: :any:`protobuf_protocol`.
+        Expert parameters: It is not recommended to adapt this calibrated configuration without understanding the influences on the resulting point cloud quality.
+
+        :param config: advanced config to be set
+        :param persist: Persist advanced config on device and reload it after a power-cycle
+        :return: response advanced config, see :any:`protobuf_protocol` advanced config
+        """
+        req = connection_pb2.Request()
+        req.set_advanced_config.config.MergeFrom(config)
+        req.set_advanced_config.persist = persist
+        return self._connection.send_request(req).set_advanced_config
+    
+    def get_advanced_config(self):
+        """> Introduced in BSL v2.11 and firmware v1.11
+        
+        Returns the currently set advanced config, see: :any:`protobuf_protocol`.
+
+        :return: Currently set advanced config, see :any:`protobuf_protocol` advanced config
+        """
+        req = connection_pb2.Request()
+        req.get_advanced_config.SetInParent()
+        return self._connection.send_request(req).get_advanced_config.config
+    
     def get_device_timestamp(self):
         """Returns the current device timestamp in seconds.
 

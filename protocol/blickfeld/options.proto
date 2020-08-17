@@ -2,6 +2,7 @@ syntax = "proto2";
 option optimize_for = CODE_SIZE;
 
 import "google/protobuf/descriptor.proto";
+import "blickfeld/config/generate.proto";
 import "blickfeld/config/secure.proto";
 
 package blickfeld.protocol;
@@ -28,4 +29,5 @@ extend google.protobuf.MessageOptions {
   optional string e_desc = 60000 [default = "No additional error description available."]; // Error description
   optional string help = 60001 [default = ""]; // Help description
   optional blickfeld.protocol.config.Secure secure = 60002;
+  optional blickfeld.protocol.config.Generate generate = 60003;
 }

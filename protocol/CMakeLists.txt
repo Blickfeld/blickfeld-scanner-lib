@@ -78,6 +78,8 @@ endif()
 # list .proto files here
 set(PROTOBUF_DEFS_DIR ${PROJECT_SOURCE_DIR})
 set(PROTOBUF_SOURCES 
+	blickfeld/config/advanced.proto
+	blickfeld/config/generate.proto
 	blickfeld/config/scan_pattern.proto
 	blickfeld/config/secure.proto
 	

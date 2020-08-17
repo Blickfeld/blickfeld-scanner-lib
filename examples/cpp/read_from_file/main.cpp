@@ -34,7 +34,8 @@ int example(int argc, char* argv[]) {
 
 		time_t time_s = frame.start_time_ns() / 1e9;
 		auto timepoint = localtime(&time_s);
-		printf ("Frame:  scanlines %u (max %0.2f Hz - current %0.2f Hz) - timestamp %f - %s",
+		printf ("Frame %lu: scanlines %u (max %0.2f Hz - current %0.2f Hz) - timestamp %f - %s",
+			frame.id(),
 			frame.scanlines_size(),
 			frame.scan_pattern().frame_rate().maximum(),
 			frame.scan_pattern().frame_rate().target(),
@@ -51,10 +52,11 @@ int example(int argc, char* argv[]) {
 					auto& ret = point.returns(r_ind);
 
 					if (p_ind < 10 && s_ind == 0)
-						printf("Point %u -ret %u [x: %4.2f, y: %4.2f, z: %4.2f] - intensity: %u\n",
+						printf("Point %u -ret %u [x: %4.2f, y: %4.2f, z: %4.2f] - intensity: %u - range: %f\n",
 						       point.id(), ret.id(),
 						       ret.cartesian(0), ret.cartesian(1), ret.cartesian(2),
-						       ret.intensity());
+						       ret.intensity(),
+						       ret.range());
 				}
 			}
 		}

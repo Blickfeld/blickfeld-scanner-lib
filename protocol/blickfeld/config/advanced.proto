@@ -1,0 +1,24 @@
+syntax = "proto2";
+
+import "blickfeld/options.proto";
+
+package blickfeld.protocol.config;
+
+/**
+ * > Introduced in BSL v2.11 and firmware v1.11
+ *
+ * Expert parameters: It is not recommended to adapt this calibrated configuration without understanding the influences on the resulting point cloud quality.
+ *
+ * The current set of parameters is preliminary, additional parameters may be added or may get obsolete in the future.
+ */
+message Advanced {
+
+	/**
+	 * The behavior of the detector can be adjusted to improve the performance under extreme environmental conditions, e.g. static setup with strong daylight or basement rooms without daylight.
+	 */
+	message Detector {
+		optional float sensitivity = 1 [ default = 1, (d_min) = 0.8, (d_max) = 1.2 ]; // Relatively influences the sensitivity of the detector. Higher values might also result into range loss. It is recommended to validate the noise filter parameters after changes to this setting.
+	}
+	
+	optional Detector detector = 1; // Refer to [Detector](#blickfeld.protocol.config.Environment.Detector)
+}

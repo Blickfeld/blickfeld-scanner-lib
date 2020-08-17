@@ -13,6 +13,20 @@ influence the resulting point cloud.
 
 ### Removed
 
+## [2.11.0] - 2020.08.17
+
+### Added
+* Python: Example of frame export for matlab / octave
+* [Introduced in firmware v1.10] Add filter parameters to scan pattern. It allows to increase the number of returns per point and provides min/max filters for point attributes. The filter can be overridden during a stream request.
+* [Introduced in firmware v1.11] Add preliminary noise filter configuration to scan pattern
+* Protobuf: Add internal message option to trigger export of custom targets
+* CI: Provide test coverage
+* [Introduced in firmware v1.11] Interleave frame mode, which allows to double the horizontal density with the COMBINE_UP_DOWN FrameMode and efficiently uses the down-ramp phase in the inner horizontal FoV
+* [Introduced in firmware v1.11] Add API request for advanced configuration
+
+### Changed
+* Bugfix: Removed incorrect end of line prints in cpp fetch_clouds example
+
 ## [2.10.2] - 2020.07.22
 
 ### Changed
