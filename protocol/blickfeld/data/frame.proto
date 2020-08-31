@@ -11,16 +11,16 @@ package blickfeld.protocol.data;
  * This section describes the contents of a point cloud frame.
  */
 message Frame {
-    optional uint64 id = 1 [(optional)=true];  // Incremental frame ID since startup of the device
-    repeated Scanline scanlines = 2 [(optional)=true];  // Refer to [Scanline](#blickfeld.protocol.data.Scanline)
-    optional uint64 start_time_ns = 3 [(optional)=true]; // Unit: [s] – start frame timestamp
-    optional config.ScanPattern scan_pattern = 5 [(optional)=true];  // Refer to [ScanPattern](#blickfeld.protocol.config.ScanPattern)
-    optional uint32 total_number_of_points = 6 [(optional)=true];  // Number of laser pulses emitted in this frame.
+	optional uint64 id = 1 [(optional)=true]; // Incremental frame ID since startup of the device
+	repeated Scanline scanlines = 2 [(optional)=true]; // Refer to [Scanline](#blickfeld.protocol.data.Scanline)
+	optional uint64 start_time_ns = 3 [(optional)=true]; // Unit: [s] – start frame timestamp
+	optional config.ScanPattern scan_pattern = 5 [(optional)=true]; // Refer to [ScanPattern](#blickfeld.protocol.config.ScanPattern)
+	optional uint32 total_number_of_points = 6 [(optional)=true]; // Number of laser pulses emitted in this frame.
 
-    /**
-     * Number of returned points recorded:
-     *
-     * Each point of the [total_number_of_points](#blickfeld.protocol.data.Frame.total_number_of_points) can produce several returns.
-     */
-    optional uint32 total_number_of_returns = 7 [(optional)=true];
+	/**
+	 * Number of returned points recorded:
+	 *
+	 * Each point of the [total_number_of_points](#blickfeld.protocol.data.Frame.total_number_of_points) can produce several returns.
+	 */
+	optional uint32 total_number_of_returns = 7 [(optional)=true];
 }

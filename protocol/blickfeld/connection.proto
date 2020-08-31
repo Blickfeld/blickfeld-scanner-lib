@@ -32,7 +32,7 @@ message Request {
 		extensions 1 to max;  // Internal developer requests
 		option (secure) = {permissions: DEVELOPER, cert_type: CLIENT};
 	}
-	
+
 	/**
 	 * This request is used for configuring a Scan Pattern.
 	 */
@@ -42,7 +42,7 @@ message Request {
 
 		optional config.ScanPattern legacy_config = 1 [(optional) = true];  // Deprecated old 'config' due to horizontal field of view definition
 	}
-	
+
 	/**
 	 * This request is used to fill an empty or partially filled scan pattern with the required parameters.
 	 * It will fill the given scan pattern with default values and return the filled scan pattern to the client.
@@ -53,13 +53,13 @@ message Request {
 
 		optional config.ScanPattern legacy_config = 1 [(allow_sparse)=true, (optional) = true];  // Deprecated
 	}
-	
+
 	/**
 	 * This request is used to retrieve the currently set [ScanPattern](#blickfeld.protocol.config.ScanPattern).
 	 */
 	message GetScanPattern {
 	}
-	
+
 	/**
 	 * This request is used for receiving the current [Status](#blickfeld.protocol.status.Status).
 	 */
@@ -78,7 +78,7 @@ message Request {
 
 	/**
 	 * > Introduced in BSL v2.11 and firmware v1.11
-	 * 
+	 *
 	 * This request is used for configuring the advanced config.
 	 */
 	message SetAdvancedConfig {
@@ -88,7 +88,7 @@ message Request {
 
 	/**
 	 * > Introduced in BSL v2.11 and firmware v1.11
-	 * 
+	 *
 	 * This request is used to retrieve the currently set [Advanced](#blickfeld.protocol.config.Advanced).
 	 */
 	message GetAdvancedConfig {
@@ -127,7 +127,7 @@ message Response {
 		// @exclude TODO: Greeting and version information
 		optional uint32 protocol_version = 1;  // Version of the Blickfeld Protocol
 	}
-	
+
 	/**
 	 * Internal use only
 	 */
@@ -147,7 +147,7 @@ message Response {
 	 */
 	message FillScanPattern {
 		option (help) = "..";
-		
+
 		optional config.ScanPattern config = 2 [(legacy_field_id) = 1];  // Refer to [ScanPattern](#blickfeld.protocol.config.ScanPattern)
 
 		optional config.ScanPattern legacy_config = 1 [(optional) = true];  // Deprecated
@@ -176,7 +176,7 @@ message Response {
 
 	/**
 	 * > Introduced in BSL v2.11 and firmware v1.11
-	 * 
+	 *
 	 * This response is sent out after setting an SetAdvancedConfig.
 	 */
 	message SetAdvancedConfig {
@@ -184,7 +184,7 @@ message Response {
 
 	/**
 	 * > Introduced in BSL v2.11 and firmware v1.11
-	 * 
+	 *
 	 * This response is returned after a request to get the current [Advanced](#blickfeld.protocol.config.Advanced).
 	 */
 	message GetAdvancedConfig {

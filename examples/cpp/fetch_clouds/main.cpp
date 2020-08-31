@@ -58,11 +58,11 @@ int example(int argc, char* argv[]) {
 		 * Print information about this frame
 		 *
 		 * Reference implementation of stream operator to clarify available attribute methods:
-		 * 	std::ostream& operator<<(std::ostream &strm, const blickfeld::protocol::data::Frame& frame) {
-		 * 		return strm << "<Blickfeld Frame " << frame.id() << ": " << frame.total_number_of_returns() << " returns, "
-		 * 			<< setprecision(1) << fixed << frame.scan_pattern().horizontal().fov() * 180.0f / M_PI << "x" << frame.scan_pattern().vertical().fov() * 180.0f / M_PI << " FoV, "
-		 * 			<< setprecision(0) << fixed << frame.scanlines_size() << " scanlines>";
-		 * 	}
+		 *      std::ostream& operator<<(std::ostream &strm, const blickfeld::protocol::data::Frame& frame) {
+		 *              return strm << "<Blickfeld Frame " << frame.id() << ": " << frame.total_number_of_returns() << " returns, "
+		 *                      << setprecision(1) << fixed << frame.scan_pattern().horizontal().fov() * 180.0f / M_PI << "x" << frame.scan_pattern().vertical().fov() * 180.0f / M_PI << " FoV, "
+		 *                      << setprecision(0) << fixed << frame.scanlines_size() << " scanlines>";
+		 *      }
 		 */
 		std::cout << frame << std::endl;
 
@@ -81,7 +81,7 @@ int example(int argc, char* argv[]) {
 				 *
 				 * Reference implementation of stream operator to clarify available attribute methods:
 				 *
-				 * 	std::ostream& operator<<(std::ostream &strm, const blickfeld::protocol::data::Point& point) {
+				 *      std::ostream& operator<<(std::ostream &strm, const blickfeld::protocol::data::Point& point) {
 				 *		return strm << "<Blickfeld Point " << point.id() << ": " << point.returns_size() << (point.returns_size() == 1 ? " return>" : " returns>");
 				 *	}
 				 */
@@ -96,7 +96,7 @@ int example(int argc, char* argv[]) {
 					 * Print return information about the first 3 points of the first scanline
 					 *
 					 * Reference implementation of stream operator to clarify available attribute methods:
-					 * 	std::ostream& operator<<(std::ostream &strm, const blickfeld::protocol::data::Point::Return& ret) {
+					 *      std::ostream& operator<<(std::ostream &strm, const blickfeld::protocol::data::Point::Return& ret) {
 					 *		return strm << "<Blickfeld Point::Return " << ret.id() << ": "
 					 *				<< setprecision(2) << fixed
 					 *				<< "(x: " << ret.cartesian(0)

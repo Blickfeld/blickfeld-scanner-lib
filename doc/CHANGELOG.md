@@ -13,6 +13,17 @@ influence the resulting point cloud.
 
 ### Removed
 
+## [2.11.1] - 2020.08.31
+
+### Added
+* Python: Flag for detecting frame losses
+
+### Changed
+* Change default scan pattern to 40 scanlines up, 40 scanlines down, INTERLEAVE pulse type, and COMBINE_UP_DOWN pulse frame mode
+* Bugfix Python: Fixed and simplified the recording functionality. The compression level can now be adjusted and is default set to 1.
+* Protocol: Formatted protobuf files for better readability
+* Python: Follow PEP 8 version rules
+
 ## [2.11.0] - 2020.08.17
 
 ### Added

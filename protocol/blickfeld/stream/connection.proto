@@ -9,7 +9,6 @@ import "blickfeld/config/scan_pattern.proto";
 
 package blickfeld.protocol.stream;
 
-
 /**
  * This section describes the different streams to which it is possible to subscribe.
  * A stream regularly provides data or status updates for the user. The events will not be pushed automatically to the BSL; the client has to retrieve them.

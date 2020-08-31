@@ -19,6 +19,6 @@ message Advanced {
 	message Detector {
 		optional float sensitivity = 1 [ default = 1, (d_min) = 0.8, (d_max) = 1.2 ]; // Relatively influences the sensitivity of the detector. Higher values might also result into range loss. It is recommended to validate the noise filter parameters after changes to this setting.
 	}
-	
+
 	optional Detector detector = 1; // Refer to [Detector](#blickfeld.protocol.config.Environment.Detector)
 }

@@ -21,14 +21,14 @@ message ScanPattern {
 	message Horizontal {
 
 		/**
-		 * Unit: [rad]  
+		 * Unit: [rad]
 		 * –
-		 * optical field of view of the horizontal mirror. 
+		 * optical field of view of the horizontal mirror.
 		 * Note: In v2.2* and below, this was defined as a mechanical FoV.
 		 */
 		optional float fov = 1;
 	}
-	
+
 	/**
 	 * This section defines the movement of the vertical mirror within one frame.
 	 * The mirror moves for from 0 degrees to the configured target FoV (up-ramping phase) and back to 0 degrees (down-ramping phase) with its eigenfrequency.
@@ -55,15 +55,15 @@ message ScanPattern {
 		 * Configures the number of scan lines required for the up-ramping phase.
 		 * During the up-ramping phase, the vertical mirror increases its amplitude from 0 degrees to the target FoV. Default: 200
 		 */
-		optional uint32 scanlines_up = 2 [default = 200, (d_min) = 1];
+		optional uint32 scanlines_up = 2 [default = 40, (d_min) = 1];
 
 		/**
 		 * Configures the amount of scan lines required for the down-ramping phase.
 		 * During the down-ramping phase, the vertical mirror decreases its amplitude from the target FoV to 0 degrees. Default: 30
 		 */
-		optional uint32 scanlines_down = 3 [default = 30, (d_min) = 1];
+		optional uint32 scanlines_down = 3 [default = 40, (d_min) = 1];
 	}
-	
+
 	/**
 	 * This section defines the pattern in which the laser pulses and captures sample points
 	 */
@@ -76,17 +76,17 @@ message ScanPattern {
 		 * The laser pulses are emittet with the configured angular spacing.
 		 */
 		enum Type {
-		    EQUI_HORIZONTAL_ANGLE = 0; // The laser is triggered depending on the horizontal angle of the laser beam with the configured angle spacing.
-		    EQUI_DENSITY = 1; // Reserved for future use. Not yet supported.
-		    CUSTOM = 2; // Internal feature for custom scan patterns
-		    /*
-		     * The laser is triggered depending on the horizontal angle of the laser beam with the configured angle spacing.
-		     * Scanlines are shifted by angle_spacing/4 with alternate directions.
-		     * This doubles the horizontal density with the COMBINE_UP_DOWN FrameMode and efficiently uses the down-ramp phase in the inner horizontal FoV.
-		     */
-		    INTERLEAVE = 3;
+			EQUI_HORIZONTAL_ANGLE = 0; // The laser is triggered depending on the horizontal angle of the laser beam with the configured angle spacing.
+			EQUI_DENSITY = 1; // Reserved for future use. Not yet supported.
+			CUSTOM = 2; // Internal feature for custom scan patterns
+			/*
+			 * The laser is triggered depending on the horizontal angle of the laser beam with the configured angle spacing.
+			 * Scanlines are shifted by angle_spacing/4 with alternate directions.
+			 * This doubles the horizontal density with the COMBINE_UP_DOWN FrameMode and efficiently uses the down-ramp phase in the inner horizontal FoV.
+			 */
+			INTERLEAVE = 3;
 		}
-		
+
 		/**
 		 * Because of the mirrors oscillating and the resulting Lissajous curve, it is not possible to pulse in a completely arbitrary pattern.
 		 * A frame always starts with a phase in which the vertical mirror increases its amplitude (up-ramping).
@@ -94,24 +94,24 @@ message ScanPattern {
 		 * It is possible to pulse in both phases. There are four different options to pulse:
 		 */
 		enum FrameMode {
-		    NONE = 0;
-			
-		    /**
+			NONE = 0;
+
+			/**
 			 * The device pulses in the up-ramping and down-ramping phases and one frame is created by combining the resulting sample points.
-			*/
-		    COMBINE_UP_DOWN = 1;
-			
-		    /**
+			 */
+			COMBINE_UP_DOWN = 1;
+
+			/**
 			 * The device pulses in the **up-ramping** phase and **does not** pulse in the **down-ramping** phase.
 			 */
-		    ONLY_UP = 2;
-			
-		    /**
+			ONLY_UP = 2;
+
+			/**
 			 * The device is **does not** pulse in the **up-ramping** phase and pulses in the **down-ramping** phase.
 			 */
-		    ONLY_DOWN = 3;
-			
-		    /**
+			ONLY_DOWN = 3;
+
+			/**
 			 * The device pulses in the up-ramping and down-ramping phases and one frame for each phase is created.
 			 */
 			SEPARATE = 4;
@@ -126,8 +126,8 @@ message ScanPattern {
 		 * This parameter therefore defines the horizontal sampling resolution.
 		 */
 		optional float angle_spacing = 2;
-		optional Type type = 3 [default = EQUI_HORIZONTAL_ANGLE];  // Refer to [ScanPattern.Pulse.Type](#blickfeld.protocol.config.ScanPattern.Pulse.Type)
-		optional FrameMode frame_mode = 4 [default = ONLY_UP];  // Refer to [ScanPattern.Pulse.FrameMode](#blickfeld.protocol.config.ScanPattern.Pulse.FrameMode)
+		optional Type type = 3 [default = INTERLEAVE];  // Refer to [ScanPattern.Pulse.Type](#blickfeld.protocol.config.ScanPattern.Pulse.Type)
+		optional FrameMode frame_mode = 4 [default = COMBINE_UP_DOWN];  // Refer to [ScanPattern.Pulse.FrameMode](#blickfeld.protocol.config.ScanPattern.Pulse.FrameMode)
 
 		/**
 		 * This parameter defines whether the distortion correction is applied when calculating the laser pulse angles. Default: True
@@ -135,7 +135,7 @@ message ScanPattern {
 		optional bool distortion_correction = 5 [default = true];
 		extensions 6, 7; // Developer
 	}
-	
+
 	/**
 	 * This section defines the target frame rate for synchronization between several LiDAR devices.
 	 * The feature is described in the [Time synchronization documentation](Sync).

@@ -1132,8 +1132,8 @@ This section defines the pattern in which the laser pulses and captures sample p
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | angle_spacing | [float](#float) | optional | Unit: [rad] – this defines the angle within which the horizontal mirror moves between two laser pulses. This parameter therefore defines the horizontal sampling resolution. |
-| type | [ScanPattern.Pulse.Type](#blickfeld.protocol.config.ScanPattern.Pulse.Type) | optional | Refer to [ScanPattern.Pulse.Type](#blickfeld.protocol.config.ScanPattern.Pulse.Type) Default: EQUI_HORIZONTAL_ANGLE |
-| frame_mode | [ScanPattern.Pulse.FrameMode](#blickfeld.protocol.config.ScanPattern.Pulse.FrameMode) | optional | Refer to [ScanPattern.Pulse.FrameMode](#blickfeld.protocol.config.ScanPattern.Pulse.FrameMode) Default: ONLY_UP |
+| type | [ScanPattern.Pulse.Type](#blickfeld.protocol.config.ScanPattern.Pulse.Type) | optional | Refer to [ScanPattern.Pulse.Type](#blickfeld.protocol.config.ScanPattern.Pulse.Type) Default: INTERLEAVE |
+| frame_mode | [ScanPattern.Pulse.FrameMode](#blickfeld.protocol.config.ScanPattern.Pulse.FrameMode) | optional | Refer to [ScanPattern.Pulse.FrameMode](#blickfeld.protocol.config.ScanPattern.Pulse.FrameMode) Default: COMBINE_UP_DOWN |
 | distortion_correction | [bool](#bool) | optional | This parameter defines whether the distortion correction is applied when calculating the laser pulse angles. Default: True Default: true |
 
 
@@ -1159,8 +1159,8 @@ For a more detailed explanation, see: [Scan Pattern documentation](Scan_Pattern)
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | fov | [float](#float) | optional | Unit: [rad] – FoV in the center of the frame. Due to the eye shape of the scan pattern, the vertical FoV decreases the outer boundaries of the horizontal mirror. |
-| scanlines_up | [uint32](#uint32) | optional | Configures the number of scan lines required for the up-ramping phase. During the up-ramping phase, the vertical mirror increases its amplitude from 0 degrees to the target FoV. Default: 200 Default: 200 |
-| scanlines_down | [uint32](#uint32) | optional | Configures the amount of scan lines required for the down-ramping phase. During the down-ramping phase, the vertical mirror decreases its amplitude from the target FoV to 0 degrees. Default: 30 Default: 30 |
+| scanlines_up | [uint32](#uint32) | optional | Configures the number of scan lines required for the up-ramping phase. During the up-ramping phase, the vertical mirror increases its amplitude from 0 degrees to the target FoV. Default: 200 Default: 40 |
+| scanlines_down | [uint32](#uint32) | optional | Configures the amount of scan lines required for the down-ramping phase. During the down-ramping phase, the vertical mirror decreases its amplitude from the target FoV to 0 degrees. Default: 30 Default: 40 |
 
 
 
@@ -1407,7 +1407,6 @@ If the error state does not recover, the device will stop operation.
 <a name="blickfeld.protocol.data.PointCloud"></a>
 
 ### PointCloud
-
 A point cloud object can contain either a full frame or a single scan line.
 
 
@@ -1425,7 +1424,6 @@ A point cloud object can contain either a full frame or a single scan line.
 <a name="blickfeld.protocol.data.PointCloud.Header"></a>
 
 ### PointCloud.Header
-
 This section describes the contents of a point cloud header.
 
 
@@ -1541,7 +1539,7 @@ This section describes the contents of a single scan line in a point cloud frame
 <a name="blickfeld.protocol.file.PointCloud"></a>
 
 ### PointCloud
-This section describes the contents of a point cloud. The first message in a Blickfeld protobuf pointcloud should always be the 
+This section describes the contents of a point cloud. The first message in a Blickfeld protobuf pointcloud should always be the
 [PointCloud.Header](#blickfeld.protocol.data.PointCloud.Header) message followed by [PointCloud.Data](#blickfeld.protocol.data.PointCloud.Data) messages.
 
 
