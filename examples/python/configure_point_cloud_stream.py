@@ -12,7 +12,7 @@ from __future__ import print_function
 import argparse
 import blickfeld_scanner
 from blickfeld_scanner.stream import point_cloud
-from blickfeld_scanner.protocol.stream import connection_pb2
+from blickfeld_scanner.protocol.config import scan_pattern_pb2
 
 
 def configure_point_cloud_stream(args):
@@ -28,7 +28,7 @@ def configure_point_cloud_stream(args):
     reference_frame = point_cloud.REF_FRAME_XYZ_I_ID  
 
     # Create filter to filter points and returns by point attributes during the post-processing on the device.
-    point_filter = connection_pb2.Subscribe().PointCloud().Filter()
+    point_filter = scan_pattern_pb2.ScanPattern().Filter()
     point_filter.range.minimum = 5  # minimum range for a point to be sent out is 5m
     point_filter.range.maximum = 50  # maximum range for a point to be sent out is 50m
     point_filter.max_number_of_returns_per_point = 2 # Set max number of returns to 2. The default value is 1.

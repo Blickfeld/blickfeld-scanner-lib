@@ -54,19 +54,17 @@ int example(int argc, char* argv[]) {
 		// Protobuf API is described in https://developers.google.com/protocol-buffers/docs/cpptutorial
 		const blickfeld::protocol::data::Frame frame = stream->recv_frame();
 
-		// Print information about this frame
+		/*
+		 * Print information about this frame
+		 *
+		 * Reference implementation of stream operator to clarify available attribute methods:
+		 *      std::ostream& operator<<(std::ostream &strm, const blickfeld::protocol::data::Frame& frame) {
+		 *              return strm << "<Blickfeld Frame " << frame.id() << ": " << frame.total_number_of_returns() << " returns, "
+		 *                      << setprecision(1) << fixed << frame.scan_pattern().horizontal().fov() * 180.0f / M_PI << "x" << frame.scan_pattern().vertical().fov() * 180.0f / M_PI << " FoV, "
+		 *                      << setprecision(0) << fixed << frame.scanlines_size() << " scanlines>";
+		 *      }
+		 */
 		std::cout << frame << std::endl;
-
-		// Example for available attributes in frame
-		time_t time_s = frame.start_time_ns() / 1e9;
-		auto timepoint = localtime(&time_s);
-		printf ("Frame attributes:  scanlines %u (max %0.2f Hz - current %0.2f Hz) - timestamp %f - %s",
-			   frame.scanlines_size(),
-			   frame.scan_pattern().frame_rate().maximum(),
-			   frame.scan_pattern().frame_rate().target(),
-			   frame.start_time_ns() / 1e9,
-			   asctime(timepoint)
-			   );
 
 		// Specify number of points printed per frame
 		int print_n_points = 3;
@@ -78,7 +76,15 @@ int example(int argc, char* argv[]) {
 			for (int p_ind = 0; p_ind < frame.scanlines(s_ind).points_size(); p_ind++) {
 				auto& point = frame.scanlines(s_ind).points(p_ind);
 
-				// Print information about the first 3 points of the first scanline
+				/*
+				 * Print information about the first 3 points of the first scanline
+				 *
+				 * Reference implementation of stream operator to clarify available attribute methods:
+				 *
+				 *      std::ostream& operator<<(std::ostream &strm, const blickfeld::protocol::data::Point& point) {
+				 *		return strm << "<Blickfeld Point " << point.id() << ": " << point.returns_size() << (point.returns_size() == 1 ? " return>" : " returns>");
+				 *	}
+				 */
 				if (p_ind < print_n_points && s_ind == 0)
 					std::cout << point << (point.returns_size() ? ": " : "");
 
@@ -86,18 +92,24 @@ int example(int argc, char* argv[]) {
 				for (int r_ind = 0; r_ind < point.returns_size(); r_ind++) {
 					auto& ret = point.returns(r_ind);
 
-					// Print information about the first 3 points of the first scanline
+					/*
+					 * Print return information about the first 3 points of the first scanline
+					 *
+					 * Reference implementation of stream operator to clarify available attribute methods:
+					 *      std::ostream& operator<<(std::ostream &strm, const blickfeld::protocol::data::Point::Return& ret) {
+					 *		return strm << "<Blickfeld Point::Return " << ret.id() << ": "
+					 *				<< setprecision(2) << fixed
+					 *				<< "(x: " << ret.cartesian(0)
+					 *				<< ", y: " << ret.cartesian(1)
+					 *				<< ", z: " << ret.cartesian(0)
+					 *				<< ") [m], "
+					 *				<< setprecision(0) << "intensity of " << ret.intensity() << ">";
+					 *	}
+					 */
 					if (p_ind < print_n_points && s_ind == 0)
 						std::cout << (ret.id() > 0 ? ", " : "") << ret;
-
-					// Example for available attributes
-					// ret.cartesian(0) equals frame.scanlines(s_ind).points(p_ind).returns(r_ind).cartesian(0)
-					if (p_ind < print_n_points && s_ind == 0)
-						printf("Point attributes: ret %u [x: %4.2f, y: %4.2f, z: %4.2f] - intensity: %u\n",
-						       ret.id(),
-						       ret.cartesian(0), ret.cartesian(1), ret.cartesian(2),
-						       ret.intensity());
 				}
+
 				if (p_ind < print_n_points && s_ind == 0)
 					std::cout << std::endl;
 			}

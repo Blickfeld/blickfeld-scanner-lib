@@ -15,17 +15,20 @@ find_program(NODEJS_EXECUTABLE NAMES node)
 find_program(NPM_EXECUTABLE NAMES npm HINTS /usr)
 if (BF_BUILD_NPM AND NODEJS_EXECUTABLE AND NPM_EXECUTABLE)
 	if(${CMAKE_HOST_SYSTEM_NAME} STREQUAL "Windows")
-		set(PROTOC_GEN_TS_PATH ${CMAKE_CURRENT_BINARY_DIR}/npm-install/protoc-gen-ts.cmd)
+		set(PBJS_PATH ${CMAKE_CURRENT_BINARY_DIR}/npm-install/pbjs.cmd)
+		set(PBTS_PATH ${CMAKE_CURRENT_BINARY_DIR}/npm-install/pbts.cmd)
 	else()
-		set(PROTOC_GEN_TS_PATH ${CMAKE_CURRENT_BINARY_DIR}/npm-install/node_modules/.bin/protoc-gen-ts)
+		set(PBJS_PATH ${CMAKE_CURRENT_BINARY_DIR}/npm-install/node_modules/.bin/pbjs)
+		set(PBTS_PATH ${CMAKE_CURRENT_BINARY_DIR}/npm-install/node_modules/.bin/pbts)
 	endif()
 		
 	add_custom_command(
-		OUTPUT ${PROTOC_GEN_TS_PATH}
+		OUTPUT ${PBJS_PATH}
+		OUTPUT ${PBTS_PATH}
 		COMMAND ${CMAKE_COMMAND} -E make_directory ${PROJECT_BINARY_DIR}/npm-install
-		COMMAND ${NPM_EXECUTABLE} install ts-protoc-gen --prefix ${PROJECT_BINARY_DIR}/npm-install
+		COMMAND ${NPM_EXECUTABLE} install protobufjs --prefix ${PROJECT_BINARY_DIR}/npm-install
 	)
-	add_custom_target(blickfeld-protocol-npm DEPENDS ${PROTOC_GEN_TS_PATH})
+	add_custom_target(blickfeld-protocol-npm DEPENDS ${PBJS_PATH} DEPENDS ${PBTS_PATH})
 endif()
 	
 ## Protocol Buffers
@@ -78,6 +81,8 @@ endif()
 # list .proto files here
 set(PROTOBUF_DEFS_DIR ${PROJECT_SOURCE_DIR})
 set(PROTOBUF_SOURCES 
+	blickfeld/config/advanced.proto
+	blickfeld/config/generate.proto
 	blickfeld/config/scan_pattern.proto
 	blickfeld/config/secure.proto
 	
@@ -118,7 +123,12 @@ set(PROTOBUF_GENERATED_CPP)
 set(PROTOBUF_GENERATED_HEADER)
 set(PROTOBUF_GENERATED_PY)
 set(PROTOBUF_GENERATED_JS)
+
+set(PROTOBUF_SOURCES_WITH_ABSOLUTE_PATH "")
+
 foreach(FILE ${PROTOBUF_SOURCES})
+	list(APPEND PROTOBUF_SOURCES_WITH_ABSOLUTE_PATH "${PROTOBUF_DEFS_DIR}/${FILE}")
+
 	string(REPLACE ".proto" ".pb.cc" FILE_CC ${FILE})
 	string(REPLACE ".proto" ".pb.h" FILE_H ${FILE})
 	
@@ -154,24 +164,25 @@ foreach(FILE ${PROTOBUF_SOURCES})
 		)
 	endif()
 	list(APPEND PROTOBUF_GENERATED_PY ${PROTOBUF_GENERATED_PY_DIR}/${FILE_PY})
-	
-	# NPM Build
-	if (BF_BUILD_NPM AND NODEJS_EXECUTABLE AND NPM_EXECUTABLE)
-		string(REPLACE ".proto" "_pb.js" FILE_JS ${FILE})
-		add_custom_command(
-			OUTPUT ${PROJECT_BINARY_DIR}/npm/${FILE_JS}
-			
-			COMMAND ${CMAKE_COMMAND} -E make_directory ${PROJECT_BINARY_DIR}/npm
-			COMMAND ${Protobuf_PROTOC_EXECUTABLE} ${PROTOBUF_DEFS_DIR}/${FILE} --plugin="protoc-gen-ts=${PROTOC_GEN_TS_PATH}" --js_out="import_style=commonjs,binary:${PROJECT_BINARY_DIR}/npm" --ts_out="${PROJECT_BINARY_DIR}/npm" --proto_path=${PROTOBUF_DEFS_DIR}
-			
-			DEPENDS $<TARGET_NAME_IF_EXISTS:blickfeld-protobuf>
-			DEPENDS blickfeld-protocol-npm
-			DEPENDS ${FILE}
-			WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
-		)
-		list(APPEND PROTOBUF_GENERATED_JS ${PROJECT_BINARY_DIR}/npm/${FILE_JS})
-	endif()
 endforeach()
+
+# NPM Build (moved out of the loop as pbjs and pbts accepts all .proto files at once.)
+if (BF_BUILD_NPM AND NODEJS_EXECUTABLE AND NPM_EXECUTABLE)
+	add_custom_command(
+		OUTPUT ${PROJECT_BINARY_DIR}/npm/protobuf-definitions.js
+		OUTPUT ${PROJECT_BINARY_DIR}/npm/protobuf-definitions.d.ts
+		
+		COMMAND ${CMAKE_COMMAND} -E make_directory ${PROJECT_BINARY_DIR}/npm
+		COMMAND ${PBJS_PATH} -t static-module -w commonjs --force-number -o ${PROJECT_BINARY_DIR}/npm/protobuf-definitions.js ${PROTOBUF_SOURCES_WITH_ABSOLUTE_PATH}
+		COMMAND ${PBTS_PATH} -o ${PROJECT_BINARY_DIR}/npm/protobuf-definitions.d.ts ${PROJECT_BINARY_DIR}/npm/protobuf-definitions.js
+		
+		DEPENDS $<TARGET_NAME_IF_EXISTS:blickfeld-protobuf>
+		DEPENDS blickfeld-protocol-npm
+		DEPENDS ${PROTOBUF_SOURCES}
+		WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
+	)
+	list(APPEND PROTOBUF_GENERATED_JS ${PROJECT_BINARY_DIR}/npm/protobuf-definitions.js)
+endif()
 
 # Custom plugin protobuf build
 set(PROTOBUF_GENERATED_CUSTOM)

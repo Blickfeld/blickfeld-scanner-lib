@@ -9,7 +9,7 @@ package blickfeld.protocol;
  * This section contains the status messages of the two deflection mirrors and the temperature sensors in the device.
  */
 message Status {
-    optional status.Scanner scanner = 1;  // Refer to [Scanner](#blickfeld.protocol.status.scanner.Scanner)
-    repeated status.Temperature temperatures = 2;  // Refer to [Temperature](#blickfeld.protocol.status.temperature.Temperature)
-    extensions 3, 4; // Internal use only
+	optional status.Scanner scanner = 1; // Refer to [Scanner](#blickfeld.protocol.status.scanner.Scanner)
+	repeated status.Temperature temperatures = 2; // Refer to [Temperature](#blickfeld.protocol.status.temperature.Temperature)
+	extensions 3, 4; // Internal use only
 }

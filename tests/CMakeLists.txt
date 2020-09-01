@@ -32,3 +32,19 @@ add_test (
   COMMAND $<TARGET_FILE_NAME:bf-scanner-lib-test>
 )
 
+if (CMAKE_BUILD_TYPE STREQUAL "TestCoverage")
+  add_custom_target(gcovr
+    COMMAND mkdir -p coverage/html coverage/cobertura coverage/sonarqube
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+  )
+  add_custom_command(TARGET gcovr
+    COMMAND echo "== executing tests - .."
+    COMMAND ./tests/bf-scanner-lib-test || true
+    COMMAND echo "== executing tests - OK"
+    COMMAND echo "== collecting coverage information - .."
+    COMMAND gcovr --config ../tests/gcovr.cfg
+    COMMAND echo "== collecting coverage information - OK"
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+  )
+  add_dependencies(gcovr bf-scanner-lib-test)
+endif()

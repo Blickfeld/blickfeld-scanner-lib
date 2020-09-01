@@ -117,6 +117,8 @@ endif(WIN32)
 # Check for GNUCC Cmake compiler
 if(CMAKE_COMPILER_IS_GNUCC)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -std=gnu++11 -static-libgcc -static-libstdc++")
+  # generate coverage information in debug builds
+  set(CMAKE_CXX_FLAGS_TESTCOVERAGE " -fprofile-arcs -ftest-coverage -O0 -g3")
 endif(CMAKE_COMPILER_IS_GNUCC)
 
 include (CheckSymbolExists)

@@ -1,0 +1,18 @@
+syntax = "proto2";
+
+package blickfeld.protocol.config;
+
+message Generate
+{
+	/**
+	 * Internal use only
+	 */
+	enum Targets
+	{
+		DEFAULT = 0;
+		PROTO_HASH = 1;
+		MATLAB_BUS = 2;
+	}
+
+	repeated Targets targets = 1; // Internal generate targets
+}

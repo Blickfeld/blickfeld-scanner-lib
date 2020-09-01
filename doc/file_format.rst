@@ -10,7 +10,7 @@ Structure
 ---------
 
 A point cloud dump is structured into three blocks: First the Header message, then a repeating Data block with encapsulated Frame messages, and finally a Data block with an encapsulated Footer message.
-All blocks are prefixed with a variable unsigned integer field, which states the length of the consequent Protobuf encoded message.
+All blocks are prefixed with a variable unsigned integer field (unsigned, 32 bit version of protobuf `Varint <https://developers.google.com/protocol-buffers/docs/encoding#varints/>`_ type), which states the length of the consequent Protobuf encoded message.
 The files are stored with GZIP compression to reduce the structure overhead of Protobuf.
 
 .. mermaid::

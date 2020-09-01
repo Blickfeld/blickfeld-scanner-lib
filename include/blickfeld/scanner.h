@@ -58,8 +58,8 @@ namespace file {
 class PointCloud_Metadata;
 class PointCloud_Data;
 }
-namespace stream {
-class Subscribe_PointCloud_Filter;
+namespace config {
+class ScanPattern_Filter;
 }
 }
 
@@ -115,7 +115,7 @@ public:
 		 * @param filter Filter points and returns by point attributes during the post-processing on the device.
 		 * @param reference_frame Frame representing the desired data. To request a field, set it to any value (also in submessages). For a repeated field, add at least one element.
 		 */
-		point_cloud_stream(std::shared_ptr<connection> conn, const protocol::stream::Subscribe_PointCloud_Filter* filter = nullptr, const protocol::data::Frame* reference_frame = nullptr);
+		point_cloud_stream(std::shared_ptr<connection> conn, const protocol::config::ScanPattern_Filter* filter = nullptr, const protocol::data::Frame* reference_frame = nullptr);
 #ifdef BSL_RECORDING
 		/**
 		 * Internal use. Use the static methods scanner::file_point_cloud_stream or scanner::simple_file_point_cloud_stream.
@@ -292,7 +292,7 @@ public:
 	 * @param filter Filter points and returns by point attributes during the post-processing on the device.
 	 * @return Shared pointer of stream instance. Use the recv_frame method to get Point Cloud Frames.
 	 */
-	std::shared_ptr<scanner::point_cloud_stream<protocol::data::Frame> > get_point_cloud_stream(const protocol::stream::Subscribe::PointCloud::Filter filter);
+	std::shared_ptr<scanner::point_cloud_stream<protocol::data::Frame> > get_point_cloud_stream(const protocol::config::ScanPattern_Filter filter);
 
 	/**
 	 * > Introduced in BSL v2.10 and firmware v1.9
@@ -319,7 +319,7 @@ public:
 	 * @param reference_frame Frame representing the desired data. To request a field, set it to any value (also in submessages). For a repeated field, add at least one element.
 	 * @return Shared pointer of stream instance. Use the recv_frame method to get Point Cloud Frames.
 	 */
-	std::shared_ptr<scanner::point_cloud_stream<protocol::data::Frame> > get_point_cloud_stream(const protocol::stream::Subscribe::PointCloud::Filter filter, const protocol::data::Frame reference_frame);
+	std::shared_ptr<scanner::point_cloud_stream<protocol::data::Frame> > get_point_cloud_stream(const protocol::config::ScanPattern_Filter filter, const protocol::data::Frame reference_frame);
 
 #ifdef BSL_RECORDING
 

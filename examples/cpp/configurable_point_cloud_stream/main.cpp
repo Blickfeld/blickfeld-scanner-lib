@@ -33,7 +33,7 @@ int example(int argc, char* argv[]) {
 	auto reference_frame = scanner->REF_FRAME_XYZ_I_ID;
 
 	// Create filter to filter points and returns by point attributes during the post-processing on the device.
-	blickfeld::protocol::stream::Subscribe::PointCloud::Filter filter;
+	blickfeld::protocol::config::ScanPattern::Filter filter;
 	filter.mutable_range()->set_minimum(5); // Minimum range for a point to be sent out is 5m
 	filter.mutable_range()->set_maximum(50); // Maximum range for a point to be sent out is 50m
 	filter.set_max_number_of_returns_per_point(2); // Set max number of returns to 2. The default value is 1.

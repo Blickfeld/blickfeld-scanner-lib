@@ -7,115 +7,115 @@ package blickfeld.protocol;
 message Error {
 
 	/**
-	* Unknown error. Please consult the Blickfeld support team for further information.
-	*/
+	 * Unknown error. Please consult the Blickfeld support team for further information.
+	 */
 	message Unknown {
 		option (e_desc) = "The server threw an unknown generic error. Description: {description:%s}";
-	
+
 		optional string description = 1;  // Description of the unknown error
 	}
-	
+
 	/**
-	* The firmware on the device is not compatible with the BSL version. Update the device or downgrade the BSL.
-	*/
+	 * The firmware on the device is not compatible with the BSL version. Update the device or downgrade the BSL.
+	 */
 	message NotImplemented {
 		option (e_desc) = "The request is not implemented on the server side. Check the versions of the client and firmware software.";
 	}
-	
+
 	/**
-	* The server sent an empty message.
-	*/
+	 * The server sent an empty message.
+	 */
 	message Empty {
 		option (e_desc) = "The server sent an empty message.";
 	}
-	
+
 	/**
-	* The server failed to process the request.
-	*/
+	 * The server failed to process the request.
+	 */
 	message ServerImplementation {
 		option (e_desc) = "The implementation on the server failed to process the request.";
 	}
-	
+
 	/**
-	* Validation of the sent request failed, please send a request with-in a valid range.
-	*/
+	 * Validation of the sent request failed, please send a request with-in a valid range.
+	 */
 	message InvalidRequest {
 		option (e_desc) = "The sent request did not pass the validation: {validation_error:%s}";
-		
+
 		optional string validation_error = 1;  // Validation error string
 	}
-	
+
 	/**
-	* The server closed the connection.
-	*/
+	 * The server closed the connection.
+	 */
 	message ConnectionClosed {
 		option (e_desc) = "The connection was closed by the server.";
 	}
 
 	/**
-	* The protocol of the client is too new. Please update the device.
-	*/
+	 * The protocol of the client is too new. Please update the device.
+	 */
 	message OutdatedServerProtocol {
 		option (e_desc) = "The protocol of the client is too new. Please update the device to {required_version:%u}.";
-		
+
 		optional uint32 required_version = 1;  // Version that is required
 	}
 
 	/**
-	* The protocol of the server is too new. Please update the client software.
-	*/
+	 * The protocol of the server is too new. Please update the client software.
+	 */
 	message OutdatedClientProtocol {
 		option (e_desc) = "The protocol of the server is too new. Please update the client software to {required_version:%u}.";
-		
+
 		optional uint32 required_version = 1;  // Version that is required
 	}
 
 	/**
-	* The device is currently busy with another operation. Cancel it and try again.
-	*/
+	 * The device is currently busy with another operation. Cancel it and try again.
+	 */
 	message ScannerBusy {
 		option (e_desc) = "The device is currently busy with another operation. Cancel it and try again.";
 	}
 
 	/**
-	* The device is set to a different operation mode. Perhaps it is currently being used by another application.
-	* Change the operation mode and try again if no one else is using it.
-	*/
+	 * The device is set to a different operation mode. Perhaps it is currently being used by another application.
+	 * Change the operation mode and try again if no one else is using it.
+	 */
 	message WrongOperationMode {
 		option (e_desc) = "The device is set to a different operation mode.Perhaps it is currently being used by another application.";
 	}
 
 	/**
-	* The requested operation is not allowed.
-	*/
+	 * The requested operation is not allowed.
+	 */
 	message NotAllowed {
 		option (e_desc) = "The requested operation is not allowed.";
 	}
 
 	/**
-	* The device is in an error state and cannot be operated. Attempt to power-cycle the device or use diagnostic software to read out the hardware state.
-	*/
+	 * The device is in an error state and cannot be operated. Attempt to power-cycle the device or use diagnostic software to read out the hardware state.
+	 */
 	message HardwareError {
 		option (e_desc) = "The device is in an error state and cannot be operated. Attempt to power cycle the device or use diagnostic software to read-out the hardware state.";
 	}
 
 	/**
-	* The device stopped unexpectedly and can no longer be operated. Attempt to power cycle the device or use diagnostic software to read-out the hardware state.
-	*/
+	 * The device stopped unexpectedly and can no longer be operated. Attempt to power cycle the device or use diagnostic software to read-out the hardware state.
+	 */
 	message SystemStop {
 		option (e_desc) = "The device stopped unexpectedly and can no longer be operated. Attempt to power cycle the device or use diagnostic software to read-out the hardware state.";
 	}
 
 	/**
-	* The requested data is not available. Please check the request parameters.
-	*/
+	 * The requested data is not available. Please check the request parameters.
+	 */
 	message NotFound {
 		option (e_desc) = "The requested data is not available. Please check the request parameters.";
 	}
 
 	/**
-	* The time synchronization failed. The NTP daemon failed or timed out.
-	*/
+	 * The time synchronization failed. The NTP daemon failed or timed out.
+	 */
 	message TimeSyncFailed {
 		option (e_desc) = "The time synchronization failed. The NTP daemon failed or timed out. Log output:\n{ntp_daemon_log:%s}";
 
@@ -123,15 +123,15 @@ message Error {
 	}
 
 	/**
-	* No device has been discovered. Check the network connection and power supply of the device. The 'discover' requests may have been blocked by a local or a network firewall.
-	*/
+	 * No device has been discovered. Check the network connection and power supply of the device. The 'discover' requests may have been blocked by a local or a network firewall.
+	 */
 	message NoDeviceDiscovered {
 		option (e_desc) = "No device has been discovered. Check the network connection and power supply of the device. The 'discover' requests may have been blocked by a local or a network firewall.";
 	}
 
 	/**
-	* Unknown Error. Please contact the Blickfeld support team and make sure to use compatible BSL and FW versions.
-	*/
+	 * Unknown Error. Please contact the Blickfeld support team and make sure to use compatible BSL and FW versions.
+	 */
 	message UnknownErrorCode {
 		option (e_desc) = "Unknown Error Code: {error_code:%u}";
 
@@ -139,15 +139,15 @@ message Error {
 	}
 
 	/**
-	* The requested parameter is not within the valid range.
-	*/
+	 * The requested parameter is not within the valid range.
+	 */
 	message NotInRange {
-			option (e_desc) = "The requested {parameter:%s} ({requested:%.2f}{unit:%s}) is not within the valid range. The {parameter:%s} has to be in the interval of {minimum:%.2f} < {maximum:%.2f}{unit:%s}.";
-			optional string parameter = 1;  // The parameter, which was not in range
-			optional float minimum = 2;  // Minimum value of the parameter
-			optional float maximum = 3;  // Maximum value of the parameter
-			optional float requested = 4;  // Requested value of the parameter
-			optional string unit = 5 [default = ""];  // Unit of the parameter
+		option (e_desc) = "The requested {parameter:%s} ({requested:%.2f}{unit:%s}) is not within the valid range. The {parameter:%s} has to be in the interval of {minimum:%.2f} < {maximum:%.2f}{unit:%s}.";
+		optional string parameter = 1;          // The parameter, which was not in range
+		optional float minimum = 2;          // Minimum value of the parameter
+		optional float maximum = 3;          // Maximum value of the parameter
+		optional float requested = 4;          // Requested value of the parameter
+		optional string unit = 5 [default = ""];          // Unit of the parameter
 	}
 
 	oneof error {

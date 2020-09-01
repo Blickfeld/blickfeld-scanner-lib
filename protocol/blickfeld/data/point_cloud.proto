@@ -13,20 +13,20 @@ package blickfeld.protocol.data;
  */
 message PointCloud {
 
-    /**
-     * This section describes the contents of a point cloud header.
-     */
-    message Header {
-        optional string legacy_cube_serial_number = 1 [(optional)=true]; // Legacy serial number of the device which recorded the pointcloud
-        optional string cube_serial_number = 2 [(legacy_field_id) = 1, (regex) = "[A-Z2-7]{9}"]; // Serial number of the device which recorded the pointcloud
-        optional uint64 start_time_ns = 3; // Unit: [s] - Start timestamp of the requested pointcloud stream
-        optional string firmware_version = 4 [(regex)="v[0-9]+\\.[0-9]+\\.[0-9]+"]; // Firmware version of the device which recorded the pointcloud
-        optional update.HardwareVariant hardware_variant = 5; // Hardware variant of the device which recorded the pointcloud
-    }
+	/**
+	 * This section describes the contents of a point cloud header.
+	 */
+	message Header {
+		optional string legacy_cube_serial_number = 1 [(optional)=true]; // Legacy serial number of the device which recorded the pointcloud
+		optional string cube_serial_number = 2 [(legacy_field_id) = 1, (regex) = "[A-Z2-7]{9}"]; // Serial number of the device which recorded the pointcloud
+		optional uint64 start_time_ns = 3; // Unit: [s] - Start timestamp of the requested pointcloud stream
+		optional string firmware_version = 4 [(regex)="v[0-9]+\\.[0-9]+\\.[0-9]+"]; // Firmware version of the device which recorded the pointcloud
+		optional update.HardwareVariant hardware_variant = 5; // Hardware variant of the device which recorded the pointcloud
+	}
 
-    oneof data {
-        Header header = 3; // Refer to [PointCloud.Header](#blickfeld.protocol.data.PointCloud.Header)
-        Frame frame = 1; // Refer to [Frame](#blickfeld.protocol.data.Frame)
-        Scanline scanline = 2;  // Refer to [Scanline](#blickfeld.protocol.data.Scanline)
-    }
+	oneof data {
+		Header header = 3; // Refer to [PointCloud.Header](#blickfeld.protocol.data.PointCloud.Header)
+		Frame frame = 1; // Refer to [Frame](#blickfeld.protocol.data.Frame)
+		Scanline scanline = 2; // Refer to [Scanline](#blickfeld.protocol.data.Scanline)
+	}
 }

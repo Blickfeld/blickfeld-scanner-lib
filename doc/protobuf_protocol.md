@@ -23,17 +23,21 @@ The data, such as a point cloud, are also packed in protobuf messages.
     - [Request](#blickfeld.protocol.Request)
     - [Request.Developer](#blickfeld.protocol.Request.Developer)
     - [Request.FillScanPattern](#blickfeld.protocol.Request.FillScanPattern)
+    - [Request.GetAdvancedConfig](#blickfeld.protocol.Request.GetAdvancedConfig)
     - [Request.GetScanPattern](#blickfeld.protocol.Request.GetScanPattern)
     - [Request.Hello](#blickfeld.protocol.Request.Hello)
     - [Request.RunSelfTest](#blickfeld.protocol.Request.RunSelfTest)
+    - [Request.SetAdvancedConfig](#blickfeld.protocol.Request.SetAdvancedConfig)
     - [Request.SetScanPattern](#blickfeld.protocol.Request.SetScanPattern)
     - [Request.Status](#blickfeld.protocol.Request.Status)
     - [Response](#blickfeld.protocol.Response)
     - [Response.Developer](#blickfeld.protocol.Response.Developer)
     - [Response.FillScanPattern](#blickfeld.protocol.Response.FillScanPattern)
+    - [Response.GetAdvancedConfig](#blickfeld.protocol.Response.GetAdvancedConfig)
     - [Response.GetScanPattern](#blickfeld.protocol.Response.GetScanPattern)
     - [Response.Hello](#blickfeld.protocol.Response.Hello)
     - [Response.RunSelfTest](#blickfeld.protocol.Response.RunSelfTest)
+    - [Response.SetAdvancedConfig](#blickfeld.protocol.Response.SetAdvancedConfig)
     - [Response.SetScanPattern](#blickfeld.protocol.Response.SetScanPattern)
   
     - [Format](#blickfeld.protocol.Format)
@@ -84,11 +88,30 @@ The data, such as a point cloud, are also packed in protobuf messages.
     - [File-level Extensions](#blickfeld/options.proto-extensions)
     - [File-level Extensions](#blickfeld/options.proto-extensions)
     - [File-level Extensions](#blickfeld/options.proto-extensions)
+    - [File-level Extensions](#blickfeld/options.proto-extensions)
+  
+  
+
+- [blickfeld/config/advanced.proto](#blickfeld/config/advanced.proto)
+    - [Advanced](#blickfeld.protocol.config.Advanced)
+    - [Advanced.Detector](#blickfeld.protocol.config.Advanced.Detector)
+  
+  
+  
+  
+
+- [blickfeld/config/generate.proto](#blickfeld/config/generate.proto)
+    - [Generate](#blickfeld.protocol.config.Generate)
+  
+    - [Generate.Targets](#blickfeld.protocol.config.Generate.Targets)
+  
   
   
 
 - [blickfeld/config/scan_pattern.proto](#blickfeld/config/scan_pattern.proto)
     - [ScanPattern](#blickfeld.protocol.config.ScanPattern)
+    - [ScanPattern.Filter](#blickfeld.protocol.config.ScanPattern.Filter)
+    - [ScanPattern.Filter.Noise](#blickfeld.protocol.config.ScanPattern.Filter.Noise)
     - [ScanPattern.FrameRate](#blickfeld.protocol.config.ScanPattern.FrameRate)
     - [ScanPattern.Horizontal](#blickfeld.protocol.config.ScanPattern.Horizontal)
     - [ScanPattern.Pulse](#blickfeld.protocol.config.ScanPattern.Pulse)
@@ -192,7 +215,6 @@ The data, such as a point cloud, are also packed in protobuf messages.
     - [Subscribe](#blickfeld.protocol.stream.Subscribe)
     - [Subscribe.Developer](#blickfeld.protocol.stream.Subscribe.Developer)
     - [Subscribe.PointCloud](#blickfeld.protocol.stream.Subscribe.PointCloud)
-    - [Subscribe.PointCloud.Filter](#blickfeld.protocol.stream.Subscribe.PointCloud.Filter)
     - [Subscribe.Status](#blickfeld.protocol.stream.Subscribe.Status)
   
   
@@ -293,6 +315,8 @@ A request is always answered with a response. For every response, there is a req
 | subscribe | [stream.Subscribe](#blickfeld.protocol.stream.Subscribe) | optional | Refer to [Subscribe](#blickfeld.protocol.stream.Subscribe) |
 | status | [Request.Status](#blickfeld.protocol.Request.Status) | optional | Refer to [Request.Status](#blickfeld.protocol.Request.Status) |
 | run_self_test | [Request.RunSelfTest](#blickfeld.protocol.Request.RunSelfTest) | optional | Refer to [Request.RunSelfTest](#blickfeld.protocol.Request.RunSelfTest) |
+| set_advanced_config | [Request.SetAdvancedConfig](#blickfeld.protocol.Request.SetAdvancedConfig) | optional | <blockquote>Introduced in BSL v2.11 and firmware v1.11</blockquote> Refer to [Request.SetAdvancedConfig](#blickfeld.protocol.Request.SetAdvancedConfig) |
+| get_advanced_config | [Request.GetAdvancedConfig](#blickfeld.protocol.Request.GetAdvancedConfig) | optional | <blockquote>Introduced in BSL v2.11 and firmware v1.11</blockquote> Refer to [Request.GetAdvancedConfig](#blickfeld.protocol.Request.GetAdvancedConfig) |
 | _asJSON | [string](#string) | optional | Internal use only |
 | accept_format | [Format](#blickfeld.protocol.Format) | optional | Internal use only Default: PROTOBUF |
 
@@ -323,6 +347,18 @@ The filled scan pattern can then be set as input for  [Request.SetScanPattern](#
 | ----- | ---- | ----- | ----------- |
 | config | [config.ScanPattern](#blickfeld.protocol.config.ScanPattern) | optional | Refer to [ScanPattern](#blickfeld.protocol.config.ScanPattern) |
 | legacy_config | [config.ScanPattern](#blickfeld.protocol.config.ScanPattern) | optional | Deprecated |
+
+
+
+
+
+
+<a name="blickfeld.protocol.Request.GetAdvancedConfig"></a>
+
+### Request.GetAdvancedConfig
+> Introduced in BSL v2.11 and firmware v1.11
+
+This request is used to retrieve the currently set [Advanced](#blickfeld.protocol.config.Advanced).
 
 
 
@@ -368,6 +404,24 @@ The report is currently only accessible by developers.
 
 
 
+<a name="blickfeld.protocol.Request.SetAdvancedConfig"></a>
+
+### Request.SetAdvancedConfig
+> Introduced in BSL v2.11 and firmware v1.11
+
+This request is used for configuring the advanced config.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| config | [config.Advanced](#blickfeld.protocol.config.Advanced) | optional | Refer to [Advanced](#blickfeld.protocol.config.Advanced) |
+| persist | [bool](#bool) | optional | Persists the config and sets it after a power cycle. Default: True Default: true |
+
+
+
+
+
+
 <a name="blickfeld.protocol.Request.SetScanPattern"></a>
 
 ### Request.SetScanPattern
@@ -377,7 +431,7 @@ This request is used for configuring a Scan Pattern.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | config | [config.ScanPattern](#blickfeld.protocol.config.ScanPattern) | optional | Refer to [ScanPattern](#blickfeld.protocol.config.ScanPattern) |
-| persist | [bool](#bool) | optional | Persists with the scan pattern and sets it after a power cycle. Default: False Default: false |
+| persist | [bool](#bool) | optional | Persists the scan pattern and sets it after a power cycle. Default: False Default: false |
 | legacy_config | [config.ScanPattern](#blickfeld.protocol.config.ScanPattern) | optional | Deprecated old 'config' due to horizontal field of view definition |
 
 
@@ -415,6 +469,8 @@ Each response has the same name as the request.
 | event | [stream.Event](#blickfeld.protocol.stream.Event) | optional | Refer to [Event](#blickfeld.protocol.stream.Event) |
 | status | [Status](#blickfeld.protocol.Status) | optional | Refer to [Response.Status](#blickfeld.protocol.Response.Status) |
 | run_self_test | [Response.RunSelfTest](#blickfeld.protocol.Response.RunSelfTest) | optional | Refer to [Response.RunSelfTest](#blickfeld.protocol.Response.RunSelfTest) |
+| set_advanced_config | [Response.SetAdvancedConfig](#blickfeld.protocol.Response.SetAdvancedConfig) | optional | <blockquote>Introduced in BSL v2.11 and firmware v1.11</blockquote> Refer to [Response.SetAdvanced](#blickfeld.protocol.Response.SetAdvancedConfig) |
+| get_advanced_config | [Response.GetAdvancedConfig](#blickfeld.protocol.Response.GetAdvancedConfig) | optional | <blockquote>Introduced in BSL v2.11 and firmware v1.11</blockquote> Refer to [Response.GetAdvanced](#blickfeld.protocol.Response.GetAdvancedConfig) |
 | _asJSON | [string](#string) | optional | Internal use only |
 
 
@@ -443,6 +499,23 @@ It returns a scan pattern, the unset fields are filled with default values.
 | ----- | ---- | ----- | ----------- |
 | config | [config.ScanPattern](#blickfeld.protocol.config.ScanPattern) | optional | Refer to [ScanPattern](#blickfeld.protocol.config.ScanPattern) |
 | legacy_config | [config.ScanPattern](#blickfeld.protocol.config.ScanPattern) | optional | Deprecated |
+
+
+
+
+
+
+<a name="blickfeld.protocol.Response.GetAdvancedConfig"></a>
+
+### Response.GetAdvancedConfig
+> Introduced in BSL v2.11 and firmware v1.11
+
+This response is returned after a request to get the current [Advanced](#blickfeld.protocol.config.Advanced).
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| config | [config.Advanced](#blickfeld.protocol.config.Advanced) | optional | Refer to [Advanced](#blickfeld.protocol.config.Advanced) |
 
 
 
@@ -493,6 +566,18 @@ The generated report is currently only accessible by developers.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | success | [bool](#bool) | optional |  |
+
+
+
+
+
+
+<a name="blickfeld.protocol.Response.SetAdvancedConfig"></a>
+
+### Response.SetAdvancedConfig
+> Introduced in BSL v2.11 and firmware v1.11
+
+This response is sent out after setting an SetAdvancedConfig.
 
 
 
@@ -826,9 +911,104 @@ Change the operation mode and try again if no one else is using it.
 | optional | bool | .google.protobuf.FieldOptions | 50006 |  Default: `false` |
 | regex | string | .google.protobuf.FieldOptions | 50005 |  Default: `.*` |
 | e_desc | string | .google.protobuf.MessageOptions | 60000 | Error description Default: `No additional error description available.` |
+| generate | config.Generate | .google.protobuf.MessageOptions | 60003 |  |
 | help | string | .google.protobuf.MessageOptions | 60001 | Help description |
 | secure | config.Secure | .google.protobuf.MessageOptions | 60002 |  |
 | optional_one_of | bool | .google.protobuf.OneofOptions | 50006 |  Default: `false` |
+
+ <!-- end HasExtensions -->
+
+ <!-- end services -->
+
+
+
+<a name="blickfeld/config/advanced.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## blickfeld/config/advanced.proto
+
+
+
+<a name="blickfeld.protocol.config.Advanced"></a>
+
+### Advanced
+> Introduced in BSL v2.11 and firmware v1.11
+
+Expert parameters: It is not recommended to adapt this calibrated configuration without understanding the influences on the resulting point cloud quality.
+
+The current set of parameters is preliminary, additional parameters may be added or may get obsolete in the future.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| detector | [Advanced.Detector](#blickfeld.protocol.config.Advanced.Detector) | optional | Refer to [Detector](#blickfeld.protocol.config.Environment.Detector) |
+
+
+
+
+
+
+<a name="blickfeld.protocol.config.Advanced.Detector"></a>
+
+### Advanced.Detector
+The behavior of the detector can be adjusted to improve the performance under extreme environmental conditions, e.g. static setup with strong daylight or basement rooms without daylight.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| sensitivity | [float](#float) | optional | Relatively influences the sensitivity of the detector. Higher values might also result into range loss. It is recommended to validate the noise filter parameters after changes to this setting. Default: 1 |
+
+
+
+
+
+ <!-- end messages -->
+
+ <!-- end enums -->
+
+ <!-- end HasExtensions -->
+
+ <!-- end services -->
+
+
+
+<a name="blickfeld/config/generate.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## blickfeld/config/generate.proto
+
+
+
+<a name="blickfeld.protocol.config.Generate"></a>
+
+### Generate
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| targets | [Generate.Targets](#blickfeld.protocol.config.Generate.Targets) | repeated | Internal generate targets |
+
+
+
+
+
+ <!-- end messages -->
+
+
+<a name="blickfeld.protocol.config.Generate.Targets"></a>
+
+### Generate.Targets
+Internal use only
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| DEFAULT | 0 |  |
+| PROTO_HASH | 1 |  |
+| MATLAB_BUS | 2 |  |
+
+
+ <!-- end enums -->
 
  <!-- end HasExtensions -->
 
@@ -859,6 +1039,50 @@ For a more detailed explanation, see: [Scan Pattern documentation](Scan_Pattern)
 | vertical | [ScanPattern.Vertical](#blickfeld.protocol.config.ScanPattern.Vertical) | optional | Refer to [ScanPattern.Vertical](#blickfeld.protocol.config.ScanPattern.Vertical) |
 | pulse | [ScanPattern.Pulse](#blickfeld.protocol.config.ScanPattern.Pulse) | optional | Refer to [ScanPattern.Pulse](#blickfeld.protocol.config.ScanPattern.Pulse) |
 | frame_rate | [ScanPattern.FrameRate](#blickfeld.protocol.config.ScanPattern.FrameRate) | optional | Refer to [ScanPattern.FrameRate](#blickfeld.protocol.config.ScanPattern.FrameRate) |
+| filter | [ScanPattern.Filter](#blickfeld.protocol.config.ScanPattern.Filter) | optional | <blockquote>Introduced in BSL v2.11 and firmware v1.11</blockquote> Refer to [Filter](#blickfeld.protocol.config.ScanPattern.Filter) |
+
+
+
+
+
+
+<a name="blickfeld.protocol.config.ScanPattern.Filter"></a>
+
+### ScanPattern.Filter
+> Introduced in BSL v2.10 and firmware v1.9
+
+Filter points and returns by point attributes during the post-processing on the device.
+This can be used to e.g. filter points with low intensity or to enable secondary returns.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| max_number_of_returns_per_point | [uint32](#uint32) | optional | Set maximum number of returns per point. By default, secondary returns are disabled. Set this, e.g. to 2, to enable secondary returns. Default: 1 |
+| intensity | [blickfeld.protocol.OptionalValueRange](#blickfeld.protocol.OptionalValueRange) | optional | Filter all points, which intensity values are not within this value range. |
+| ambient_light_level | [blickfeld.protocol.OptionalValueRange](#blickfeld.protocol.OptionalValueRange) | optional | Filter all points, which ambient light level values are not within this value range. |
+| range | [blickfeld.protocol.OptionalValueRange](#blickfeld.protocol.OptionalValueRange) | optional | Filter all points, which range values are not within this value range. |
+| noise | [ScanPattern.Filter.Noise](#blickfeld.protocol.config.ScanPattern.Filter.Noise) | optional | <blockquote>Introduced in BSL v2.11 and firmware v1.11</blockquote> Refer to [Filter.Noise](#blickfeld.protocol.config.ScanPattern.Filter.Noise) |
+
+
+
+
+
+
+<a name="blickfeld.protocol.config.ScanPattern.Filter.Noise"></a>
+
+### ScanPattern.Filter.Noise
+> Introduced in BSL v2.11 and firmware v1.11
+
+This is a preliminary interface to control the noise filter on the device.
+All points, which have a lower intensity than the minimum intensity calculated by this filter will be filtered out.
+The formula is: minimum_intensity = offset + gain * point.ambient_light_level,
+where the point.ambient_light_level is the ambient light level of the point the laser shoots at.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| offset | [uint32](#uint32) | optional | Can be seen as minimum intensity filter, if there is no ambient light. |
+| gain | [float](#float) | optional | The gain will be multiplied with the ambient light level of the point the laser shoots at. |
 
 
 
@@ -908,8 +1132,8 @@ This section defines the pattern in which the laser pulses and captures sample p
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | angle_spacing | [float](#float) | optional | Unit: [rad] – this defines the angle within which the horizontal mirror moves between two laser pulses. This parameter therefore defines the horizontal sampling resolution. |
-| type | [ScanPattern.Pulse.Type](#blickfeld.protocol.config.ScanPattern.Pulse.Type) | optional | Refer to [ScanPattern.Pulse.Type](#blickfeld.protocol.config.ScanPattern.Pulse.Type) Default: EQUI_HORIZONTAL_ANGLE |
-| frame_mode | [ScanPattern.Pulse.FrameMode](#blickfeld.protocol.config.ScanPattern.Pulse.FrameMode) | optional | Refer to [ScanPattern.Pulse.FrameMode](#blickfeld.protocol.config.ScanPattern.Pulse.FrameMode) Default: ONLY_UP |
+| type | [ScanPattern.Pulse.Type](#blickfeld.protocol.config.ScanPattern.Pulse.Type) | optional | Refer to [ScanPattern.Pulse.Type](#blickfeld.protocol.config.ScanPattern.Pulse.Type) Default: INTERLEAVE |
+| frame_mode | [ScanPattern.Pulse.FrameMode](#blickfeld.protocol.config.ScanPattern.Pulse.FrameMode) | optional | Refer to [ScanPattern.Pulse.FrameMode](#blickfeld.protocol.config.ScanPattern.Pulse.FrameMode) Default: COMBINE_UP_DOWN |
 | distortion_correction | [bool](#bool) | optional | This parameter defines whether the distortion correction is applied when calculating the laser pulse angles. Default: True Default: true |
 
 
@@ -935,8 +1159,8 @@ For a more detailed explanation, see: [Scan Pattern documentation](Scan_Pattern)
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | fov | [float](#float) | optional | Unit: [rad] – FoV in the center of the frame. Due to the eye shape of the scan pattern, the vertical FoV decreases the outer boundaries of the horizontal mirror. |
-| scanlines_up | [uint32](#uint32) | optional | Configures the number of scan lines required for the up-ramping phase. During the up-ramping phase, the vertical mirror increases its amplitude from 0 degrees to the target FoV. Default: 200 Default: 200 |
-| scanlines_down | [uint32](#uint32) | optional | Configures the amount of scan lines required for the down-ramping phase. During the down-ramping phase, the vertical mirror decreases its amplitude from the target FoV to 0 degrees. Default: 30 Default: 30 |
+| scanlines_up | [uint32](#uint32) | optional | Configures the number of scan lines required for the up-ramping phase. During the up-ramping phase, the vertical mirror increases its amplitude from 0 degrees to the target FoV. Default: 200 Default: 40 |
+| scanlines_down | [uint32](#uint32) | optional | Configures the amount of scan lines required for the down-ramping phase. During the down-ramping phase, the vertical mirror decreases its amplitude from the target FoV to 0 degrees. Default: 30 Default: 40 |
 
 
 
@@ -972,8 +1196,10 @@ The laser pulses are emittet with the configured angular spacing.
 
 | Name | Number | Description |
 | ---- | ------ | ----------- |
-| EQUI_HORIZONTAL_ANGLE | 0 | The laser is triggered depending on the horizontal angle of the laser beam. |
+| EQUI_HORIZONTAL_ANGLE | 0 | The laser is triggered depending on the horizontal angle of the laser beam with the configured angle spacing. |
 | EQUI_DENSITY | 1 | Reserved for future use. Not yet supported. |
+| CUSTOM | 2 | Internal feature for custom scan patterns |
+| INTERLEAVE | 3 | The laser is triggered depending on the horizontal angle of the laser beam with the configured angle spacing. Scanlines are shifted by angle_spacing/4 with alternate directions. This doubles the horizontal density with the COMBINE_UP_DOWN FrameMode and efficiently uses the down-ramp phase in the inner horizontal FoV. |
 
 
  <!-- end enums -->
@@ -1181,7 +1407,6 @@ If the error state does not recover, the device will stop operation.
 <a name="blickfeld.protocol.data.PointCloud"></a>
 
 ### PointCloud
-
 A point cloud object can contain either a full frame or a single scan line.
 
 
@@ -1199,7 +1424,6 @@ A point cloud object can contain either a full frame or a single scan line.
 <a name="blickfeld.protocol.data.PointCloud.Header"></a>
 
 ### PointCloud.Header
-
 This section describes the contents of a point cloud header.
 
 
@@ -1315,7 +1539,7 @@ This section describes the contents of a single scan line in a point cloud frame
 <a name="blickfeld.protocol.file.PointCloud"></a>
 
 ### PointCloud
-This section describes the contents of a point cloud. The first message in a Blickfeld protobuf pointcloud should always be the 
+This section describes the contents of a point cloud. The first message in a Blickfeld protobuf pointcloud should always be the
 [PointCloud.Header](#blickfeld.protocol.data.PointCloud.Header) message followed by [PointCloud.Data](#blickfeld.protocol.data.PointCloud.Data) messages.
 
 
@@ -1650,28 +1874,7 @@ This request is used for subscribing to a point cloud stream.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | reference_frame | [blickfeld.protocol.data.Frame](#blickfeld.protocol.data.Frame) | optional | <blockquote>Introduced in BSL v2.10 and firmware v1.9</blockquote> If present, only fields that are set in this message and submessages will be present in the point cloud. If less fields are requested, the Protobuf encoding and network transport time can reduce significantly. |
-| filter | [Subscribe.PointCloud.Filter](#blickfeld.protocol.stream.Subscribe.PointCloud.Filter) | optional | <blockquote>Introduced in BSL v2.10 and firmware v1.9</blockquote> Refer to [PointCloud.Filter](#blickfeld.protocol.stream.Subscribe.PointCloud.Filter) |
-
-
-
-
-
-
-<a name="blickfeld.protocol.stream.Subscribe.PointCloud.Filter"></a>
-
-### Subscribe.PointCloud.Filter
-> Introduced in BSL v2.10 and firmware v1.9
-
-Filter points and returns by point attributes during the post-processing on the device.
-This can be used to e.g. filter points with low intensity or to enable secondary returns.
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| max_number_of_returns_per_point | [uint32](#uint32) | optional | Set maximum number of returns per point. By default, secondary returns are disabled. Set this, e.g. to 2, to enable secondary returns. Default: 1 |
-| intensity | [blickfeld.protocol.OptionalValueRange](#blickfeld.protocol.OptionalValueRange) | optional | Filter all points, which intensity values are not within this value range. |
-| ambient_light_level | [blickfeld.protocol.OptionalValueRange](#blickfeld.protocol.OptionalValueRange) | optional | Filter all points, which ambient light level values are not within this value range. |
-| range | [blickfeld.protocol.OptionalValueRange](#blickfeld.protocol.OptionalValueRange) | optional | Filter all points, which range values are not within this value range. |
+| filter | [blickfeld.protocol.config.ScanPattern.Filter](#blickfeld.protocol.config.ScanPattern.Filter) | optional | <blockquote>Introduced in BSL v2.10 and firmware v1.9</blockquote> Refer to [ScanPattern.Filter](#blickfeld.protocol.config.ScanPattern.Filter). Overrides parameters of scan pattern. |
 
 
 

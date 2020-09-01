@@ -12,6 +12,6 @@ message Client {
 	}
 
 	optional string library_version = 1 [(regex)="v[0-9]+\\.[0-9]+\\.[0-9]+"]; // Library version
-    optional uint64 file_time_ns = 2; // Unit: [ns] - File time stamp
-    optional Language language = 3; // Used library language for file creation
+	optional uint64 file_time_ns = 2; // Unit: [ns] - File time stamp
+	optional Language language = 3; // Used library language for file creation
 }

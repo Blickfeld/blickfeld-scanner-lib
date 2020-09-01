@@ -1,1 +1,1 @@
-__version__ = "@PYTHON_RELEASE_VERSION@"
+__version__ = "@CONDA_RELEASE_VERSION@"

@@ -62,7 +62,7 @@ void convert_point_cloud(const protocol::data::Frame& frame_i, protocol::data::F
 }
 
 template<class frame_t>
-scanner::point_cloud_stream<frame_t>::point_cloud_stream(std::shared_ptr<connection> conn, const protocol::stream::Subscribe_PointCloud_Filter* filter, const protocol::data::Frame* reference_frame) :
+scanner::point_cloud_stream<frame_t>::point_cloud_stream(std::shared_ptr<connection> conn, const protocol::config::ScanPattern_Filter* filter, const protocol::data::Frame* reference_frame) :
 	conn(conn),
 	resp(new protocol::Response()),
 	metadata(new protocol::file::PointCloud::Metadata()),
@@ -472,11 +472,11 @@ std::shared_ptr<scanner::point_cloud_stream<protocol::data::Frame> > scanner::ge
 	return std::make_shared<point_cloud_stream<protocol::data::Frame> >(create_connection(), nullptr, &reference_frame);
 }
 
-std::shared_ptr<scanner::point_cloud_stream<protocol::data::Frame> > scanner::get_point_cloud_stream(const protocol::stream::Subscribe::PointCloud::Filter filter) {
+std::shared_ptr<scanner::point_cloud_stream<protocol::data::Frame> > scanner::get_point_cloud_stream(const protocol::config::ScanPattern::Filter filter) {
 	return std::make_shared<point_cloud_stream<protocol::data::Frame> >(create_connection(), &filter, nullptr);
 }
 
-std::shared_ptr<scanner::point_cloud_stream<protocol::data::Frame> > scanner::get_point_cloud_stream(const protocol::stream::Subscribe::PointCloud::Filter filter, const protocol::data::Frame reference_frame) {
+std::shared_ptr<scanner::point_cloud_stream<protocol::data::Frame> > scanner::get_point_cloud_stream(const protocol::config::ScanPattern::Filter filter, const protocol::data::Frame reference_frame) {
 	return std::make_shared<point_cloud_stream<protocol::data::Frame> >(create_connection(), &filter, &reference_frame);
 }
 

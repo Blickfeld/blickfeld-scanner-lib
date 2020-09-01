@@ -1,4 +1,4 @@
-syntax = "proto2"; 
+syntax = "proto2";
 option optimize_for = CODE_SIZE;
 
 import "blickfeld/options.proto";
@@ -9,19 +9,19 @@ package blickfeld.protocol.update;
 // WARNING: do NOT change enum labels, they are used as strings in code
 
 message manifest_msg {
-    optional string min_bus_version = 1;
-    enum ImageType {
-        PARTITIONED  = 0;
-        SYSTEM = 1;
-    };
-    optional ImageType image_type = 2;
-    message CompatibleHardware {
-        repeated HardwareVariant variant = 1;
-        repeated string msb = 2;
-        repeated string scanner_big = 3;
-        repeated string scanner_small = 4;
-        repeated string hsd = 5;
-    }
-    optional CompatibleHardware compatible_hardware = 3;
-    optional bool secure = 4  [default = false];
+	optional string min_bus_version = 1;
+	enum ImageType {
+		PARTITIONED  = 0;
+		SYSTEM = 1;
+	};
+	optional ImageType image_type = 2;
+	message CompatibleHardware {
+		repeated HardwareVariant variant = 1;
+		repeated string msb = 2;
+		repeated string scanner_big = 3;
+		repeated string scanner_small = 4;
+		repeated string hsd = 5;
+	}
+	optional CompatibleHardware compatible_hardware = 3;
+	optional bool secure = 4  [default = false];
 }

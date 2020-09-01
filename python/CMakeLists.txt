@@ -9,8 +9,8 @@
 find_package(Python COMPONENTS Interpreter)
 
 # Note that PYTHON_VERSION is not the python version but the version of the package blickfeld_scanner
-string(REGEX REPLACE "/" "-" PYTHON_RELEASE_VERSION "${PROJECT_GIT_DESCRIBE}")
-string(REGEX REPLACE "-" "_" CONDA_RELEASE_VERSION "${PYTHON_RELEASE_VERSION}")
+string(REGEX REPLACE "([0-9.]*)-" "\\1\+" CONDA_RELEASE_VERSION_TMP "${PROJECT_GIT_DESCRIBE}")
+string(REGEX REPLACE "\\+([0-9]*)\\+" "\+\\1\." CONDA_RELEASE_VERSION "${CONDA_RELEASE_VERSION_TMP}")
 
 if(Python_Interpreter_FOUND)
     set(SETUP_PY_IN "${CMAKE_CURRENT_SOURCE_DIR}/setup.py.in")
@@ -41,7 +41,7 @@ if(Python_Interpreter_FOUND)
 	    COMMAND ${Python_EXECUTABLE} ${SETUP_PY} build
 	    COMMAND ${CMAKE_COMMAND} -E remove_directory ${CMAKE_CURRENT_BINARY_DIR}/dist
   	  COMMAND ${Python_EXECUTABLE} ${SETUP_PY} sdist
-  	  COMMAND ${CMAKE_COMMAND} -E rename ${CMAKE_CURRENT_BINARY_DIR}/dist/blickfeld_scanner-${PYTHON_RELEASE_VERSION}.tar.gz ${OUTPUT}
+  	  COMMAND ${CMAKE_COMMAND} -E rename ${CMAKE_CURRENT_BINARY_DIR}/dist/blickfeld_scanner-${CONDA_RELEASE_VERSION}.tar.gz ${OUTPUT}
 	    DEPENDS ${DEPS}
     )
 
