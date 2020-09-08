@@ -100,7 +100,7 @@ check_include_files (winsock.h HAVE_WINSOCK_H)
 # Check for Windows Build
 if(MSVC)
 	# Reduce warning level to hide protobuf warnings
-    add_compile_options(/W1 /EHsc)
+    add_compile_options(/EHsc)
 endif(MSVC)
 if(WIN32)
 	macro(get_WIN32_WINNT version)
@@ -240,6 +240,10 @@ if(WIN32)
 		target_compile_definitions(blickfeld-scanner PRIVATE "BF_DLLEXPORT=__declspec(dllexport)")
 		target_compile_definitions(blickfeld-scanner-static PUBLIC "BF_DLLEXPORT=__declspec(dllexport)")
 	endif()
+		
+  # https://github.com/protocolbuffers/protobuf/blob/master/cmake/README.md#notes-on-compiler-warnings
+  target_compile_options(blickfeld-scanner PUBLIC "/wd4251")
+  target_compile_options(blickfeld-scanner-static PUBLIC "/wd4251" "/wd4244" "/wd4267")
 endif(WIN32)
 
 add_dependencies(blickfeld-scanner blickfeld-scanner-protocol)

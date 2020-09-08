@@ -13,6 +13,12 @@ influence the resulting point cloud.
 
 ### Removed
 
+## [2.12.1] - 2020.09.08
+
+### Changed
+* Windows: Only disable Protobuf-related warnings
+* Python: Throw explicit error types in point cloud stream class
+
 ## [2.12.0] - 2020.09.08
 
 ### Added

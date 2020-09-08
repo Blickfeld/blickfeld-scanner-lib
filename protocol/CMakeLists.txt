@@ -215,12 +215,18 @@ endforeach()
 add_library(blickfeld-scanner-protocol-static OBJECT ${PROTOBUF_GENERATED_CUSTOM} ${PROTOBUF_GENERATED_CPP})
 target_include_directories(blickfeld-scanner-protocol-static PRIVATE ${LIBINCLUDEDIR_TOP})
 target_link_libraries(blickfeld-scanner-protocol-static PUBLIC ${Protobuf_LIBRARY})
-if(NOT BSL_STANDALONE)
-	target_compile_definitions(blickfeld-scanner-protocol-static PRIVATE "BF_DLLEXPORT=__declspec(dllexport)" "PROTOBUF_USE_DLLS")
-else()
-	target_compile_definitions(blickfeld-scanner-protocol-static PRIVATE "BF_DLLEXPORT=__declspec(dllexport)")
-endif()
 set_property(TARGET blickfeld-scanner-protocol-static PROPERTY POSITION_INDEPENDENT_CODE ON)
+
+if(WIN32)
+	if(NOT BSL_STANDALONE)
+		target_compile_definitions(blickfeld-scanner-protocol-static PRIVATE "BF_DLLEXPORT=__declspec(dllexport)" "PROTOBUF_USE_DLLS")
+	else()
+		target_compile_definitions(blickfeld-scanner-protocol-static PRIVATE "BF_DLLEXPORT=__declspec(dllexport)")
+	endif()
+	
+	# https://github.com/protocolbuffers/protobuf/blob/master/cmake/README.md#notes-on-compiler-warnings
+	target_compile_options(blickfeld-scanner-protocol-static PRIVATE "/wd4251" "/wd4244" "/wd4267")
+endif()
 
 set(PROTOBUF_GENERATED_CPP ${PROTOBUF_GENERATED_CPP} PARENT_SCOPE)
 set(PROTOBUF_GENERATED_PY_DIR ${PROTOBUF_GENERATED_PY_DIR} PARENT_SCOPE)
