@@ -12,6 +12,7 @@ project (blickfeld-scanner-lib)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS 1)
+set(CMAKE_DEBUG_POSTFIX d)
 
 # Options
 # BF_USE_SYSTEM_PROTOBUF: defaults to ON on normal build, OFF on cross-compile
@@ -98,7 +99,8 @@ check_include_files (winsock.h HAVE_WINSOCK_H)
 
 # Check for Windows Build
 if(MSVC)
-    set(CMAKE_CXX_FLAGS "/EHsc")
+	# Reduce warning level to hide protobuf warnings
+    add_compile_options(/W1 /EHsc)
 endif(MSVC)
 if(WIN32)
 	macro(get_WIN32_WINNT version)
@@ -138,6 +140,7 @@ if(BF_USE_SYSTEM_PROTOBUF)
 
   # Check version of protobuf
   if(PROTOBUF_FOUND AND Protobuf_PROTOC_EXECUTABLE)
+		message ("Found protobuf compiler: ${Protobuf_PROTOC_EXECUTABLE}")
 		execute_process(COMMAND ${Protobuf_PROTOC_EXECUTABLE} --version OUTPUT_VARIABLE Protobuf_Compiler_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
 		string(REGEX REPLACE "^libprotoc " "" Protobuf_Compiler_VERSION "${Protobuf_Compiler_VERSION}")
 
@@ -228,22 +231,29 @@ target_include_directories(blickfeld-scanner-static PUBLIC ${BLICKFELD_SCANNER_I
 if(WIN32)
   	# https://msdn.microsoft.com/en-us/library/windows/desktop/ms738520(v=vs.85).aspx
   	
-  target_link_libraries(blickfeld-scanner PUBLIC ws2_32 wsock32)
-	target_compile_definitions(blickfeld-scanner PRIVATE "BF_DLLEXPORT=__declspec(dllexport)")
-	target_compile_definitions(blickfeld-scanner-static PUBLIC "BF_DLLEXPORT=__declspec(dllexport)")
+	target_link_libraries(blickfeld-scanner PUBLIC ws2_32 wsock32)
+	if(NOT BSL_STANDALONE)
+		target_compile_definitions(blickfeld-scanner PRIVATE "BF_DLLEXPORT=__declspec(dllexport)" "PROTOBUF_USE_DLLS")
+		target_compile_definitions(blickfeld-scanner-static PUBLIC "BF_DLLEXPORT=__declspec(dllexport)" "PROTOBUF_USE_DLLS")
+		target_compile_definitions(blickfeld-scanner INTERFACE "BF_DLLEXPORT=__declspec(dllimport)" "PROTOBUF_USE_DLLS")
+	else()
+		target_compile_definitions(blickfeld-scanner PRIVATE "BF_DLLEXPORT=__declspec(dllexport)")
+		target_compile_definitions(blickfeld-scanner-static PUBLIC "BF_DLLEXPORT=__declspec(dllexport)")
+	endif()
 endif(WIN32)
 
 add_dependencies(blickfeld-scanner blickfeld-scanner-protocol)
 add_dependencies(blickfeld-scanner-static blickfeld-scanner-protocol)
-target_link_libraries(blickfeld-scanner-static PUBLIC blickfeld-scanner-protocol-static ${Protobuf_LIBRARY})
-target_link_libraries(blickfeld-scanner PRIVATE blickfeld-scanner-protocol-static)
 
 if(NOT BSL_STANDALONE)
 	target_link_libraries(blickfeld-scanner PUBLIC ${Protobuf_LIBRARY})
+	target_include_directories(blickfeld-scanner PUBLIC ${Protobuf_INCLUDE_DIRS})
 else()
 	target_link_libraries(blickfeld-scanner PRIVATE ${Protobuf_LIBRARY})
+	target_include_directories(blickfeld-scanner PRIVATE ${Protobuf_INCLUDE_DIRS})
 endif()
 target_link_libraries(blickfeld-scanner-static PUBLIC ${Protobuf_LIBRARY})
+target_include_directories(blickfeld-scanner-static PUBLIC ${Protobuf_INCLUDE_DIRS})
 
 if(HAVE_OPENSSL)
   target_link_libraries(blickfeld-scanner PUBLIC OpenSSL::SSL OpenSSL::Crypto)
@@ -312,7 +322,6 @@ write_basic_package_version_file(
 )
 export(EXPORT blickfeld-scanner
   FILE "${CMAKE_CURRENT_BINARY_DIR}/blickfeld-scanner/blickfeld-scanner.cmake"
-#  NAMESPACE blickfeld-scanner::
 )
 configure_file(cmake/blickfeld-scanner-config.cmake
   "${CMAKE_CURRENT_BINARY_DIR}/blickfeld-scanner/blickfeld-scanner-config.cmake"

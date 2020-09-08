@@ -16,5 +16,5 @@ if (NOT TARGET blickfeld-scanner)
     find_package(blickfeld-scanner REQUIRED full)
 endif()
 
-add_executable(bf-configurable_point_cloud_stream main.cpp)
-target_link_libraries(bf-configurable_point_cloud_stream blickfeld-scanner)
+add_executable(bf-reduced_clouds main.cpp)
+target_link_libraries(bf-reduced_clouds blickfeld-scanner)

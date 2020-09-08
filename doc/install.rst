@@ -121,8 +121,8 @@ From source
     make -j8
     sudo make install
 
-Build library
-~~~~~~~~~~~~~
+Build library with installed dependencies
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: bash
 
@@ -131,6 +131,49 @@ Build library
     cmake ..
     make -j8
     sudo make install
+
+Follow the :ref:`BSL_Getting_started` guide to write your first application.
+
+Build library without installed dependencies
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The BSL can also be build without installing the dependencies, it will fetch the needed dependencies via git and build them, before building the BSL.
+An example how to build the BSL with full support can be found in cmake/external.
+For this example git is required, to download the sources from protobuf and zlib.
+
+1. Build BSL with all dependencies
+
+   .. code-block:: bash
+
+       git clone --recursive https://github.com/Blickfeld/blickfeld-scanner-lib.git
+       mkdir blickfeld-scanner-lib/build && cd blickfeld-scanner-lib/build
+       cmake ../cmake/external
+       make
+
+   After building the BSL, all dependencies are in the build/install folder (Protobuf, zlib and the BSL).
+   For building the example and linking own projects, the absolute path to the install folder is required, please note it down somewhere.
+
+   For example this could be the following path: `/mnt/e/develop/blickfeld-scanner-lib/build/install`.
+
+2. Build example and link it to the previously build BSL. 
+
+   As an example, the reduced_clouds example is build. The approach is working analogously for the other examples or custom applications.
+
+   .. code-block:: bash
+
+       mkdir build_example && cd build_example
+       cmake -DCMAKE_PREFIX_PATH=<path_to_bsl_install_dir> ../examples/cpp/reduced_clouds/
+       make
+
+   .. note:: The <path_to_bsl_install_dir> is the absolute path to the build/install folder of the BSL build, which we noted down in the step above.
+
+3. Start the example
+
+   .. code-block:: bash
+
+       ./bf-reduced_clouds <hostname>
+
+   Use the device's hostname or ip adress as `<hostname>`.
 
 Follow the :ref:`BSL_Getting_started` guide to write your first application.
 
@@ -146,17 +189,59 @@ The VC++ build tool can be found here: https://visualstudio.microsoft.com/de/dow
 Install an up-to-date CMake from: https://cmake.org/download/.
 
 To activate full support, Protocol Buffers are required. It is recommended to use `CMake External Projects <https://cmake.org/cmake/help/latest/module/ExternalProject.html>`_.
-An example will be available soon.
 
 Build library
 ~~~~~~~~~~~~~
+
+An example how to build the BSL with full support can be found in cmake/external.
+For this example git is required, to download the sources from protobuf and zlib
+
+1. Build BSL with all dependencies
+
+   .. code-block:: bash
+
+	   git clone --recursive https://github.com/Blickfeld/blickfeld-scanner-lib.git
+	   mkdir blickfeld-scanner-lib/build && cd blickfeld-scanner-lib/build
+	   cmake ../cmake/external -DCMAKE_BUILD_TYPE=Release
+	   cmake --build . --target ALL_BUILD
+
+   After building the BSL, all dependencies are in the build/install folder (Protobuf, zlib and the BSL).
+   For building the example and linking own projects, the absolute path to the install folder is required, please note it down somewhere.
+
+   For example this could be the following path: `C:\\develop\\blickfeld-scanner-lib\\build\\install`.
+
+2. Build example and link it to the previously build BSL. 
+
+   As an example, the reduced_clouds example is build. The approach is working analogously for the other examples or custom applications.
+
+   .. code-block:: bash
+
+	   mkdir build_example && cd build_example
+	   cmake -DCMAKE_PREFIX_PATH=<path_to_bsl_install_dir> -DCMAKE_BUILD_TYPE=Release ../examples/cpp/reduced_clouds/
+	   cmake --build .
+
+   .. note:: The <path_to_bsl_install_dir> is the absolute path to the build/install folder of the BSL build, which we noted down in the step above.
+
+3. Start the example
+
+   .. code-block:: bash
+
+	   ./Release/bf-reduced_clouds.exe <hostname>
+
+   Use the device's hostname or ip adress as `<hostname>`.
+
+
+Follow the :ref:`BSL_Getting_started` guide to write your first application.
+
+Build standalone library
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: bash
 
     git clone --recursive https://github.com/Blickfeld/blickfeld-scanner-lib.git
     mkdir blickfeld-scanner-lib/build && cd blickfeld-scanner-lib/build
-    cmake .. -DBF_USE_SYSTEM_PROTOBUF=OFF
-    cmake --build . --target ALL_BUILD --config Release
+    cmake .. -DBF_USE_SYSTEM_PROTOBUF=OFF -DCMAKE_BUILD_TYPE=Release
+    cmake --build . --target ALL_BUILD
     
 .. note:: The `BF_USE_SYSTEM_PROTOBUF=OFF` flag builds the BSL with reduced functionality. Read :ref:`BSL Installation Dependencies` for more information.
 
@@ -166,4 +251,3 @@ Compile options
 ---------------
 
 .. note:: Detailed information about the CMake compile options will be available soon.
-

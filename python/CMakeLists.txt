@@ -10,7 +10,7 @@ find_package(Python COMPONENTS Interpreter)
 
 # Note that PYTHON_VERSION is not the python version but the version of the package blickfeld_scanner
 string(REGEX REPLACE "([0-9.]*)-" "\\1\+" CONDA_RELEASE_VERSION_TMP "${PROJECT_GIT_DESCRIBE}")
-string(REGEX REPLACE "\\+([0-9]*)\\+" "\+\\1\." CONDA_RELEASE_VERSION "${CONDA_RELEASE_VERSION_TMP}")
+string(REGEX REPLACE "\\+([0-9]*)\\+" ".dev0\+\\1\." CONDA_RELEASE_VERSION "${CONDA_RELEASE_VERSION_TMP}")
 
 if(Python_Interpreter_FOUND)
     set(SETUP_PY_IN "${CMAKE_CURRENT_SOURCE_DIR}/setup.py.in")

@@ -20,5 +20,15 @@ message Advanced {
 		optional float sensitivity = 1 [ default = 1, (d_min) = 0.8, (d_max) = 1.2 ]; // Relatively influences the sensitivity of the detector. Higher values might also result into range loss. It is recommended to validate the noise filter parameters after changes to this setting.
 	}
 
-	optional Detector detector = 1; // Refer to [Detector](#blickfeld.protocol.config.Environment.Detector)
+	/**
+	 * > Introduced in BSL v2.12 and firmware v1.12
+	 *
+	 * Processing parameters are set at the factory after calibration. Changing these values invalidates the factory calibration.
+	 */
+	message Processing {
+		optional float range_offset = 1 [default = 0, (d_min) = -2, (d_max) = 2]; // in [m]
+	}
+
+	optional Detector detector = 1; // Refer to [Detector](#blickfeld.protocol.config.Advanced.Detector)
+	optional Processing processing = 2; // <blockquote>Introduced in BSL v2.12 and firmware v1.12</blockquote> Refer to [Processing](#blickfeld.protocol.config.Advanced.Processing)
 }

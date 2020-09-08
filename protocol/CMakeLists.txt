@@ -115,7 +115,7 @@ set(PROTOBUF_SOURCES_CUSTOM
 
 set(PROTOBUF_GENERATED_PY_DIR ${PROJECT_BINARY_DIR}/python)
 
-IF(MSVC)
+IF(WIN32)
 	set(DLL_EXPORT "dllexport_decl=BF_DLLEXPORT:")
 ENDIF()
 
@@ -215,9 +215,14 @@ endforeach()
 add_library(blickfeld-scanner-protocol-static OBJECT ${PROTOBUF_GENERATED_CUSTOM} ${PROTOBUF_GENERATED_CPP})
 target_include_directories(blickfeld-scanner-protocol-static PRIVATE ${LIBINCLUDEDIR_TOP})
 target_link_libraries(blickfeld-scanner-protocol-static PUBLIC ${Protobuf_LIBRARY})
-target_compile_definitions(blickfeld-scanner-protocol-static PRIVATE "BF_DLLEXPORT=__declspec(dllexport)")
+if(NOT BSL_STANDALONE)
+	target_compile_definitions(blickfeld-scanner-protocol-static PRIVATE "BF_DLLEXPORT=__declspec(dllexport)" "PROTOBUF_USE_DLLS")
+else()
+	target_compile_definitions(blickfeld-scanner-protocol-static PRIVATE "BF_DLLEXPORT=__declspec(dllexport)")
+endif()
 set_property(TARGET blickfeld-scanner-protocol-static PROPERTY POSITION_INDEPENDENT_CODE ON)
 
+set(PROTOBUF_GENERATED_CPP ${PROTOBUF_GENERATED_CPP} PARENT_SCOPE)
 set(PROTOBUF_GENERATED_PY_DIR ${PROTOBUF_GENERATED_PY_DIR} PARENT_SCOPE)
 set(PROTOBUF_GENERATED_PY ${PROTOBUF_GENERATED_PY} PARENT_SCOPE)
 set(PROTOBUF_GENERATED_JS ${PROTOBUF_GENERATED_JS} PARENT_SCOPE)
@@ -225,6 +230,7 @@ set(PROTOBUF_GENERATED_JS_DIR ${PROJECT_BINARY_DIR}/npm PARENT_SCOPE)
 
 add_custom_target(blickfeld-scanner-protocol 
 	DEPENDS blickfeld-scanner-protocol-static
+	DEPENDS ${PROTOBUF_GENERATED_CPP}
 	DEPENDS ${PROTOBUF_GENERATED_PY})
 
 add_custom_target(blickfeld-scanner-protocol-js
