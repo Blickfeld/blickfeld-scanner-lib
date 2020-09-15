@@ -222,7 +222,7 @@ class point_cloud(object):
             frame = self._connection.recv().event.point_cloud.frame
         else:
             if self.end_of_stream():
-                raise Exception("Reached end of stream. Use end_of_stream() before calling recv_frame().")
+                raise ConnectionAbortedError("Reached end of stream. Use end_of_stream() before calling recv_frame().")
             self._stream_buffered = False
 
             frame = self._stream_data.frame
@@ -236,7 +236,7 @@ class point_cloud(object):
                 if self._ofile:
                     ex_str += "\nReducing the compressions level in the record_to_file function could prevent frame losses."
 
-                raise Exception(ex_str)
+                raise RuntimeError(ex_str)
             self._last_frame_id = frame.id
 
         # Record frame to file
@@ -283,7 +283,7 @@ class point_cloud(object):
         :param compresslevel: The compresslevel argument is an integer from 0 to 9 controlling the level of compression; 1 is fastest and produces the least compression, and 9 is slowest and produces the most compression. 0 is no compression. The default is 1. If frames are lost during the recording decrease the compression level.
         """
         if self._ofile:
-            raise Exception("A recording was already started. Please stop the recording before starting another one (stop_recording)")
+            raise Exception("The output file has already been opened. To open another file, please call 'stop_recording' first to close the current output file.")
         self._prev_scan_pattern_str = b""
         self._metadata.ClearField("footer")
         self._ofile = gzip.open(file_name, 'wb', compresslevel=compresslevel)

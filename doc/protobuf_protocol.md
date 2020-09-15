@@ -95,6 +95,7 @@ The data, such as a point cloud, are also packed in protobuf messages.
 - [blickfeld/config/advanced.proto](#blickfeld/config/advanced.proto)
     - [Advanced](#blickfeld.protocol.config.Advanced)
     - [Advanced.Detector](#blickfeld.protocol.config.Advanced.Detector)
+    - [Advanced.Processing](#blickfeld.protocol.config.Advanced.Processing)
   
   
   
@@ -941,7 +942,8 @@ The current set of parameters is preliminary, additional parameters may be added
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| detector | [Advanced.Detector](#blickfeld.protocol.config.Advanced.Detector) | optional | Refer to [Detector](#blickfeld.protocol.config.Environment.Detector) |
+| detector | [Advanced.Detector](#blickfeld.protocol.config.Advanced.Detector) | optional | Refer to [Detector](#blickfeld.protocol.config.Advanced.Detector) |
+| processing | [Advanced.Processing](#blickfeld.protocol.config.Advanced.Processing) | optional | <blockquote>Introduced in BSL v2.12 and firmware v1.12</blockquote> Refer to [Processing](#blickfeld.protocol.config.Advanced.Processing) |
 
 
 
@@ -957,6 +959,23 @@ The behavior of the detector can be adjusted to improve the performance under ex
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | sensitivity | [float](#float) | optional | Relatively influences the sensitivity of the detector. Higher values might also result into range loss. It is recommended to validate the noise filter parameters after changes to this setting. Default: 1 |
+
+
+
+
+
+
+<a name="blickfeld.protocol.config.Advanced.Processing"></a>
+
+### Advanced.Processing
+> Introduced in BSL v2.12 and firmware v1.12
+
+Processing parameters are set at the factory after calibration. Changing these values invalidates the factory calibration.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| range_offset | [float](#float) | optional | in [m] Default: 0 |
 
 
 

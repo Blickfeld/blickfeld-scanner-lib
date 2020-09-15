@@ -52,6 +52,9 @@
 #endif
 #include <string>
 
+#define _USE_MATH_DEFINES
+#include <cmath>
+
 namespace blickfeld {
 namespace os {
 

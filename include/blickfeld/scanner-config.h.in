@@ -32,5 +32,11 @@
   #define BF_DLLEXPORT __declspec(dllimport)  
 #endif
 
+#ifndef BSL_STANDALONE
+#if !defined(PROTOBUF_USE_DLLS)
+  #define PROTOBUF_USE_DLLS
+#endif
+#endif
+
 #endif // BLICKFELD_SCANNER_CONFIG_H
 

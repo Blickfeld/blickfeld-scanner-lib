@@ -13,6 +13,21 @@ influence the resulting point cloud.
 
 ### Removed
 
+## [2.12.1] - 2020.09.08
+
+### Changed
+* Windows: Only disable Protobuf-related warnings
+* Python: Throw explicit error types in point cloud stream class
+
+## [2.12.0] - 2020.09.08
+
+### Added
+* Protocol: Additional processing section in advanced configuration
+* Example for builds with external projects which locates all dependencies in a local directory. Can be found in cmake/external. Install section in documentation is updated.
+
+### Changed
+* Bugfix: M_PI was not defined and compiler flags were overridden in cpp windows builds
+
 ## [2.11.1] - 2020.08.31
 
 ### Added
