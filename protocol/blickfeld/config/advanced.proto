@@ -1,6 +1,7 @@
 syntax = "proto2";
 
 import "blickfeld/options.proto";
+import "blickfeld/stream/connection.proto";
 
 package blickfeld.protocol.config;
 
@@ -29,6 +30,16 @@ message Advanced {
 		optional float range_offset = 1 [default = 0, (d_min) = -2, (d_max) = 2]; // in [m]
 	}
 
+	/**
+	 * > Introduced in BSL v2.13 and firmware v1.13
+	 *
+	 * Parameters, which control the server behavior.
+	 */
+	message Server {
+		optional stream.Subscribe.PointCloud default_point_cloud_subscription = 1; // Overwrite default point cloud subscription. Can still be overridden with client requests.
+	}
+
 	optional Detector detector = 1; // Refer to [Detector](#blickfeld.protocol.config.Advanced.Detector)
 	optional Processing processing = 2; // <blockquote>Introduced in BSL v2.12 and firmware v1.12</blockquote> Refer to [Processing](#blickfeld.protocol.config.Advanced.Processing)
+	optional Server server = 3; // <blockquote>Introduced in BSL v2.13 and firmware v1.13</blockquote> Refer to [Server](#blickfeld.protocol.config.Advanced.Server)
 }

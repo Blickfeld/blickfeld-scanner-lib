@@ -89,6 +89,7 @@ set(PROTOBUF_SOURCES
 	blickfeld/status/main.proto
 	blickfeld/status/scanner.proto
 	blickfeld/status/temperature.proto
+	blickfeld/status/server.proto
 	
 	blickfeld/data/frame.proto
 	blickfeld/data/point_cloud.proto
@@ -99,6 +100,7 @@ set(PROTOBUF_SOURCES
 	blickfeld/file/point_cloud.proto
 	
 	blickfeld/stream/connection.proto
+	blickfeld/stream/event.proto
 
 	blickfeld/update/hardware.proto
 	blickfeld/update/manifest.proto

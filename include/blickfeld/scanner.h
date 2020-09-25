@@ -38,11 +38,8 @@ namespace google {
 namespace protobuf {
 namespace io {
 class IstreamInputStream;
-class OstreamOutputStream;
 class GzipInputStream;
-class GzipOutputStream;
 class CodedInputStream;
-class CodedOutputStream;
 }
 }
 }
@@ -64,6 +61,7 @@ class ScanPattern_Filter;
 }
 
 class connection;
+class point_cloud_record;
 
 /**
  * Blickfeld Scanner class for point cloud streams, status, and configuration requests.
@@ -102,9 +100,7 @@ public:
 		google::protobuf::io::GzipInputStream* pb_izstream = nullptr;
 		google::protobuf::io::CodedInputStream* pb_icstream = nullptr;
 		std::ostream* ostream = nullptr;
-		google::protobuf::io::OstreamOutputStream* pb_ostream = nullptr;
-		google::protobuf::io::GzipOutputStream* pb_ozstream = nullptr;
-		google::protobuf::io::CodedOutputStream* pb_ocstream = nullptr;
+		point_cloud_record* record = nullptr;
 #endif
 
 public:
@@ -133,7 +129,7 @@ public:
 		 *
 		 * @param ostream Output stream for point cloud file. The file format is described in the technical documentation: "Blickfeld Scanner Library : File Format".
 		 */
-		void record_to_stream(std::ostream* ostream);
+		void record_to_stream(std::ostream* ostream, int compression_level = 1);
 
 		/**
 		 * Stops the recording, which was started with record_to_stream.
@@ -269,6 +265,14 @@ public:
 	 */
 	static std::shared_ptr<scanner::point_cloud_stream<protocol::data::frame_t> > simple_file_point_cloud_stream(std::istream* istream);
 #endif
+
+	/**
+	 * > Introduced in BSL v2.13 and firmware v1.3
+	 *
+	 * Can be used to attempt a re-initialization of the device if it is errored.
+	 * A self test is automatically triggered after a successful re-initialization.
+	 */
+	void attempt_error_recovery();
 
 #ifndef BSL_STANDALONE
 	/**

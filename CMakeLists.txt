@@ -65,6 +65,10 @@ endif()
 
 string(REGEX REPLACE "^v([0-9.]+).*" "\\1" PROJECT_VERSION "${PROJECT_VERSION}")
 string(REGEX REPLACE "^v" "" PROJECT_GIT_DESCRIBE "${PROJECT_GIT_DESCRIBE}")
+string(REPLACE "." ";" VERSION_LIST ${PROJECT_VERSION})
+list(GET VERSION_LIST 0 BSL_VERSION_MAJOR)
+list(GET VERSION_LIST 1 BSL_VERSION_MINOR)
+list(GET VERSION_LIST 2 BSL_VERSION_PATCH)
 
 message("BSL Version ${PROJECT_GIT_DESCRIBE}")
 project (blickfeld-scanner-lib 
@@ -204,6 +208,7 @@ set(BLICKFELD_SCANNER_SOURCES
   src/scanner_connection.cpp
   src/connection.cpp
   src/discover.cpp
+  src/point_cloud_record.cpp
 )
 set(BLICKFELD_SCANNER_INCLUDES
   ${Protobuf_INCLUDE_DIRS}
@@ -250,8 +255,8 @@ add_dependencies(blickfeld-scanner blickfeld-scanner-protocol)
 add_dependencies(blickfeld-scanner-static blickfeld-scanner-protocol)
 
 if(NOT BSL_STANDALONE)
-	target_link_libraries(blickfeld-scanner PUBLIC ${Protobuf_LIBRARY})
-	target_include_directories(blickfeld-scanner PUBLIC ${Protobuf_INCLUDE_DIRS})
+	target_link_libraries( blickfeld-scanner PUBLIC $<BUILD_INTERFACE:${Protobuf_LIBRARY}>)
+	target_include_directories( blickfeld-scanner PUBLIC $<BUILD_INTERFACE:${Protobuf_INCLUDE_DIRS}>)
 else()
 	target_link_libraries(blickfeld-scanner PRIVATE ${Protobuf_LIBRARY})
 	target_include_directories(blickfeld-scanner PRIVATE ${Protobuf_INCLUDE_DIRS})
@@ -269,12 +274,9 @@ set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 target_link_libraries(blickfeld-scanner INTERFACE ${CMAKE_THREAD_LIBS_INIT})
 
-get_directory_property(HAS_PARENT PARENT_DIRECTORY)
-if(HAS_PARENT)
-	set(Protobuf_PROTOC_EXECUTABLE ${Protobuf_PROTOC_EXECUTABLE} PARENT_SCOPE)
-	set(Protobuf_LIBRARY ${Protobuf_LIBRARY} PARENT_SCOPE)
-	set(BF_BSL_VERSION ${PROJECT_GIT_DESCRIBE} PARENT_SCOPE)
-endif()
+# Set version to lib
+set_target_properties(blickfeld-scanner
+    PROPERTIES VERSION ${BSL_VERSION_MAJOR}.${BSL_VERSION_MINOR})
 
 target_include_directories(blickfeld-scanner INTERFACE
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -304,6 +306,12 @@ install(
   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
   FILES_MATCHING PATTERN "*.h"
 )
+# Protocol files
+install(
+  DIRECTORY ${PROJECT_SOURCE_DIR}/protocol/blickfeld/
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/blickfeld-scanner/protocol/blickfeld
+  FILES_MATCHING PATTERN "*.proto"
+)
 
 # Misc
 if(BF_BUILD_TESTS)
@@ -316,21 +324,32 @@ if(BF_BUILD_PYTHON)
   add_subdirectory(python)
 endif()
 
+get_directory_property(HAS_PARENT PARENT_DIRECTORY)
+if(HAS_PARENT)
+	set(Protobuf_PROTOC_EXECUTABLE ${Protobuf_PROTOC_EXECUTABLE} PARENT_SCOPE)
+	set(Protobuf_LIBRARY ${Protobuf_LIBRARY} PARENT_SCOPE)
+	set(BF_BSL_PYTHON_VERSION ${BF_BSL_PYTHON_VERSION} PARENT_SCOPE)
+	
+	set(blickfeld-scanner_INCLUDE_DIRS ${BLICKFELD_SCANNER_INCLUDES} PARENT_SCOPE)
+	set(blickfeld-scanner_PROTOCOL "${PROJECT_SOURCE_DIR}/protocol" PARENT_SCOPE)
+endif()
+
 # CMake Package
 include(CMakePackageConfigHelpers)
 
 write_basic_package_version_file(
-  "${CMAKE_CURRENT_BINARY_DIR}/blickfeld-scanner/blickfeld-scanner-config-version.cmake"
+  "${CMAKE_CURRENT_BINARY_DIR}/cmake/blickfeld-scanner/blickfeld-scanner-config-version.cmake"
   VERSION ${blickfeld-scanner-lib_VERSION}
   COMPATIBILITY AnyNewerVersion
 )
 export(EXPORT blickfeld-scanner
-  FILE "${CMAKE_CURRENT_BINARY_DIR}/blickfeld-scanner/blickfeld-scanner.cmake"
+  FILE "${CMAKE_CURRENT_BINARY_DIR}/cmake/blickfeld-scanner/blickfeld-scanner.cmake"
 )
 configure_file(cmake/blickfeld-scanner-config.cmake
-  "${CMAKE_CURRENT_BINARY_DIR}/blickfeld-scanner/blickfeld-scanner-config.cmake"
+  "${CMAKE_CURRENT_BINARY_DIR}/cmake/blickfeld-scanner/blickfeld-scanner-config.cmake"
   @ONLY
 )
+file(COPY "${PROJECT_SOURCE_DIR}/protocol/blickfeld" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/cmake/blickfeld-scanner/protocol")
 
 set(ConfigPackageLocation lib/cmake/blickfeld-scanner)
 install(EXPORT blickfeld-scanner
@@ -341,8 +360,8 @@ install(EXPORT blickfeld-scanner
 )
 install(
   FILES
-    "${CMAKE_CURRENT_BINARY_DIR}/blickfeld-scanner/blickfeld-scanner-config.cmake"
-    "${CMAKE_CURRENT_BINARY_DIR}/blickfeld-scanner/blickfeld-scanner-config-version.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/cmake/blickfeld-scanner/blickfeld-scanner-config.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/cmake/blickfeld-scanner/blickfeld-scanner-config-version.cmake"
   DESTINATION
     ${ConfigPackageLocation}
   COMPONENT

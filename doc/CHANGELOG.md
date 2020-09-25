@@ -13,6 +13,23 @@ influence the resulting point cloud.
 
 ### Removed
 
+## [2.13.0] - 2020.09.25
+
+### Added
+* [Introduced in firmware v1.13] Separate API request for raw file streams. This allows file recordings with Python on low-performance clients.
+* [Introduced in firmware v1.13] Server section to status message. Reports connected clients and network statistics.
+* Add protocol files to install target
+* [Introduced in firmware v1.13] Extend advanced configuration with `default_point_cloud_subscription`
+* [Introduced in firmware v1.13] Request to attempt error recovery
+
+### Changed
+* Python: Improved examples and refactored arguments
+* CPP: Refactored point cloud recording class
+* CMake: Improved the approach of linking dependent library to make the install package relocatable
+
+### Removed
+* [Removed in firmware v1.13] Drop deprecated legacy scan patterns
+
 ## [2.12.1] - 2020.09.08
 
 ### Changed

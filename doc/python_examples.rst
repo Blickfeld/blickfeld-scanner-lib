@@ -14,3 +14,5 @@ To fully understand the code, please refer to the source code as well.
    autoapi/getting_started_example/index.rst
    autoapi/configure_point_cloud_stream/index.rst
    autoapi/export_mat/index.rst
+   autoapi/record_point_cloud/index.rst
+   autoapi/read_point_cloud_file/index.rst

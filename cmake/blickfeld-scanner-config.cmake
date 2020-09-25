@@ -5,7 +5,7 @@ set(BSL_STANDALONE @BSL_STANDALONE@)
 set(HAVE_OPENSSL @HAVE_OPENSSL@)
 
 if (NOT BSL_STANDALONE)
- 	find_dependency(Protobuf REQUIRED)
+ 	find_dependency(Protobuf @Protobuf_VERSION@ REQUIRED)
   	if(NOT PROTOBUF_FOUND)
     	set(blickfeld-scanner_FOUND False)
     	set(blickfeld-scanner_NOT_FOUND_MESSAGE "BSL is configured with Protobuf support. Could not find suitable Protobuf on this system (libprotobuf-dev).")
@@ -38,3 +38,8 @@ foreach(_comp ${blickfeld-scanner_FIND_COMPONENTS})
 endforeach()
 
 include("${CMAKE_CURRENT_LIST_DIR}/blickfeld-scanner.cmake")
+set_property(TARGET blickfeld-scanner 
+        APPEND PROPERTY INTERFACE_INCLUDE_DIRECTORIES "${PROTOBUF_INCLUDE_DIR}"
+        APPEND PROPERTY INTERFACE_LINK_LIBRARIES "${Protobuf_LIBRARIES}"
+)
+set(blickfeld-scanner_PROTOCOL "${CMAKE_CURRENT_LIST_DIR}/protocol")

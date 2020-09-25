@@ -7,6 +7,6 @@ test_*dump*
 .pydevproject
 *.idea*
 *__pycache__*
-# NPM Packages
+.vscode
 node_modules
-package-lock.json
+*.bfpc

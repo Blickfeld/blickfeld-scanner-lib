@@ -1,6 +1,6 @@
 package:
   name: blickfeld_scanner
-  version: @CONDA_RELEASE_VERSION@
+  version: @BF_BSL_PYTHON_VERSION@
 
 source:
   path: ./

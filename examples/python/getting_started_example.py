@@ -43,7 +43,7 @@ def getting_started_example(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()  # Command line argument parser
-    parser.add_argument("--host", default="localhost", required=True, help="hostname or IP of device") # host name or IP address of the device
+    parser.add_argument("host", help="hostname or IP of device") # host name or IP address of the device
     args = parser.parse_args()  # Parse command line arguments
 
     getting_started_example(args)  # Start example

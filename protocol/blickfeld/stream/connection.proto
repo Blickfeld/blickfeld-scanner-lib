@@ -2,9 +2,7 @@ syntax = "proto2";
 option cc_enable_arenas = true;
 
 import "blickfeld/options.proto";
-import "blickfeld/data/point_cloud.proto";
 import "blickfeld/data/frame.proto";
-import "blickfeld/status/main.proto";
 import "blickfeld/config/scan_pattern.proto";
 
 package blickfeld.protocol.stream;
@@ -18,15 +16,29 @@ message Subscribe {
 	 * This request is used for subscribing to a point cloud stream.
 	 */
 	message PointCloud {
-
 		optional data.Frame reference_frame = 1 [(optional)=true, (allow_sparse)=true]; // <blockquote>Introduced in BSL v2.10 and firmware v1.9</blockquote> If present, only fields that are set in this message and submessages will be present in the point cloud. If less fields are requested, the Protobuf encoding and network transport time can reduce significantly.
 		optional config.ScanPattern.Filter filter = 2; // <blockquote>Introduced in BSL v2.10 and firmware v1.9</blockquote> Refer to [ScanPattern.Filter](#blickfeld.protocol.config.ScanPattern.Filter). Overrides parameters of scan pattern.
+		extensions 3; // Internal developer configuration
 	}
 
 	/**
 	 * This request is used for subscribing to a status stream.
 	 */
 	message Status {
+	}
+
+	/**
+	 * > Introduced in BSL v2.13 and firmware v1.13
+	 *
+	 * This request is used for subscribing to a raw file stream.
+	 * The requested stream is directly packed in the Blickfeld data format and only raw bytes are sent to the client, which it should write sequentially in a file.
+	 * An [Unsubscribe](#blickfeld.protocol.stream.Unsubscribe) request with the same request data must be sent to properly end the file stream.
+	 * The request raw file stream is ended with an [EndOfStream](#blickfeld.protocol.stream.Event.EndOfStream) event.
+	 */
+	message RawFile {
+		oneof data {
+			PointCloud point_cloud = 1;  // Subscribe to a raw point cloud stream. Refer to [Subscribe.PointCloud](#blickfeld.protocol.stream.Subscribe.PointCloud).
+		}
 	}
 
 	/**
@@ -44,25 +56,6 @@ message Subscribe {
 		PointCloud point_cloud = 11;  // Refer to [Subscribe.PointCloud](#blickfeld.protocol.stream.Subscribe.PointCloud)
 		Status status = 12;  // Refer to [Subscribe.Status](#blickfeld.protocol.stream.Subscribe.Status)
 		Developer developer = 13;  // Refer to [Subscribe.Developer](#blickfeld.protocol.stream.Subscribe.Developer)
-	}
-}
-
-/**
- * This section describes the events of streams.
- */
-message Event {
-
-	/**
-	 * Internal use only
-	 */
-	message Developer {
-		extensions 1 to max;  // Internal developer events
-	}
-
-	oneof data {
-		option (optional_one_of) = true;
-		data.PointCloud point_cloud = 11;  // Refer to [PointCloud](#blickfeld.protocol.data.PointCloud)
-		Status status = 12;  // Refer to [Status](#blickfeld.protocol.status.Status)
-		Developer developer = 13;  // Refer to [Event.Developer](#blickfeld.protocol.stream.Event.Developer)
+		RawFile raw_file = 14; // Refer to [Subscribe.RawFile](#blickfeld.protocol.stream.Subscribe.RawFile)
 	}
 }

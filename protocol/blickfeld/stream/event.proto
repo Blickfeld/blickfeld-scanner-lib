@@ -1,0 +1,42 @@
+syntax = "proto2";
+option cc_enable_arenas = true;
+
+import "blickfeld/options.proto";
+import "blickfeld/data/point_cloud.proto";
+import "blickfeld/status/main.proto";
+import "blickfeld/stream/connection.proto";
+
+package blickfeld.protocol.stream;
+
+/**
+ * This section describes the events of streams.
+ */
+message Event {
+
+	/**
+	 * Internal use only
+	 */
+	message Developer {
+		extensions 1 to max;  // Internal developer events
+	}
+
+	/**
+	 * > Introduced in BSL v2.13 and firmware v1.13
+	 *
+	 * Event to indicate the end of stream.
+	 * This is called after an [Unsubscribe](#blickfeld.protocol.stream.Unsubscribe) request.
+	 * No further events will arrive for the subscribed stream after this event.
+	 */
+	message EndOfStream {
+		optional stream.Subscribe subscription = 1; // Ended subscription. Refer to [Subscribe](#blickfeld.protocol.stream.Subscribe).
+	}
+
+	oneof data {
+		option (optional_one_of) = true;
+		data.PointCloud point_cloud = 11;  // Refer to [PointCloud](#blickfeld.protocol.data.PointCloud)
+		Status status = 12;  // Refer to [Status](#blickfeld.protocol.status.Status)
+		Developer developer = 13;  // Refer to [Event.Developer](#blickfeld.protocol.stream.Event.Developer)
+		bytes raw_file = 14;  // <blockquote>Introduced in BSL v2.13 and firmware v1.13</blockquote> Raw bytes, which should be written sequentially in a file. Refer to [RawFile](#blickfeld.protocol.stream.Subscribe.RawFile).
+		EndOfStream end_of_stream = 15;  // <blockquote>Introduced in BSL v2.13 and firmware v1.13</blockquote> Refer to [EndOfStream](#blickfeld.protocol.stream.Event.EndOfStream)
+	}
+}

@@ -16,8 +16,10 @@ import struct
 import ssl
 import tempfile
 import os
+import warnings
 
 from .protocol import connection_pb2
+from .protocol.stream import connection_pb2 as stream_connection_pb2
 from .protocol import options_pb2
 from . import stream
 
@@ -92,20 +94,80 @@ class scanner(object):
         """
         return status_stream(self.create_connection())
 
-    def get_point_cloud_stream(self, filter=None, reference_frame=None):
+    def get_point_cloud_stream(self, filter=None, reference_frame=None, point_filter=None):
         """ Request point cloud stream of device
 
-        :param filter: 
+        :param filter: DEPRECATED
+
             > Introduced in BSL v2.10 and firmware v1.9
-            
-            Filter points and returns by point attributes during the post-processing on the device.
-        :param reference_frame: 
+
+            Filter points and returns by point attributes during the post-processing on the device. Is replaced by 'point_filter'.
+        :param reference_frame:
             > Introduced in BSL v2.10 and firmware v1.9
-            
+
             Frame representing the desired data. To request a field, set it to any value (also in submessages). For a repeated field, add at least one element.
+        :param point_filter:
+            > Introduced in BSL v2.13 and firmware v1.9
+
+            Filter points and returns by point attributes during the post-processing on the device. This replaces the 'filter' parameter
         :returns: :py:class:`blickfeld_scanner.scanner.stream.point_cloud` object
         """
-        return stream.point_cloud(self.create_connection(), filter=filter, reference_frame=reference_frame)
+        if filter and point_filter:
+            raise Exception("Either provide 'filter' or 'point_filter'.\nPlease use 'point_filter' instead of 'filter'. 'filter' is deprecated.")
+        if filter:
+            warnings.warn("Please use 'point_filter' instead of 'filter'. 'filter' is deprecated.", DeprecationWarning, stacklevel=2)
+            point_filter = filter
+        return stream.point_cloud(self.create_connection(), point_filter=point_filter, reference_frame=reference_frame)
+
+    def get_raw_point_cloud_stream(self, point_filter=None, reference_frame=None):
+        """ Request raw point cloud stream of device
+        
+        > Introduced in BSL v2.13 and firmware v1.13
+
+        :param point_filter:
+            > Introduced in BSL v2.10 and firmware v1.9
+
+            Filter points and returns by point attributes during the post-processing on the device.
+        :param reference_frame:
+            > Introduced in BSL v2.10 and firmware v1.9
+
+            Frame representing the desired data. To request a field, set it to any value (also in submessages). For a repeated field, add at least one element.
+        :returns: :py:class:`blickfeld_scanner.scanner.stream.raw` object
+        """
+        req = stream_connection_pb2.Subscribe.RawFile()
+        req.point_cloud.SetInParent()
+        if point_filter:
+            req.point_cloud.filter.CopyFrom(point_filter)
+        if reference_frame:
+            req.point_cloud.reference_frame.CopyFrom(reference_frame)
+
+        return stream.raw(self.create_connection(), req)
+
+    def record_point_cloud_stream(self, file_name, point_filter=None, reference_frame=None):
+        """ Record point cloud stream to file
+        
+        > Introduced in BSL v2.13 and firmware v1.13
+        
+        :param file_name: Path to the file where it should be dumped
+
+        :param point_filter:
+            > Introduced in BSL v2.10 and firmware v1.9
+
+            Filter points and returns by point attributes during the post-processing on the device.
+        :param reference_frame:
+            > Introduced in BSL v2.10 and firmware v1.9
+
+            Frame representing the desired data. To request a field, set it to any value (also in submessages). For a repeated field, add at least one element.
+        :returns: :py:class:`blickfeld_scanner.scanner.stream.raw` object
+        """
+        req = stream_connection_pb2.Subscribe.RawFile()
+        req.point_cloud.SetInParent()
+        if point_filter:
+            req.point_cloud.filter.CopyFrom(point_filter)
+        if reference_frame:
+            req.point_cloud.reference_frame.CopyFrom(reference_frame)
+
+        return stream.raw(self.create_connection(), req, file_name)
 
     @staticmethod
     def file_point_cloud_stream(dump_filename):
@@ -151,10 +213,10 @@ class scanner(object):
         return self._connection.send_request(req).get_scan_pattern.config
     
     def set_advanced_config(self, config, persist = False):
-        """> Introduced in BSL v2.11 and firmware v1.11
-        
-        Function to set advanced config, see: :any:`protobuf_protocol`.
+        """ Function to set advanced config, see: :any:`protobuf_protocol`.
         Expert parameters: It is not recommended to adapt this calibrated configuration without understanding the influences on the resulting point cloud quality.
+
+        > Introduced in BSL v2.11 and firmware v1.11
 
         :param config: advanced config to be set
         :param persist: Persist advanced config on device and reload it after a power-cycle
@@ -166,9 +228,9 @@ class scanner(object):
         return self._connection.send_request(req).set_advanced_config
     
     def get_advanced_config(self):
-        """> Introduced in BSL v2.11 and firmware v1.11
+        """ Returns the currently set advanced config, see: :any:`protobuf_protocol`.
         
-        Returns the currently set advanced config, see: :any:`protobuf_protocol`.
+        > Introduced in BSL v2.11 and firmware v1.11
 
         :return: Currently set advanced config, see :any:`protobuf_protocol` advanced config
         """
@@ -233,6 +295,16 @@ class scanner(object):
         :return: Newly created :py:class:`blickfeld_scanner.scanner.connection`
         """
         return connection(self.hostname_or_ip, self.port, self._key_and_cert)
+            
+    def attempt_error_recovery(self):
+        """> Introduced in BSL v2.13 and firmware v1.13
+        
+        This request can be used to attempt a re-initialization of the device if it is errored.
+        A self test is automatically triggered after a successful re-initialization.
+        """
+        req = connection_pb2.Request()
+        req.attempt_error_recovery.SetInParent()
+        return self._connection.send_request(req).attempt_error_recovery
  
     @staticmethod
     def sync(devices, scan_pattern = None, target_frame_rate = None, max_time_difference = 0.1):
