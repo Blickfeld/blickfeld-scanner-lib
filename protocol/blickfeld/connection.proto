@@ -6,8 +6,9 @@ import "blickfeld/error.proto";
 import "blickfeld/config/advanced.proto";
 import "blickfeld/config/scan_pattern.proto";
 import "blickfeld/config/secure.proto";
-import "blickfeld/stream/connection.proto";
 import "blickfeld/status/main.proto";
+import "blickfeld/stream/connection.proto";
+import "blickfeld/stream/event.proto";
 
 package blickfeld.protocol;
 
@@ -37,10 +38,11 @@ message Request {
 	 * This request is used for configuring a Scan Pattern.
 	 */
 	message SetScanPattern {
-		optional config.ScanPattern config = 3 [(legacy_field_id) = 1];  // Refer to [ScanPattern](#blickfeld.protocol.config.ScanPattern)
-		optional bool persist = 2 [default = false];  // Persists the scan pattern and sets it after a power cycle. Default: False
+		reserved "legacy_config";
+		reserved 1;
 
-		optional config.ScanPattern legacy_config = 1 [(optional) = true];  // Deprecated old 'config' due to horizontal field of view definition
+		optional config.ScanPattern config = 3;  // Refer to [ScanPattern](#blickfeld.protocol.config.ScanPattern)
+		optional bool persist = 2 [default = false];  // Persists the scan pattern and sets it after a power cycle. Default: False
 	}
 
 	/**
@@ -49,9 +51,10 @@ message Request {
 	 * The filled scan pattern can then be set as input for  [Request.SetScanPattern](#blickfeld.protocol.Request.SetScanPattern).
 	 */
 	message FillScanPattern {
-		optional config.ScanPattern config = 2 [(allow_sparse)=true, (legacy_field_id) = 1];  // Refer to [ScanPattern](#blickfeld.protocol.config.ScanPattern)
+		reserved "legacy_config";
+		reserved 1;
 
-		optional config.ScanPattern legacy_config = 1 [(allow_sparse)=true, (optional) = true];  // Deprecated
+		optional config.ScanPattern config = 2 [(allow_sparse)=true];  // Refer to [ScanPattern](#blickfeld.protocol.config.ScanPattern)
 	}
 
 	/**
@@ -94,6 +97,15 @@ message Request {
 	message GetAdvancedConfig {
 	}
 
+	/**
+	 * > Introduced in BSL v2.13 and firmware v1.13
+	 *
+	 * This request can be used to attempt a re-initialization of the device if it is errored.
+	 * A self test is automatically triggered after a successful re-initialization.
+	 */
+	message AttemptErrorRecovery {
+	}
+
 	oneof data {
 		Hello hello = 11;  // Refer to [Request.Hello](#blickfeld.protocol.Request.Hello)
 		Developer developer = 13;  // Refer to [Request.Developer](#blickfeld.protocol.Request.Developer)
@@ -105,6 +117,8 @@ message Request {
 		RunSelfTest run_self_test = 20;  // Refer to [Request.RunSelfTest](#blickfeld.protocol.Request.RunSelfTest)
 		SetAdvancedConfig set_advanced_config = 21; // <blockquote>Introduced in BSL v2.11 and firmware v1.11</blockquote> Refer to [Request.SetAdvancedConfig](#blickfeld.protocol.Request.SetAdvancedConfig)
 		GetAdvancedConfig get_advanced_config = 22; // <blockquote>Introduced in BSL v2.11 and firmware v1.11</blockquote> Refer to [Request.GetAdvancedConfig](#blickfeld.protocol.Request.GetAdvancedConfig)
+		stream.Subscribe unsubscribe = 23; // <blockquote>Introduced in BSL v2.13 and firmware v1.13</blockquote> Unsubscribe a stream started with a [Subscribe](#blickfeld.protocol.stream.Subscribe) request.
+		AttemptErrorRecovery attempt_error_recovery = 24; // <blockquote>Introduced in BSL v2.13 and firmware v1.13</blockquote> Refer to [Request.AttemptErrorRecovery](#blickfeld.protocol.Request.AttemptErrorRecovery)
 
 		string _asJSON = 100; // Internal use only
 	}
@@ -146,20 +160,20 @@ message Response {
 	 * It returns a scan pattern, the unset fields are filled with default values.
 	 */
 	message FillScanPattern {
-		option (help) = "..";
+		reserved "legacy_config";
+		reserved 1;
 
-		optional config.ScanPattern config = 2 [(legacy_field_id) = 1];  // Refer to [ScanPattern](#blickfeld.protocol.config.ScanPattern)
-
-		optional config.ScanPattern legacy_config = 1 [(optional) = true];  // Deprecated
+		optional config.ScanPattern config = 2;  // Refer to [ScanPattern](#blickfeld.protocol.config.ScanPattern)
 	}
 
 	/**
 	 * This response is returned after a request to get the current [ScanPattern](#blickfeld.protocol.config.ScanPattern).
 	 */
 	message GetScanPattern {
-		optional config.ScanPattern config = 2 [(legacy_field_id) = 1];  // Refer to [ScanPattern](#blickfeld.protocol.config.ScanPattern)
+		reserved "legacy_config";
+		reserved 1;
 
-		optional config.ScanPattern legacy_config = 1 [(optional) = true]; // Deprecated
+		optional config.ScanPattern config = 2;  // Refer to [ScanPattern](#blickfeld.protocol.config.ScanPattern)
 	}
 
 	/**
@@ -191,6 +205,14 @@ message Response {
 		optional config.Advanced config = 1;  // Refer to [Advanced](#blickfeld.protocol.config.Advanced)
 	}
 
+	/**
+	 * > Introduced in BSL v2.13 and firmware v1.13
+	 *
+	 * This response is sent out after sending AttemptErrorRecovery.
+	 */
+	message AttemptErrorRecovery {
+	}
+
 	oneof data {
 		Error error = 10;  // Refer to [Error](#blickfeld.protocol.Error)
 		Hello hello = 11;  // Refer to [Response.Hello](#blickfeld.protocol.Response.Hello)
@@ -203,6 +225,7 @@ message Response {
 		RunSelfTest run_self_test = 20; // Refer to [Response.RunSelfTest](#blickfeld.protocol.Response.RunSelfTest)
 		SetAdvancedConfig set_advanced_config = 21; // <blockquote>Introduced in BSL v2.11 and firmware v1.11</blockquote> Refer to [Response.SetAdvanced](#blickfeld.protocol.Response.SetAdvancedConfig)
 		GetAdvancedConfig get_advanced_config = 22; // <blockquote>Introduced in BSL v2.11 and firmware v1.11</blockquote> Refer to [Response.GetAdvanced](#blickfeld.protocol.Response.GetAdvancedConfig)
+		AttemptErrorRecovery attempt_error_recovery = 24; // <blockquote>Introduced in BSL v2.13 and firmware v1.13</blockquote> Refer to [Response.AttemptErrorRecovery](#blickfeld.protocol.Response.AttemptErrorRecovery)
 
 		string _asJSON = 100; // Internal use only
 	}

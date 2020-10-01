@@ -45,7 +45,7 @@ def configure_point_cloud_stream(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()  # Command line argument parser
-    parser.add_argument("--target", "-t", help="hostname or IP of scanner to connect to")  # host name or IP address of the device
+    parser.add_argument("target", help="hostname or IP of scanner to connect to")  # host name or IP address of the device
 
     args = parser.parse_args()  # Parse command line arguments
     configure_point_cloud_stream(args)  # Start example

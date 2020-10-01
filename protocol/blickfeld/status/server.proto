@@ -1,0 +1,32 @@
+syntax = "proto2";
+
+import "blickfeld/options.proto";
+import "blickfeld/stream/connection.proto";
+
+package blickfeld.protocol.status;
+
+/**
+ * This section defines the status of the network server.
+ */
+message Server {
+	message NetworkStats {
+		message Channel {
+			optional uint64 total_byte_count = 1 [ default = 0 ];
+			optional float bytes_per_second = 2 [ (optional)=true ];
+			optional float maximum_bytes_per_second = 3 [ (optional)=true ];
+		}
+
+		optional Channel sent = 1;
+		optional Channel received = 2;
+		optional uint64 dropped_messages = 3 [ default = 0];
+	}
+
+	message Client {
+		repeated stream.Subscribe subscriptions = 1;
+		optional NetworkStats network_stats = 2;
+		optional string identifier = 3;
+	}
+
+	repeated Client clients = 1;
+	optional NetworkStats network_stats = 2;
+}

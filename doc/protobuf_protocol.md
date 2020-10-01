@@ -21,6 +21,7 @@ The data, such as a point cloud, are also packed in protobuf messages.
 
 - [blickfeld/connection.proto](#blickfeld/connection.proto)
     - [Request](#blickfeld.protocol.Request)
+    - [Request.AttemptErrorRecovery](#blickfeld.protocol.Request.AttemptErrorRecovery)
     - [Request.Developer](#blickfeld.protocol.Request.Developer)
     - [Request.FillScanPattern](#blickfeld.protocol.Request.FillScanPattern)
     - [Request.GetAdvancedConfig](#blickfeld.protocol.Request.GetAdvancedConfig)
@@ -31,6 +32,7 @@ The data, such as a point cloud, are also packed in protobuf messages.
     - [Request.SetScanPattern](#blickfeld.protocol.Request.SetScanPattern)
     - [Request.Status](#blickfeld.protocol.Request.Status)
     - [Response](#blickfeld.protocol.Response)
+    - [Response.AttemptErrorRecovery](#blickfeld.protocol.Response.AttemptErrorRecovery)
     - [Response.Developer](#blickfeld.protocol.Response.Developer)
     - [Response.FillScanPattern](#blickfeld.protocol.Response.FillScanPattern)
     - [Response.GetAdvancedConfig](#blickfeld.protocol.Response.GetAdvancedConfig)
@@ -96,6 +98,7 @@ The data, such as a point cloud, are also packed in protobuf messages.
     - [Advanced](#blickfeld.protocol.config.Advanced)
     - [Advanced.Detector](#blickfeld.protocol.config.Advanced.Detector)
     - [Advanced.Processing](#blickfeld.protocol.config.Advanced.Processing)
+    - [Advanced.Server](#blickfeld.protocol.config.Advanced.Server)
   
   
   
@@ -202,6 +205,16 @@ The data, such as a point cloud, are also packed in protobuf messages.
   
   
 
+- [blickfeld/status/server.proto](#blickfeld/status/server.proto)
+    - [Server](#blickfeld.protocol.status.Server)
+    - [Server.Client](#blickfeld.protocol.status.Server.Client)
+    - [Server.NetworkStats](#blickfeld.protocol.status.Server.NetworkStats)
+    - [Server.NetworkStats.Channel](#blickfeld.protocol.status.Server.NetworkStats.Channel)
+  
+  
+  
+  
+
 - [blickfeld/status/temperature.proto](#blickfeld/status/temperature.proto)
     - [Temperature](#blickfeld.protocol.status.Temperature)
   
@@ -211,12 +224,20 @@ The data, such as a point cloud, are also packed in protobuf messages.
   
 
 - [blickfeld/stream/connection.proto](#blickfeld/stream/connection.proto)
-    - [Event](#blickfeld.protocol.stream.Event)
-    - [Event.Developer](#blickfeld.protocol.stream.Event.Developer)
     - [Subscribe](#blickfeld.protocol.stream.Subscribe)
     - [Subscribe.Developer](#blickfeld.protocol.stream.Subscribe.Developer)
     - [Subscribe.PointCloud](#blickfeld.protocol.stream.Subscribe.PointCloud)
+    - [Subscribe.RawFile](#blickfeld.protocol.stream.Subscribe.RawFile)
     - [Subscribe.Status](#blickfeld.protocol.stream.Subscribe.Status)
+  
+  
+  
+  
+
+- [blickfeld/stream/event.proto](#blickfeld/stream/event.proto)
+    - [Event](#blickfeld.protocol.stream.Event)
+    - [Event.Developer](#blickfeld.protocol.stream.Event.Developer)
+    - [Event.EndOfStream](#blickfeld.protocol.stream.Event.EndOfStream)
   
   
   
@@ -318,8 +339,23 @@ A request is always answered with a response. For every response, there is a req
 | run_self_test | [Request.RunSelfTest](#blickfeld.protocol.Request.RunSelfTest) | optional | Refer to [Request.RunSelfTest](#blickfeld.protocol.Request.RunSelfTest) |
 | set_advanced_config | [Request.SetAdvancedConfig](#blickfeld.protocol.Request.SetAdvancedConfig) | optional | <blockquote>Introduced in BSL v2.11 and firmware v1.11</blockquote> Refer to [Request.SetAdvancedConfig](#blickfeld.protocol.Request.SetAdvancedConfig) |
 | get_advanced_config | [Request.GetAdvancedConfig](#blickfeld.protocol.Request.GetAdvancedConfig) | optional | <blockquote>Introduced in BSL v2.11 and firmware v1.11</blockquote> Refer to [Request.GetAdvancedConfig](#blickfeld.protocol.Request.GetAdvancedConfig) |
+| unsubscribe | [stream.Subscribe](#blickfeld.protocol.stream.Subscribe) | optional | <blockquote>Introduced in BSL v2.13 and firmware v1.13</blockquote> Unsubscribe a stream started with a [Subscribe](#blickfeld.protocol.stream.Subscribe) request. |
+| attempt_error_recovery | [Request.AttemptErrorRecovery](#blickfeld.protocol.Request.AttemptErrorRecovery) | optional | <blockquote>Introduced in BSL v2.13 and firmware v1.13</blockquote> Refer to [Request.AttemptErrorRecovery](#blickfeld.protocol.Request.AttemptErrorRecovery) |
 | _asJSON | [string](#string) | optional | Internal use only |
 | accept_format | [Format](#blickfeld.protocol.Format) | optional | Internal use only Default: PROTOBUF |
+
+
+
+
+
+
+<a name="blickfeld.protocol.Request.AttemptErrorRecovery"></a>
+
+### Request.AttemptErrorRecovery
+> Introduced in BSL v2.13 and firmware v1.13
+
+This request can be used to attempt a re-initialization of the device if it is errored.
+A self test is automatically triggered after a successful re-initialization.
 
 
 
@@ -347,7 +383,6 @@ The filled scan pattern can then be set as input for  [Request.SetScanPattern](#
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | config | [config.ScanPattern](#blickfeld.protocol.config.ScanPattern) | optional | Refer to [ScanPattern](#blickfeld.protocol.config.ScanPattern) |
-| legacy_config | [config.ScanPattern](#blickfeld.protocol.config.ScanPattern) | optional | Deprecated |
 
 
 
@@ -433,7 +468,6 @@ This request is used for configuring a Scan Pattern.
 | ----- | ---- | ----- | ----------- |
 | config | [config.ScanPattern](#blickfeld.protocol.config.ScanPattern) | optional | Refer to [ScanPattern](#blickfeld.protocol.config.ScanPattern) |
 | persist | [bool](#bool) | optional | Persists the scan pattern and sets it after a power cycle. Default: False Default: false |
-| legacy_config | [config.ScanPattern](#blickfeld.protocol.config.ScanPattern) | optional | Deprecated old 'config' due to horizontal field of view definition |
 
 
 
@@ -472,7 +506,20 @@ Each response has the same name as the request.
 | run_self_test | [Response.RunSelfTest](#blickfeld.protocol.Response.RunSelfTest) | optional | Refer to [Response.RunSelfTest](#blickfeld.protocol.Response.RunSelfTest) |
 | set_advanced_config | [Response.SetAdvancedConfig](#blickfeld.protocol.Response.SetAdvancedConfig) | optional | <blockquote>Introduced in BSL v2.11 and firmware v1.11</blockquote> Refer to [Response.SetAdvanced](#blickfeld.protocol.Response.SetAdvancedConfig) |
 | get_advanced_config | [Response.GetAdvancedConfig](#blickfeld.protocol.Response.GetAdvancedConfig) | optional | <blockquote>Introduced in BSL v2.11 and firmware v1.11</blockquote> Refer to [Response.GetAdvanced](#blickfeld.protocol.Response.GetAdvancedConfig) |
+| attempt_error_recovery | [Response.AttemptErrorRecovery](#blickfeld.protocol.Response.AttemptErrorRecovery) | optional | <blockquote>Introduced in BSL v2.13 and firmware v1.13</blockquote> Refer to [Response.AttemptErrorRecovery](#blickfeld.protocol.Response.AttemptErrorRecovery) |
 | _asJSON | [string](#string) | optional | Internal use only |
+
+
+
+
+
+
+<a name="blickfeld.protocol.Response.AttemptErrorRecovery"></a>
+
+### Response.AttemptErrorRecovery
+> Introduced in BSL v2.13 and firmware v1.13
+
+This response is sent out after sending AttemptErrorRecovery.
 
 
 
@@ -499,7 +546,6 @@ It returns a scan pattern, the unset fields are filled with default values.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | config | [config.ScanPattern](#blickfeld.protocol.config.ScanPattern) | optional | Refer to [ScanPattern](#blickfeld.protocol.config.ScanPattern) |
-| legacy_config | [config.ScanPattern](#blickfeld.protocol.config.ScanPattern) | optional | Deprecated |
 
 
 
@@ -532,7 +578,6 @@ This response is returned after a request to get the current [ScanPattern](#blic
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | config | [config.ScanPattern](#blickfeld.protocol.config.ScanPattern) | optional | Refer to [ScanPattern](#blickfeld.protocol.config.ScanPattern) |
-| legacy_config | [config.ScanPattern](#blickfeld.protocol.config.ScanPattern) | optional | Deprecated |
 
 
 
@@ -944,6 +989,7 @@ The current set of parameters is preliminary, additional parameters may be added
 | ----- | ---- | ----- | ----------- |
 | detector | [Advanced.Detector](#blickfeld.protocol.config.Advanced.Detector) | optional | Refer to [Detector](#blickfeld.protocol.config.Advanced.Detector) |
 | processing | [Advanced.Processing](#blickfeld.protocol.config.Advanced.Processing) | optional | <blockquote>Introduced in BSL v2.12 and firmware v1.12</blockquote> Refer to [Processing](#blickfeld.protocol.config.Advanced.Processing) |
+| server | [Advanced.Server](#blickfeld.protocol.config.Advanced.Server) | optional | <blockquote>Introduced in BSL v2.13 and firmware v1.13</blockquote> Refer to [Server](#blickfeld.protocol.config.Advanced.Server) |
 
 
 
@@ -976,6 +1022,23 @@ Processing parameters are set at the factory after calibration. Changing these v
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | range_offset | [float](#float) | optional | in [m] Default: 0 |
+
+
+
+
+
+
+<a name="blickfeld.protocol.config.Advanced.Server"></a>
+
+### Advanced.Server
+> Introduced in BSL v2.13 and firmware v1.13
+
+Parameters, which control the server behavior.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| default_point_cloud_subscription | [blickfeld.protocol.stream.Subscribe.PointCloud](#blickfeld.protocol.stream.Subscribe.PointCloud) | optional | Overwrite default point cloud subscription. Can still be overridden with client requests. |
 
 
 
@@ -1705,6 +1768,7 @@ This section contains the status messages of the two deflection mirrors and the 
 | ----- | ---- | ----- | ----------- |
 | scanner | [status.Scanner](#blickfeld.protocol.status.Scanner) | optional | Refer to [Scanner](#blickfeld.protocol.status.scanner.Scanner) |
 | temperatures | [status.Temperature](#blickfeld.protocol.status.Temperature) | repeated | Refer to [Temperature](#blickfeld.protocol.status.temperature.Temperature) |
+| server | [status.Server](#blickfeld.protocol.status.Server) | optional | Refer to [Client](#blickfeld.protocol.status.server.Server) |
 
 
 
@@ -1738,7 +1802,6 @@ This section defines the status of the device.
 | state | [Scanner.State](#blickfeld.protocol.status.Scanner.State) | optional | Refer to [Scanner.State](#blickfeld.protocol.status.Scanner.State) |
 | scan_pattern | [blickfeld.protocol.config.ScanPattern](#blickfeld.protocol.config.ScanPattern) | optional | Refer to [ScanPattern](#blickfeld.protocol.config.ScanPattern) |
 | error | [blickfeld.protocol.Error](#blickfeld.protocol.Error) | optional | Refer to [Error](#blickfeld.protocol.Error) |
-| legacy_scan_pattern | [blickfeld.protocol.config.ScanPattern](#blickfeld.protocol.config.ScanPattern) | optional | Deprecated old ´scan_pattern´ definition |
 
 
 
@@ -1762,6 +1825,89 @@ This section defines the status of the device.
 | ERRORED | 6 | Device is in an error state; it can no longer operate. |
 | SELF_TESTING | 7 | Device is testing the hardware. |
 
+
+ <!-- end enums -->
+
+ <!-- end HasExtensions -->
+
+ <!-- end services -->
+
+
+
+<a name="blickfeld/status/server.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## blickfeld/status/server.proto
+
+
+
+<a name="blickfeld.protocol.status.Server"></a>
+
+### Server
+This section defines the status of the network server.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| clients | [Server.Client](#blickfeld.protocol.status.Server.Client) | repeated |  |
+| network_stats | [Server.NetworkStats](#blickfeld.protocol.status.Server.NetworkStats) | optional |  |
+
+
+
+
+
+
+<a name="blickfeld.protocol.status.Server.Client"></a>
+
+### Server.Client
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| subscriptions | [blickfeld.protocol.stream.Subscribe](#blickfeld.protocol.stream.Subscribe) | repeated |  |
+| network_stats | [Server.NetworkStats](#blickfeld.protocol.status.Server.NetworkStats) | optional |  |
+| identifier | [string](#string) | optional |  |
+
+
+
+
+
+
+<a name="blickfeld.protocol.status.Server.NetworkStats"></a>
+
+### Server.NetworkStats
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| sent | [Server.NetworkStats.Channel](#blickfeld.protocol.status.Server.NetworkStats.Channel) | optional |  |
+| received | [Server.NetworkStats.Channel](#blickfeld.protocol.status.Server.NetworkStats.Channel) | optional |  |
+| dropped_messages | [uint64](#uint64) | optional |  Default: 0 |
+
+
+
+
+
+
+<a name="blickfeld.protocol.status.Server.NetworkStats.Channel"></a>
+
+### Server.NetworkStats.Channel
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| total_byte_count | [uint64](#uint64) | optional |  Default: 0 |
+| bytes_per_second | [float](#float) | optional |  |
+| maximum_bytes_per_second | [float](#float) | optional |  |
+
+
+
+
+
+ <!-- end messages -->
 
  <!-- end enums -->
 
@@ -1829,33 +1975,6 @@ This section describes the hardware modules in the device.
 
 
 
-<a name="blickfeld.protocol.stream.Event"></a>
-
-### Event
-This section describes the events of streams.
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| point_cloud | [blickfeld.protocol.data.PointCloud](#blickfeld.protocol.data.PointCloud) | optional | Refer to [PointCloud](#blickfeld.protocol.data.PointCloud) |
-| status | [blickfeld.protocol.Status](#blickfeld.protocol.Status) | optional | Refer to [Status](#blickfeld.protocol.status.Status) |
-| developer | [Event.Developer](#blickfeld.protocol.stream.Event.Developer) | optional | Refer to [Event.Developer](#blickfeld.protocol.stream.Event.Developer) |
-
-
-
-
-
-
-<a name="blickfeld.protocol.stream.Event.Developer"></a>
-
-### Event.Developer
-Internal use only
-
-
-
-
-
-
 <a name="blickfeld.protocol.stream.Subscribe"></a>
 
 ### Subscribe
@@ -1868,6 +1987,7 @@ A stream regularly provides data or status updates for the user. The events will
 | point_cloud | [Subscribe.PointCloud](#blickfeld.protocol.stream.Subscribe.PointCloud) | optional | Refer to [Subscribe.PointCloud](#blickfeld.protocol.stream.Subscribe.PointCloud) |
 | status | [Subscribe.Status](#blickfeld.protocol.stream.Subscribe.Status) | optional | Refer to [Subscribe.Status](#blickfeld.protocol.stream.Subscribe.Status) |
 | developer | [Subscribe.Developer](#blickfeld.protocol.stream.Subscribe.Developer) | optional | Refer to [Subscribe.Developer](#blickfeld.protocol.stream.Subscribe.Developer) |
+| raw_file | [Subscribe.RawFile](#blickfeld.protocol.stream.Subscribe.RawFile) | optional | Refer to [Subscribe.RawFile](#blickfeld.protocol.stream.Subscribe.RawFile) |
 
 
 
@@ -1900,10 +2020,94 @@ This request is used for subscribing to a point cloud stream.
 
 
 
+<a name="blickfeld.protocol.stream.Subscribe.RawFile"></a>
+
+### Subscribe.RawFile
+> Introduced in BSL v2.13 and firmware v1.13
+
+This request is used for subscribing to a raw file stream.
+The requested stream is directly packed in the Blickfeld data format and only raw bytes are sent to the client, which it should write sequentially in a file.
+An [Unsubscribe](#blickfeld.protocol.stream.Unsubscribe) request with the same request data must be sent to properly end the file stream.
+The request raw file stream is ended with an [EndOfStream](#blickfeld.protocol.stream.Event.EndOfStream) event.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| point_cloud | [Subscribe.PointCloud](#blickfeld.protocol.stream.Subscribe.PointCloud) | optional | Subscribe to a raw point cloud stream. Refer to [Subscribe.PointCloud](#blickfeld.protocol.stream.Subscribe.PointCloud). |
+
+
+
+
+
+
 <a name="blickfeld.protocol.stream.Subscribe.Status"></a>
 
 ### Subscribe.Status
 This request is used for subscribing to a status stream.
+
+
+
+
+
+ <!-- end messages -->
+
+ <!-- end enums -->
+
+ <!-- end HasExtensions -->
+
+ <!-- end services -->
+
+
+
+<a name="blickfeld/stream/event.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## blickfeld/stream/event.proto
+
+
+
+<a name="blickfeld.protocol.stream.Event"></a>
+
+### Event
+This section describes the events of streams.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| point_cloud | [blickfeld.protocol.data.PointCloud](#blickfeld.protocol.data.PointCloud) | optional | Refer to [PointCloud](#blickfeld.protocol.data.PointCloud) |
+| status | [blickfeld.protocol.Status](#blickfeld.protocol.Status) | optional | Refer to [Status](#blickfeld.protocol.status.Status) |
+| developer | [Event.Developer](#blickfeld.protocol.stream.Event.Developer) | optional | Refer to [Event.Developer](#blickfeld.protocol.stream.Event.Developer) |
+| raw_file | [bytes](#bytes) | optional | <blockquote>Introduced in BSL v2.13 and firmware v1.13</blockquote> Raw bytes, which should be written sequentially in a file. Refer to [RawFile](#blickfeld.protocol.stream.Subscribe.RawFile). |
+| end_of_stream | [Event.EndOfStream](#blickfeld.protocol.stream.Event.EndOfStream) | optional | <blockquote>Introduced in BSL v2.13 and firmware v1.13</blockquote> Refer to [EndOfStream](#blickfeld.protocol.stream.Event.EndOfStream) |
+
+
+
+
+
+
+<a name="blickfeld.protocol.stream.Event.Developer"></a>
+
+### Event.Developer
+Internal use only
+
+
+
+
+
+
+<a name="blickfeld.protocol.stream.Event.EndOfStream"></a>
+
+### Event.EndOfStream
+> Introduced in BSL v2.13 and firmware v1.13
+
+Event to indicate the end of stream.
+This is called after an [Unsubscribe](#blickfeld.protocol.stream.Unsubscribe) request.
+No further events will arrive for the subscribed stream after this event.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| subscription | [Subscribe](#blickfeld.protocol.stream.Subscribe) | optional | Ended subscription. Refer to [Subscribe](#blickfeld.protocol.stream.Subscribe). |
 
 
 

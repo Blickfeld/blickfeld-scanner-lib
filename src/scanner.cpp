@@ -14,6 +14,7 @@
 #include "blickfeld/protocol_exception.h"
 
 #include "scanner_connection.h"
+#include "point_cloud_record.h"
 
 #include <string>
 #include <chrono>
@@ -77,12 +78,6 @@ scanner::point_cloud_stream<frame_t>::point_cloud_stream(std::shared_ptr<connect
 		req.mutable_subscribe()->mutable_point_cloud()->mutable_reference_frame()->CopyFrom(*reference_frame);
 	conn->send_request(req, resp);
 	metadata->mutable_header()->mutable_device()->CopyFrom(resp.event().point_cloud().header());
-
-	// Write client header
-	auto client_header = metadata->mutable_header()->mutable_client();
-	client_header->set_library_version(BSL_VERSION);
-	client_header->set_file_time_ns(std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now().time_since_epoch()).count());
-	client_header->set_language(protocol::file::Client::CPP);
 }
 
 #ifdef BSL_RECORDING
@@ -158,45 +153,23 @@ scanner::point_cloud_stream<frame_t>::~point_cloud_stream() {
 #ifdef BSL_RECORDING
 	if (stream_data)
 		delete stream_data;
-	if (pb_icstream)
-		delete pb_icstream;
-	if (pb_izstream)
-		delete pb_izstream;
-	if (pb_istream)
-		delete pb_istream;
+	if (record)
+		delete record;
 #endif
 }
 
 template<class frame_t>
 const frame_t& scanner::point_cloud_stream<frame_t>::recv_frame() {
 	if (conn) {
-		// Previous frame
-		auto frame_prev = (static_cast<protocol::Response&>(*resp)).event().point_cloud().frame();
-
 		// Receive and extract frame
 		conn->recv(*resp);
 		auto frame_i = (static_cast<protocol::Response&>(*resp)).event().point_cloud().frame();
 
 #ifdef BSL_RECORDING
-		// Record frame to stream
-		if (pb_ocstream) {
-			auto data = protocol::file::PointCloud_Data();
+		if (record) {
+			protocol::file::PointCloud_Data data;
 			data.mutable_frame()->CopyFrom(frame_i);
-			pb_ocstream->WriteVarint32(static_cast<unsigned int>(data.ByteSizeLong()));
-			data.SerializeWithCachedSizes(pb_ocstream);
-
-			// Add events for changed scan pattern to footer
-			if (!google::protobuf::util::MessageDifferencer::ApproximatelyEquals(frame_prev.scan_pattern(), frame_i.scan_pattern())) {
-				auto event = metadata->mutable_footer()->add_events();
-				event->set_from_frame_id(frame_i.id());
-				event->mutable_scan_pattern()->CopyFrom(frame_i.scan_pattern());
-			}
-
-			// Update stats in footer
-			auto mut_counter = metadata->mutable_footer()->mutable_stats()->mutable_counter();
-			mut_counter->set_frames(mut_counter->frames() + 1);
-			mut_counter->set_points(mut_counter->points() + frame_i.total_number_of_points());
-			mut_counter->set_returns(mut_counter->returns() + frame_i.total_number_of_returns());
+			record->record_data(&data);
 		}
 #endif
 
@@ -226,35 +199,20 @@ void scanner::point_cloud_stream<frame_t>::subscribe(subscribe_callback_t cb) {
 #ifdef BSL_RECORDING
 
 template<class frame_t>
-void scanner::point_cloud_stream<frame_t>::record_to_stream(std::ostream* ostream) {
-	if (pb_ocstream) {
-		delete pb_ocstream;
-		delete pb_ozstream;
-		delete pb_ostream;
-		this->ostream->flush();
-	}
+void scanner::point_cloud_stream<frame_t>::record_to_stream(std::ostream* ostream, int compression_level) {
+	stop_recording();
 
 	this->ostream = ostream;
-	pb_ostream = new google::protobuf::io::OstreamOutputStream(ostream);
-	pb_ozstream = new google::protobuf::io::GzipOutputStream(pb_ostream);
-	pb_ocstream = new google::protobuf::io::CodedOutputStream(pb_ozstream);
-
-	pb_ocstream->WriteVarint32(metadata->header().ByteSizeLong());
-	metadata->header().SerializeWithCachedSizes(pb_ocstream);
+	record = new point_cloud_record(ostream, compression_level);
+	record->start(metadata->header().device());
 }
 
 template<class frame_t>
 void scanner::point_cloud_stream<frame_t>::stop_recording() {
-	if (pb_ocstream) {
-		auto data = protocol::file::PointCloud_Data();
-		data.mutable_footer()->CopyFrom(metadata->footer());
-		pb_ocstream->WriteVarint32(static_cast<unsigned int>(data.ByteSizeLong()));
-		data.SerializeWithCachedSizes(pb_ocstream);
-
-		delete pb_ocstream;
-		delete pb_ozstream;
-		delete pb_ostream;
-		ostream->flush();
+	if (record) {
+		delete record;
+		record = nullptr;
+		this->ostream->flush();;
 		metadata->mutable_footer()->Clear();
 	}
 }
@@ -461,6 +419,13 @@ std::shared_ptr<scanner::point_cloud_stream<protocol::data::frame_t> > scanner::
 }
 
 #endif
+
+void scanner::attempt_error_recovery() {
+	protocol::Request req;
+	protocol::Response resp;
+	req.mutable_attempt_error_recovery();
+	conn->send_request(req, resp);
+}
 
 #ifndef BSL_STANDALONE
 

@@ -10,7 +10,7 @@ with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
 
 setuptools.setup(
     name="blickfeld_scanner",
-    version="${CONDA_RELEASE_VERSION}",
+    version="${BF_BSL_PYTHON_VERSION}",
     author="Blickfeld GmbH",
     author_email="opensource@blickfeld.com",
     description="Python package to communicate with LiDAR devices of the Blickfeld GmbH.",
