@@ -12,6 +12,7 @@ message Generate
 		DEFAULT = 0;
 		PROTO_HASH = 1;
 		MATLAB_BUS = 2;
+		CSTRUCT = 3;
 	}
 
 	repeated Targets targets = 1; // Internal generate targets

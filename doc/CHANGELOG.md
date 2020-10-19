@@ -13,6 +13,15 @@ influence the resulting point cloud.
 
 ### Removed
 
+## [2.14.0] - 2020.10.19
+
+### Added
+* [Introduced in firmware v1.14] API request to fetch constraints for allowed scan pattern configurations. This improves the Web GUI and results in improved validation error messages.
+
+### Changed
+* Python: Fixed point cloud stream close to first call stop and unsubscribe
+* Python: Fixed bug when stopping a raw stream and deleting it afterwards, it would call stop again
+
 ## [2.13.0] - 2020.09.25
 
 ### Added

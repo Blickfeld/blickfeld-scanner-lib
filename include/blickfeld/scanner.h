@@ -267,7 +267,7 @@ public:
 #endif
 
 	/**
-	 * > Introduced in BSL v2.13 and firmware v1.3
+	 * > Introduced in BSL v2.13 and firmware v1.13
 	 *
 	 * Can be used to attempt a re-initialization of the device if it is errored.
 	 * A self test is automatically triggered after a successful re-initialization.

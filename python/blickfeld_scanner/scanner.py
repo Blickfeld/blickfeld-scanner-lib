@@ -212,6 +212,21 @@ class scanner(object):
         req.get_scan_pattern.SetInParent()
         return self._connection.send_request(req).get_scan_pattern.config
     
+    def get_scan_pattern_constraints(self):
+        """This request returns a list of constraints which are applied on scan patterns.
+        
+        > Introduced in BSL v2.14 and firmware v1.14
+        
+        The constraints define the constant and dynamic relationships between field values.
+        The constraints are equal for a device type and firmware, but might vary for firmware releases and device variants.
+        It is mainly used to visualize the constraints in the scan pattern configuration of the web gui.
+
+        :return: List of active constraints, see :any:`protobuf_protocol` common
+        """
+        req = connection_pb2.Request()
+        req.get_scan_pattern_constraints.SetInParent()
+        return self._connection.send_request(req).get_scan_pattern_constraints.constraints
+    
     def set_advanced_config(self, config, persist = False):
         """ Function to set advanced config, see: :any:`protobuf_protocol`.
         Expert parameters: It is not recommended to adapt this calibrated configuration without understanding the influences on the resulting point cloud quality.

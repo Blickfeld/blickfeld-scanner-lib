@@ -3,6 +3,7 @@ option cc_enable_arenas = true;
 
 import "blickfeld/options.proto";
 import "blickfeld/error.proto";
+import "blickfeld/common.proto";
 import "blickfeld/config/advanced.proto";
 import "blickfeld/config/scan_pattern.proto";
 import "blickfeld/config/secure.proto";
@@ -106,6 +107,17 @@ message Request {
 	message AttemptErrorRecovery {
 	}
 
+	/**
+	 * > Introduced in BSL v2.14 and firmware v1.14
+	 *
+	 * This request returns a list of constraints which are applied on scan patterns.
+	 * The constraints define the constant and dynamic relationships between field values.
+	 * The constraints are equal for a device type and firmware, but might vary for firmware releases and device variants.
+	 * It is mainly used to visualize the constraints in the scan pattern configuration of the web gui.
+	 */
+	message GetScanPatternConstraints {
+	}
+
 	oneof data {
 		Hello hello = 11;  // Refer to [Request.Hello](#blickfeld.protocol.Request.Hello)
 		Developer developer = 13;  // Refer to [Request.Developer](#blickfeld.protocol.Request.Developer)
@@ -119,6 +131,7 @@ message Request {
 		GetAdvancedConfig get_advanced_config = 22; // <blockquote>Introduced in BSL v2.11 and firmware v1.11</blockquote> Refer to [Request.GetAdvancedConfig](#blickfeld.protocol.Request.GetAdvancedConfig)
 		stream.Subscribe unsubscribe = 23; // <blockquote>Introduced in BSL v2.13 and firmware v1.13</blockquote> Unsubscribe a stream started with a [Subscribe](#blickfeld.protocol.stream.Subscribe) request.
 		AttemptErrorRecovery attempt_error_recovery = 24; // <blockquote>Introduced in BSL v2.13 and firmware v1.13</blockquote> Refer to [Request.AttemptErrorRecovery](#blickfeld.protocol.Request.AttemptErrorRecovery)
+		GetScanPatternConstraints get_scan_pattern_constraints = 25; // <blockquote>Introduced in BSL v2.14 and firmware v1.14</blockquote> Refer to [Request.GetScanPatternConstraints](#blickfeld.protocol.Request.GetScanPatternConstraints)
 
 		string _asJSON = 100; // Internal use only
 	}
@@ -213,6 +226,15 @@ message Response {
 	message AttemptErrorRecovery {
 	}
 
+	/**
+	 * > Introduced in BSL v2.14 and firmware v1.14
+	 *
+	 * This response is sent out after sending GetScanPatternConstraints.
+	 */
+	message GetScanPatternConstraints {
+		repeated Constraint constraints = 1; // List of constraints which apply for scan patterns.
+	}
+
 	oneof data {
 		Error error = 10;  // Refer to [Error](#blickfeld.protocol.Error)
 		Hello hello = 11;  // Refer to [Response.Hello](#blickfeld.protocol.Response.Hello)
@@ -226,6 +248,7 @@ message Response {
 		SetAdvancedConfig set_advanced_config = 21; // <blockquote>Introduced in BSL v2.11 and firmware v1.11</blockquote> Refer to [Response.SetAdvanced](#blickfeld.protocol.Response.SetAdvancedConfig)
 		GetAdvancedConfig get_advanced_config = 22; // <blockquote>Introduced in BSL v2.11 and firmware v1.11</blockquote> Refer to [Response.GetAdvanced](#blickfeld.protocol.Response.GetAdvancedConfig)
 		AttemptErrorRecovery attempt_error_recovery = 24; // <blockquote>Introduced in BSL v2.13 and firmware v1.13</blockquote> Refer to [Response.AttemptErrorRecovery](#blickfeld.protocol.Response.AttemptErrorRecovery)
+		GetScanPatternConstraints get_scan_pattern_constraints = 25; // <blockquote>Introduced in BSL v2.14 and firmware v1.14</blockquote> Refer to [Response.GetScanPatternConstraints](#blickfeld.protocol.Response.GetScanPatternConstraints)
 
 		string _asJSON = 100; // Internal use only
 	}

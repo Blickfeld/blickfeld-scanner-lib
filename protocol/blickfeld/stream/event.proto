@@ -34,7 +34,7 @@ message Event {
 	oneof data {
 		option (optional_one_of) = true;
 		data.PointCloud point_cloud = 11;  // Refer to [PointCloud](#blickfeld.protocol.data.PointCloud)
-		Status status = 12;  // Refer to [Status](#blickfeld.protocol.status.Status)
+		blickfeld.protocol.Status status = 12;  // Refer to [Status](#blickfeld.protocol.Status)
 		Developer developer = 13;  // Refer to [Event.Developer](#blickfeld.protocol.stream.Event.Developer)
 		bytes raw_file = 14;  // <blockquote>Introduced in BSL v2.13 and firmware v1.13</blockquote> Raw bytes, which should be written sequentially in a file. Refer to [RawFile](#blickfeld.protocol.stream.Subscribe.RawFile).
 		EndOfStream end_of_stream = 15;  // <blockquote>Introduced in BSL v2.13 and firmware v1.13</blockquote> Refer to [EndOfStream](#blickfeld.protocol.stream.Event.EndOfStream)

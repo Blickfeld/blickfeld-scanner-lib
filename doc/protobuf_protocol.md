@@ -12,6 +12,11 @@ The data, such as a point cloud, are also packed in protobuf messages.
 ## Table of Contents
 
 - [blickfeld/common.proto](#blickfeld/common.proto)
+    - [Constraint](#blickfeld.protocol.Constraint)
+    - [Constraint.Constant](#blickfeld.protocol.Constraint.Constant)
+    - [Constraint.Polynomial](#blickfeld.protocol.Constraint.Polynomial)
+    - [Field](#blickfeld.protocol.Field)
+    - [Field.Identifier](#blickfeld.protocol.Field.Identifier)
     - [OptionalValueRange](#blickfeld.protocol.OptionalValueRange)
     - [ValueRange](#blickfeld.protocol.ValueRange)
   
@@ -26,6 +31,7 @@ The data, such as a point cloud, are also packed in protobuf messages.
     - [Request.FillScanPattern](#blickfeld.protocol.Request.FillScanPattern)
     - [Request.GetAdvancedConfig](#blickfeld.protocol.Request.GetAdvancedConfig)
     - [Request.GetScanPattern](#blickfeld.protocol.Request.GetScanPattern)
+    - [Request.GetScanPatternConstraints](#blickfeld.protocol.Request.GetScanPatternConstraints)
     - [Request.Hello](#blickfeld.protocol.Request.Hello)
     - [Request.RunSelfTest](#blickfeld.protocol.Request.RunSelfTest)
     - [Request.SetAdvancedConfig](#blickfeld.protocol.Request.SetAdvancedConfig)
@@ -37,6 +43,7 @@ The data, such as a point cloud, are also packed in protobuf messages.
     - [Response.FillScanPattern](#blickfeld.protocol.Response.FillScanPattern)
     - [Response.GetAdvancedConfig](#blickfeld.protocol.Response.GetAdvancedConfig)
     - [Response.GetScanPattern](#blickfeld.protocol.Response.GetScanPattern)
+    - [Response.GetScanPatternConstraints](#blickfeld.protocol.Response.GetScanPatternConstraints)
     - [Response.Hello](#blickfeld.protocol.Response.Hello)
     - [Response.RunSelfTest](#blickfeld.protocol.Response.RunSelfTest)
     - [Response.SetAdvancedConfig](#blickfeld.protocol.Response.SetAdvancedConfig)
@@ -75,6 +82,10 @@ The data, such as a point cloud, are also packed in protobuf messages.
 - [blickfeld/options.proto](#blickfeld/options.proto)
   
   
+    - [File-level Extensions](#blickfeld/options.proto-extensions)
+    - [File-level Extensions](#blickfeld/options.proto-extensions)
+    - [File-level Extensions](#blickfeld/options.proto-extensions)
+    - [File-level Extensions](#blickfeld/options.proto-extensions)
     - [File-level Extensions](#blickfeld/options.proto-extensions)
     - [File-level Extensions](#blickfeld/options.proto-extensions)
     - [File-level Extensions](#blickfeld/options.proto-extensions)
@@ -272,6 +283,96 @@ The data, such as a point cloud, are also packed in protobuf messages.
 
 
 
+<a name="blickfeld.protocol.Constraint"></a>
+
+### Constraint
+> Introduced in BSL v2.14 and firmware v1.14
+
+Describes a constraint for a single target field
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| target | [Field](#blickfeld.protocol.Field) | optional | Link to target field on which the contraint is applied |
+| reason | [string](#string) | optional | Human-readable reason for the constraint and its failure |
+| constant | [Constraint.Constant](#blickfeld.protocol.Constraint.Constant) | optional |  |
+| polynomial | [Constraint.Polynomial](#blickfeld.protocol.Constraint.Polynomial) | optional |  |
+
+
+
+
+
+
+<a name="blickfeld.protocol.Constraint.Constant"></a>
+
+### Constraint.Constant
+Constant constraint which is used to apply min and/or max ranges
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| minimum | [float](#float) | optional | Target value must be equals or higher than the specified minimum |
+| maximum | [float](#float) | optional | Target value must be equals or smaller than the specified maximum |
+
+
+
+
+
+
+<a name="blickfeld.protocol.Constraint.Polynomial"></a>
+
+### Constraint.Polynomial
+Polynomial constraint which describe a value relationship to another field
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| reference | [Field](#blickfeld.protocol.Field) | optional | Link to reference field. The value of the reference field is used as x input for the polynomial. |
+| minimum | [float](#float) | repeated | Target value must be equals or higher than the specified minimum, which is described by the specified repeated coefficients: c0 + x * c1 + x^2 * c2 .. |
+| maximum | [float](#float) | repeated | Target value must be equals or smaller than the specified maximum, which is described by the specified repeated coefficients: c0 + x * c1 + x^2 * c2 .. |
+
+
+
+
+
+
+<a name="blickfeld.protocol.Field"></a>
+
+### Field
+> Introduced in BSL v2.14 and firmware v1.14
+
+Describes a protobuf field inside a (nested) message to efficiently use reflection on all supported platforms
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| identifiers | [Field.Identifier](#blickfeld.protocol.Field.Identifier) | repeated | Path to field in relation to given top level message. |
+| scale | [float](#float) | optional | Numerical scale which is applied on a field value before using it for validation. This is required to prevent floating point precision issues due to rounding, which could fail a validation.
+
+Validation example: Field value is stored as radian but is shown to the user as degree. Without scaling and rounding, a possible degree format could be rejected as it exceeded the maximum value of the radian respresentation after down-scaling. |
+
+
+
+
+
+
+<a name="blickfeld.protocol.Field.Identifier"></a>
+
+### Field.Identifier
+Describes unique identifier of (sub) field
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| id | [uint32](#uint32) | optional | Protobuf number of field |
+| key | [string](#string) | optional | Protobuf key of field |
+| camelcase_key | [string](#string) | optional | Protobuf camelcase key of field |
+
+
+
+
+
+
 <a name="blickfeld.protocol.OptionalValueRange"></a>
 
 ### OptionalValueRange
@@ -341,6 +442,7 @@ A request is always answered with a response. For every response, there is a req
 | get_advanced_config | [Request.GetAdvancedConfig](#blickfeld.protocol.Request.GetAdvancedConfig) | optional | <blockquote>Introduced in BSL v2.11 and firmware v1.11</blockquote> Refer to [Request.GetAdvancedConfig](#blickfeld.protocol.Request.GetAdvancedConfig) |
 | unsubscribe | [stream.Subscribe](#blickfeld.protocol.stream.Subscribe) | optional | <blockquote>Introduced in BSL v2.13 and firmware v1.13</blockquote> Unsubscribe a stream started with a [Subscribe](#blickfeld.protocol.stream.Subscribe) request. |
 | attempt_error_recovery | [Request.AttemptErrorRecovery](#blickfeld.protocol.Request.AttemptErrorRecovery) | optional | <blockquote>Introduced in BSL v2.13 and firmware v1.13</blockquote> Refer to [Request.AttemptErrorRecovery](#blickfeld.protocol.Request.AttemptErrorRecovery) |
+| get_scan_pattern_constraints | [Request.GetScanPatternConstraints](#blickfeld.protocol.Request.GetScanPatternConstraints) | optional | <blockquote>Introduced in BSL v2.14 and firmware v1.14</blockquote> Refer to [Request.GetScanPatternConstraints](#blickfeld.protocol.Request.GetScanPatternConstraints) |
 | _asJSON | [string](#string) | optional | Internal use only |
 | accept_format | [Format](#blickfeld.protocol.Format) | optional | Internal use only Default: PROTOBUF |
 
@@ -405,6 +507,21 @@ This request is used to retrieve the currently set [Advanced](#blickfeld.protoco
 
 ### Request.GetScanPattern
 This request is used to retrieve the currently set [ScanPattern](#blickfeld.protocol.config.ScanPattern).
+
+
+
+
+
+
+<a name="blickfeld.protocol.Request.GetScanPatternConstraints"></a>
+
+### Request.GetScanPatternConstraints
+> Introduced in BSL v2.14 and firmware v1.14
+
+This request returns a list of constraints which are applied on scan patterns.
+The constraints define the constant and dynamic relationships between field values.
+The constraints are equal for a device type and firmware, but might vary for firmware releases and device variants.
+It is mainly used to visualize the constraints in the scan pattern configuration of the web gui.
 
 
 
@@ -507,6 +624,7 @@ Each response has the same name as the request.
 | set_advanced_config | [Response.SetAdvancedConfig](#blickfeld.protocol.Response.SetAdvancedConfig) | optional | <blockquote>Introduced in BSL v2.11 and firmware v1.11</blockquote> Refer to [Response.SetAdvanced](#blickfeld.protocol.Response.SetAdvancedConfig) |
 | get_advanced_config | [Response.GetAdvancedConfig](#blickfeld.protocol.Response.GetAdvancedConfig) | optional | <blockquote>Introduced in BSL v2.11 and firmware v1.11</blockquote> Refer to [Response.GetAdvanced](#blickfeld.protocol.Response.GetAdvancedConfig) |
 | attempt_error_recovery | [Response.AttemptErrorRecovery](#blickfeld.protocol.Response.AttemptErrorRecovery) | optional | <blockquote>Introduced in BSL v2.13 and firmware v1.13</blockquote> Refer to [Response.AttemptErrorRecovery](#blickfeld.protocol.Response.AttemptErrorRecovery) |
+| get_scan_pattern_constraints | [Response.GetScanPatternConstraints](#blickfeld.protocol.Response.GetScanPatternConstraints) | optional | <blockquote>Introduced in BSL v2.14 and firmware v1.14</blockquote> Refer to [Response.GetScanPatternConstraints](#blickfeld.protocol.Response.GetScanPatternConstraints) |
 | _asJSON | [string](#string) | optional | Internal use only |
 
 
@@ -578,6 +696,23 @@ This response is returned after a request to get the current [ScanPattern](#blic
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | config | [config.ScanPattern](#blickfeld.protocol.config.ScanPattern) | optional | Refer to [ScanPattern](#blickfeld.protocol.config.ScanPattern) |
+
+
+
+
+
+
+<a name="blickfeld.protocol.Response.GetScanPatternConstraints"></a>
+
+### Response.GetScanPatternConstraints
+> Introduced in BSL v2.14 and firmware v1.14
+
+This response is sent out after sending GetScanPatternConstraints.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| constraints | [Constraint](#blickfeld.protocol.Constraint) | repeated | List of constraints which apply for scan patterns. |
 
 
 
@@ -739,6 +874,7 @@ Validation of the sent request failed, please send a request with-in a valid ran
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | validation_error | [string](#string) | optional | Validation error string |
+| constraints | [Constraint](#blickfeld.protocol.Constraint) | repeated | <blockquote>Introduced in BSL v2.14 and firmware v1.14</blockquote> Contains list of failed constraints. The `validation_error` field contains a human-readable output of the constraint validation. |
 
 
 
@@ -956,6 +1092,10 @@ Change the operation mode and try again if no one else is using it.
 | min_length | sint32 | .google.protobuf.FieldOptions | 50008 |  Default: `0` |
 | optional | bool | .google.protobuf.FieldOptions | 50006 |  Default: `false` |
 | regex | string | .google.protobuf.FieldOptions | 50005 |  Default: `.*` |
+| ui_decimal_places | uint32 | .google.protobuf.FieldOptions | 50014 |  Default: `0` |
+| ui_scale | double | .google.protobuf.FieldOptions | 50013 | Scaling of field value in user interfaces (UIs). Example: rad-to-degree conversions. Default: `1` |
+| ui_unit | string | .google.protobuf.FieldOptions | 50012 | Unit of field value in user interfaces (UIs). |
+| unit | string | .google.protobuf.FieldOptions | 50011 | Unit of field value |
 | e_desc | string | .google.protobuf.MessageOptions | 60000 | Error description Default: `No additional error description available.` |
 | generate | config.Generate | .google.protobuf.MessageOptions | 60003 |  |
 | help | string | .google.protobuf.MessageOptions | 60001 | Help description |
@@ -1088,6 +1228,7 @@ Internal use only
 | DEFAULT | 0 |  |
 | PROTO_HASH | 1 |  |
 | MATLAB_BUS | 2 |  |
+| CSTRUCT | 3 |  |
 
 
  <!-- end enums -->
@@ -1122,6 +1263,7 @@ For a more detailed explanation, see: [Scan Pattern documentation](Scan_Pattern)
 | pulse | [ScanPattern.Pulse](#blickfeld.protocol.config.ScanPattern.Pulse) | optional | Refer to [ScanPattern.Pulse](#blickfeld.protocol.config.ScanPattern.Pulse) |
 | frame_rate | [ScanPattern.FrameRate](#blickfeld.protocol.config.ScanPattern.FrameRate) | optional | Refer to [ScanPattern.FrameRate](#blickfeld.protocol.config.ScanPattern.FrameRate) |
 | filter | [ScanPattern.Filter](#blickfeld.protocol.config.ScanPattern.Filter) | optional | <blockquote>Introduced in BSL v2.11 and firmware v1.11</blockquote> Refer to [Filter](#blickfeld.protocol.config.ScanPattern.Filter) |
+| constraints | [blickfeld.protocol.Constraint](#blickfeld.protocol.Constraint) | repeated |  |
 
 
 
@@ -2075,7 +2217,7 @@ This section describes the events of streams.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | point_cloud | [blickfeld.protocol.data.PointCloud](#blickfeld.protocol.data.PointCloud) | optional | Refer to [PointCloud](#blickfeld.protocol.data.PointCloud) |
-| status | [blickfeld.protocol.Status](#blickfeld.protocol.Status) | optional | Refer to [Status](#blickfeld.protocol.status.Status) |
+| status | [blickfeld.protocol.Status](#blickfeld.protocol.Status) | optional | Refer to [Status](#blickfeld.protocol.Status) |
 | developer | [Event.Developer](#blickfeld.protocol.stream.Event.Developer) | optional | Refer to [Event.Developer](#blickfeld.protocol.stream.Event.Developer) |
 | raw_file | [bytes](#bytes) | optional | <blockquote>Introduced in BSL v2.13 and firmware v1.13</blockquote> Raw bytes, which should be written sequentially in a file. Refer to [RawFile](#blickfeld.protocol.stream.Subscribe.RawFile). |
 | end_of_stream | [Event.EndOfStream](#blickfeld.protocol.stream.Event.EndOfStream) | optional | <blockquote>Introduced in BSL v2.13 and firmware v1.13</blockquote> Refer to [EndOfStream](#blickfeld.protocol.stream.Event.EndOfStream) |

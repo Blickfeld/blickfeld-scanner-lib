@@ -13,3 +13,59 @@ message OptionalValueRange {
 	optional float minimum = 1 [(optional)=true];
 	optional float maximum = 2 [(optional)=true];
 }
+
+/**
+ * > Introduced in BSL v2.14 and firmware v1.14
+ *
+ * Describes a protobuf field inside a (nested) message to efficiently use reflection on all supported platforms
+ */
+message Field {
+	// Describes unique identifier of (sub) field
+	message Identifier {
+		optional uint32 id = 1; // Protobuf number of field
+		optional string key = 2; // Protobuf key of field
+		optional string camelcase_key = 3; // Protobuf camelcase key of field
+	}
+
+	// Path to field in relation to given top level message.
+	repeated Identifier identifiers = 1;
+
+	// Numerical scale which is applied on a field value before using it for validation.
+	// This is required to prevent floating point precision issues due to rounding, which could fail a validation.
+	//
+	// Validation example:
+	// Field value is stored as radian but is shown to the user as degree.
+	// Without scaling and rounding, a possible degree format could be rejected as it exceeded the maximum value of the radian respresentation after down-scaling.
+	optional float scale = 2;
+}
+
+/**
+ * > Introduced in BSL v2.14 and firmware v1.14
+ *
+ * Describes a constraint for a single target field
+ */
+message Constraint {
+	// Constant constraint which is used to apply min and/or max ranges
+	message Constant {
+		optional float minimum = 1 [ (optional)=true ]; // Target value must be equals or higher than the specified minimum
+		optional float maximum = 2 [ (optional)=true ]; // Target value must be equals or smaller than the specified maximum
+	}
+
+	// Polynomial constraint which describe a value relationship to another field
+	message Polynomial {
+		optional Field reference = 1; // Link to reference field. The value of the reference field is used as x input for the polynomial.
+		repeated float minimum = 2; // Target value must be equals or higher than the specified minimum, which is described by the specified repeated coefficients: c0 + x * c1 + x^2 * c2 ..
+		repeated float maximum = 3; // Target value must be equals or smaller than the specified maximum, which is described by the specified repeated coefficients: c0 + x * c1 + x^2 * c2 ..
+	}
+
+	// Link to target field on which the contraint is applied
+	optional Field target = 1;
+
+	// Human-readable reason for the constraint and its failure
+	optional string reason = 2;
+
+	oneof type {
+		Constant constant = 10;
+		Polynomial polynomial = 11;
+	}
+}

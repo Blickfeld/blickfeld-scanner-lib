@@ -1,6 +1,7 @@
 syntax = "proto2";
 
 import "blickfeld/options.proto";
+import "blickfeld/common.proto";
 
 package blickfeld.protocol;
 
@@ -42,7 +43,8 @@ message Error {
 	message InvalidRequest {
 		option (e_desc) = "The sent request did not pass the validation: {validation_error:%s}";
 
-		optional string validation_error = 1;  // Validation error string
+		optional string validation_error = 1; // Validation error string
+		repeated Constraint constraints = 2; // <blockquote>Introduced in BSL v2.14 and firmware v1.14</blockquote> Contains list of failed constraints. The `validation_error` field contains a human-readable output of the constraint validation.
 	}
 
 	/**

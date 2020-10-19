@@ -200,7 +200,7 @@ class point_cloud(object):
     def close(self):
         """ Close point cloud stream and connection. Always call this function before deleting a point_cloud_stream object.
         """
-        self.stop_recording()
+        self.stop()
 
         if self._connection:
             self._connection.close()
@@ -335,7 +335,7 @@ class point_cloud(object):
             self._ofile = None
 
     def stop(self):
-        """ Stop and unsubscribe of the stream
+        """ Stop and unsubscribe of the stream, this isn't needed for a file stream.
         """
         self.stop_recording()
         
@@ -343,5 +343,3 @@ class point_cloud(object):
             req = connection_pb2.Request()
             req.unsubscribe.point_cloud.SetInParent()
             self._connection.send(req)
-        else:
-            raise NotImplementedError("File stream not supported.")
