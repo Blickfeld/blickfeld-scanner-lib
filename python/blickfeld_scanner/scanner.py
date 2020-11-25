@@ -90,9 +90,9 @@ class scanner(object):
         This returns a status stream, which only delivers updates when the device has changed.
         Do not use this in a synchronous blocking call. Use the `get_status` method instead.
 
-        :returns: :py:class:`blickfeld_scanner.scanner.status_stream` object
+        :returns: :py:class:`blickfeld_scanner.scanner.stream.status` object
         """
-        return status_stream(self.create_connection())
+        return stream.status(self.create_connection())
 
     def get_point_cloud_stream(self, filter=None, reference_frame=None, point_filter=None):
         """ Request point cloud stream of device
@@ -516,33 +516,3 @@ class connection(object):
         """
         if hasattr(self, "socket"):
             self.socket.close()
-
-
-
-class status_stream(object):
-    """Class to request a status stream
-
-    :param connection: connection to the device
-    :type connection: :py:class:`blickfeld_scanner.scanner.connection`
-    """
-    def __init__(self, connection):
-        self._connection = connection
-
-        req = connection_pb2.Request()
-        req.subscribe.status.SetInParent()
-        ret = self._connection.send_request(req)
-
-    def __del__(self):
-        self.close()
-
-    def close(self):
-        """ Close stream and connection
-        """
-        self._connection.close()
-
-    def recv_status(self):
-        """ Receive status update
-
-        :return: Status messages of the device, see: :any:`protobuf_protocol`
-        """
-        return self._connection.recv().event.status

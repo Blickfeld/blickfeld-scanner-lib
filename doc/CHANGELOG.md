@@ -13,6 +13,18 @@ influence the resulting point cloud.
 
 ### Removed
 
+## [2.14.2] - 2020.11.25
+
+### Changed
+* Python: Raise minimum required Protobuf version due to incompability with currently specified version
+
+## [2.14.1] - 2020.11.09
+
+### Changed
+* Python: Moved status stream to stream folder.
+* Python: Unified stop and close in the different streams. Please now use stop in all the streams.
+* [Introduced in firmware v1.15] Replaced linear filter with non-linear function. Please re-adjust filter configurations in scan patterns stored on the device.
+
 ## [2.14.0] - 2020.10.19
 
 ### Added

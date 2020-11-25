@@ -1299,6 +1299,14 @@ This can be used to e.g. filter points with low intensity or to enable secondary
 
 This is a preliminary interface to control the noise filter on the device.
 All points, which have a lower intensity than the minimum intensity calculated by this filter will be filtered out.
+
+> Changed in firmware v1.15. Please re-adjust filter configurations in scan patterns.
+
+The internal algorithm implements a non-linear function, which describes the noise level for different ambient light levels.
+The function can be scaled with the gain and shifted with the offset.
+
+> Before firmware v1.15
+
 The formula is: minimum_intensity = offset + gain * point.ambient_light_level,
 where the point.ambient_light_level is the ambient light level of the point the laser shoots at.
 
@@ -1306,7 +1314,7 @@ where the point.ambient_light_level is the ambient light level of the point the 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | offset | [uint32](#uint32) | optional | Can be seen as minimum intensity filter, if there is no ambient light. |
-| gain | [float](#float) | optional | The gain will be multiplied with the ambient light level of the point the laser shoots at. |
+| gain | [float](#float) | optional | The gain scales a non-linear function, which uses the ambient light level of the point the laser shoots at, as an input. |
 
 
 
