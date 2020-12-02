@@ -85,6 +85,7 @@ set(PROTOBUF_SOURCES
 	blickfeld/config/generate.proto
 	blickfeld/config/scan_pattern.proto
 	blickfeld/config/secure.proto
+	blickfeld/config/named_scan_pattern.proto
 	
 	blickfeld/status/main.proto
 	blickfeld/status/scanner.proto

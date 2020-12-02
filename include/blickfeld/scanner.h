@@ -58,6 +58,9 @@ class PointCloud_Data;
 namespace config {
 class ScanPattern_Filter;
 }
+namespace stream {
+class Subscribe_PointCloud;
+}
 }
 
 class connection;
@@ -110,8 +113,9 @@ public:
 		 * @param conn Scanner connection which should be used for stream.
 		 * @param filter Filter points and returns by point attributes during the post-processing on the device.
 		 * @param reference_frame Frame representing the desired data. To request a field, set it to any value (also in submessages). For a repeated field, add at least one element.
+		 * @param extend_subscription Template subscription. Enabled extenstions from this parameter are used to open the stream.
 		 */
-		point_cloud_stream(std::shared_ptr<connection> conn, const protocol::config::ScanPattern_Filter* filter = nullptr, const protocol::data::Frame* reference_frame = nullptr);
+		point_cloud_stream(std::shared_ptr<connection> conn, const protocol::config::ScanPattern_Filter* filter = nullptr, const protocol::data::Frame* reference_frame = nullptr, const protocol::stream::Subscribe_PointCloud* extend_subscription = nullptr);
 #ifdef BSL_RECORDING
 		/**
 		 * Internal use. Use the static methods scanner::file_point_cloud_stream or scanner::simple_file_point_cloud_stream.
@@ -325,6 +329,21 @@ public:
 	 */
 	std::shared_ptr<scanner::point_cloud_stream<protocol::data::Frame> > get_point_cloud_stream(const protocol::config::ScanPattern_Filter filter, const protocol::data::Frame reference_frame);
 
+	/**
+	 * > Introduced in BSL v2.15 and firmware v1.9
+	 *
+	 * Fetches point cloud frames from the device.
+	 * This call already boots up the device.
+	 * It fails if the device is in an errored state.
+	 * Delete the shared reference to stop the stream.
+	 *
+	 * @param filter Filter points and returns by point attributes during the post-processing on the device.
+	 * @param reference_frame Frame representing the desired data. To request a field, set it to any value (also in submessages). For a repeated field, add at least one element.
+	 * @param reference_subscription Template subscription. Enabled extenstions from this parameter are used to open the stream.
+	 * @return Shared pointer of stream instance. Use the recv_frame method to get Point Cloud Frames.
+	 */
+	std::shared_ptr<scanner::point_cloud_stream<protocol::data::Frame> > get_point_cloud_stream(const protocol::config::ScanPattern_Filter filter, const protocol::data::Frame reference_frame, const protocol::stream::Subscribe::PointCloud extend_subscription);
+
 #ifdef BSL_RECORDING
 
 	/**
@@ -354,10 +373,44 @@ public:
 	/// @returns A filled ScanPattern to send via set_scan_pattern(const protocol::config::ScanPattern& config)
 	const protocol::config::ScanPattern fill_scan_pattern(const protocol::config::ScanPattern& config);
 
-	/// Used for setting a ScanPattern
+	/// Set a ScanPattern, by providing a scan pattern
 	///
+	/// @param config ScanPattern to be set by the BSS
+	/// @param persist persist flag. The device will have this scan pattern set after the next reboot
 	/// @warning First fill the ScanPattern with fill_scan_pattern(const protocol::config::ScanPattern& config)
 	void set_scan_pattern(const protocol::config::ScanPattern& config, bool persist = false);
+
+	/// Set a ScanPattern, by providing a name of a named scan pattern, see the protocol definitions of the Named Scan patterns
+	///
+	/// @param name Name of the named scan pattern to be set by the BSS
+	/// @param persist persist flag. The device will have this scan pattern set after the next reboot
+	void set_scan_pattern(const std::string name, bool persist = false);
+
+	/// > Introduced in BSL v2.15 and firmware v1.16
+	///
+	/// Get protobuf list of named scan patterns. There are two types of named scan patterns:
+	/// 1. Default scan patterns, which are not changeable.
+	/// 2. User defined named scan patterns, which are changeable.
+	///
+	/// @returns List of named scan patterns, see protobuf_protocol Response.GetNamedScanPatterns
+	std::list<protocol::config::NamedScanPattern> get_named_scan_patterns();
+
+	/// > Introduced in BSL v2.15 and firmware v1.16
+	///
+	/// Store a named scan patterns.
+	/// The default scan patterns can't be overwritten.
+	///
+	/// @param name: Name of the scan pattern
+	/// @param config: Config of the scan pattern, see protobuf_protocol ScanPattern
+	void store_named_scan_pattern(std::string name, const protocol::config::ScanPattern& config);
+
+	/// > Introduced in BSL v2.15 and firmware v1.16
+	///
+	/// Delete a named scan patterns.
+	/// The default scan patterns can't be deleted.
+	///
+	/// @param name: Name of the scan pattern
+	void delete_named_scan_pattern(std::string name);
 
 	/// Start self test on device
 	const protocol::Response::RunSelfTest run_self_test();

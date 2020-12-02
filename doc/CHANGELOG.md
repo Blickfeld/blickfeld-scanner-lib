@@ -13,6 +13,13 @@ influence the resulting point cloud.
 
 ### Removed
 
+## [2.15.0] - 2020.12.02
+
+### Added
+* CPP: Add support for point cloud streams using extensions
+* [Introduced in firmware v1.16] API: Add custom trigger API, which allows to control external trigger outputs for special product variants
+* [Introduced in firmware v1.16] API: Add named scan pattern API. Multiple patterns can be persisted and are pre-loaded.
+
 ## [2.14.2] - 2020.11.25
 
 ### Changed

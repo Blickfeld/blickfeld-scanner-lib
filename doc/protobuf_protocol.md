@@ -27,9 +27,11 @@ The data, such as a point cloud, are also packed in protobuf messages.
 - [blickfeld/connection.proto](#blickfeld/connection.proto)
     - [Request](#blickfeld.protocol.Request)
     - [Request.AttemptErrorRecovery](#blickfeld.protocol.Request.AttemptErrorRecovery)
+    - [Request.DeleteNamedScanPattern](#blickfeld.protocol.Request.DeleteNamedScanPattern)
     - [Request.Developer](#blickfeld.protocol.Request.Developer)
     - [Request.FillScanPattern](#blickfeld.protocol.Request.FillScanPattern)
     - [Request.GetAdvancedConfig](#blickfeld.protocol.Request.GetAdvancedConfig)
+    - [Request.GetNamedScanPatterns](#blickfeld.protocol.Request.GetNamedScanPatterns)
     - [Request.GetScanPattern](#blickfeld.protocol.Request.GetScanPattern)
     - [Request.GetScanPatternConstraints](#blickfeld.protocol.Request.GetScanPatternConstraints)
     - [Request.Hello](#blickfeld.protocol.Request.Hello)
@@ -37,17 +39,21 @@ The data, such as a point cloud, are also packed in protobuf messages.
     - [Request.SetAdvancedConfig](#blickfeld.protocol.Request.SetAdvancedConfig)
     - [Request.SetScanPattern](#blickfeld.protocol.Request.SetScanPattern)
     - [Request.Status](#blickfeld.protocol.Request.Status)
+    - [Request.StoreNamedScanPattern](#blickfeld.protocol.Request.StoreNamedScanPattern)
     - [Response](#blickfeld.protocol.Response)
     - [Response.AttemptErrorRecovery](#blickfeld.protocol.Response.AttemptErrorRecovery)
+    - [Response.DeleteNamedScanPattern](#blickfeld.protocol.Response.DeleteNamedScanPattern)
     - [Response.Developer](#blickfeld.protocol.Response.Developer)
     - [Response.FillScanPattern](#blickfeld.protocol.Response.FillScanPattern)
     - [Response.GetAdvancedConfig](#blickfeld.protocol.Response.GetAdvancedConfig)
+    - [Response.GetNamedScanPatterns](#blickfeld.protocol.Response.GetNamedScanPatterns)
     - [Response.GetScanPattern](#blickfeld.protocol.Response.GetScanPattern)
     - [Response.GetScanPatternConstraints](#blickfeld.protocol.Response.GetScanPatternConstraints)
     - [Response.Hello](#blickfeld.protocol.Response.Hello)
     - [Response.RunSelfTest](#blickfeld.protocol.Response.RunSelfTest)
     - [Response.SetAdvancedConfig](#blickfeld.protocol.Response.SetAdvancedConfig)
     - [Response.SetScanPattern](#blickfeld.protocol.Response.SetScanPattern)
+    - [Response.StoreNamedScanPattern](#blickfeld.protocol.Response.StoreNamedScanPattern)
   
     - [Format](#blickfeld.protocol.Format)
   
@@ -123,6 +129,13 @@ The data, such as a point cloud, are also packed in protobuf messages.
   
   
 
+- [blickfeld/config/named_scan_pattern.proto](#blickfeld/config/named_scan_pattern.proto)
+    - [NamedScanPattern](#blickfeld.protocol.config.NamedScanPattern)
+  
+  
+  
+  
+
 - [blickfeld/config/scan_pattern.proto](#blickfeld/config/scan_pattern.proto)
     - [ScanPattern](#blickfeld.protocol.config.ScanPattern)
     - [ScanPattern.Filter](#blickfeld.protocol.config.ScanPattern.Filter)
@@ -130,8 +143,15 @@ The data, such as a point cloud, are also packed in protobuf messages.
     - [ScanPattern.FrameRate](#blickfeld.protocol.config.ScanPattern.FrameRate)
     - [ScanPattern.Horizontal](#blickfeld.protocol.config.ScanPattern.Horizontal)
     - [ScanPattern.Pulse](#blickfeld.protocol.config.ScanPattern.Pulse)
+    - [ScanPattern.Pulse.Custom](#blickfeld.protocol.config.ScanPattern.Pulse.Custom)
+    - [ScanPattern.Pulse.Custom.AngleTrigger](#blickfeld.protocol.config.ScanPattern.Pulse.Custom.AngleTrigger)
+    - [ScanPattern.Pulse.Custom.AngleTrigger.Angle](#blickfeld.protocol.config.ScanPattern.Pulse.Custom.AngleTrigger.Angle)
+    - [ScanPattern.Pulse.Custom.Duration](#blickfeld.protocol.config.ScanPattern.Pulse.Custom.Duration)
+    - [ScanPattern.Pulse.Custom.PointTrigger](#blickfeld.protocol.config.ScanPattern.Pulse.Custom.PointTrigger)
+    - [ScanPattern.Pulse.Custom.PointTrigger.Point](#blickfeld.protocol.config.ScanPattern.Pulse.Custom.PointTrigger.Point)
     - [ScanPattern.Vertical](#blickfeld.protocol.config.ScanPattern.Vertical)
   
+    - [ScanPattern.Pulse.Custom.Trigger](#blickfeld.protocol.config.ScanPattern.Pulse.Custom.Trigger)
     - [ScanPattern.Pulse.FrameMode](#blickfeld.protocol.config.ScanPattern.Pulse.FrameMode)
     - [ScanPattern.Pulse.Type](#blickfeld.protocol.config.ScanPattern.Pulse.Type)
   
@@ -443,6 +463,9 @@ A request is always answered with a response. For every response, there is a req
 | unsubscribe | [stream.Subscribe](#blickfeld.protocol.stream.Subscribe) | optional | <blockquote>Introduced in BSL v2.13 and firmware v1.13</blockquote> Unsubscribe a stream started with a [Subscribe](#blickfeld.protocol.stream.Subscribe) request. |
 | attempt_error_recovery | [Request.AttemptErrorRecovery](#blickfeld.protocol.Request.AttemptErrorRecovery) | optional | <blockquote>Introduced in BSL v2.13 and firmware v1.13</blockquote> Refer to [Request.AttemptErrorRecovery](#blickfeld.protocol.Request.AttemptErrorRecovery) |
 | get_scan_pattern_constraints | [Request.GetScanPatternConstraints](#blickfeld.protocol.Request.GetScanPatternConstraints) | optional | <blockquote>Introduced in BSL v2.14 and firmware v1.14</blockquote> Refer to [Request.GetScanPatternConstraints](#blickfeld.protocol.Request.GetScanPatternConstraints) |
+| get_named_scan_patterns | [Request.GetNamedScanPatterns](#blickfeld.protocol.Request.GetNamedScanPatterns) | optional | <blockquote>Introduced in BSL v2.15 and firmware v1.16</blockquote> Refer to [Request.GetNamedScanPatterns](#blickfeld.protocol.Request.GetNamedScanPatterns) |
+| store_named_scan_pattern | [Request.StoreNamedScanPattern](#blickfeld.protocol.Request.StoreNamedScanPattern) | optional | <blockquote>Introduced in BSL v2.15 and firmware v1.16</blockquote> Refer to [Request.StoreNamedScanPattern](#blickfeld.protocol.Request.StoreNamedScanPattern) |
+| delete_named_scan_pattern | [Request.DeleteNamedScanPattern](#blickfeld.protocol.Request.DeleteNamedScanPattern) | optional | <blockquote>Introduced in BSL v2.15 and firmware v1.16</blockquote> Refer to [Request.DeleteNamedScanPattern](#blickfeld.protocol.Request.DeleteNamedScanPattern) |
 | _asJSON | [string](#string) | optional | Internal use only |
 | accept_format | [Format](#blickfeld.protocol.Format) | optional | Internal use only Default: PROTOBUF |
 
@@ -458,6 +481,24 @@ A request is always answered with a response. For every response, there is a req
 
 This request can be used to attempt a re-initialization of the device if it is errored.
 A self test is automatically triggered after a successful re-initialization.
+
+
+
+
+
+
+<a name="blickfeld.protocol.Request.DeleteNamedScanPattern"></a>
+
+### Request.DeleteNamedScanPattern
+> Introduced in BSL v2.15 and firmware v1.16
+
+This request deletes a named scan pattern.
+Default scan patterns can't be deleted.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| name | [string](#string) | optional | Name |
 
 
 
@@ -497,6 +538,18 @@ The filled scan pattern can then be set as input for  [Request.SetScanPattern](#
 > Introduced in BSL v2.11 and firmware v1.11
 
 This request is used to retrieve the currently set [Advanced](#blickfeld.protocol.config.Advanced).
+
+
+
+
+
+
+<a name="blickfeld.protocol.Request.GetNamedScanPatterns"></a>
+
+### Request.GetNamedScanPatterns
+> Introduced in BSL v2.15 and firmware v1.16
+
+This request returns a list of named scan patterns.
 
 
 
@@ -578,12 +631,14 @@ This request is used for configuring the advanced config.
 <a name="blickfeld.protocol.Request.SetScanPattern"></a>
 
 ### Request.SetScanPattern
-This request is used for configuring a Scan Pattern.
+This request is used for setting a Scan Pattern.
+A Scan Pattern can either be set by providing a Scan Pattern configuration or a name of a named Scan Pattern.
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | config | [config.ScanPattern](#blickfeld.protocol.config.ScanPattern) | optional | Refer to [ScanPattern](#blickfeld.protocol.config.ScanPattern) |
+| name | [string](#string) | optional | Set named Scan Pattern, refer to [NamedScanPattern](#blickfeld.protocol.config.NamedScanPattern) |
 | persist | [bool](#bool) | optional | Persists the scan pattern and sets it after a power cycle. Default: False Default: false |
 
 
@@ -595,6 +650,25 @@ This request is used for configuring a Scan Pattern.
 
 ### Request.Status
 This request is used for receiving the current [Status](#blickfeld.protocol.status.Status).
+
+
+
+
+
+
+<a name="blickfeld.protocol.Request.StoreNamedScanPattern"></a>
+
+### Request.StoreNamedScanPattern
+> Introduced in BSL v2.15 and firmware v1.16
+
+This request sets a named scan patterns.
+The name has to be different of the default scan patterns and can only contain letters, numbers, space, underscore and minus.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| name | [string](#string) | optional | Name |
+| config | [config.ScanPattern](#blickfeld.protocol.config.ScanPattern) | optional | Refer to [ScanPattern](#blickfeld.protocol.config.ScanPattern) |
 
 
 
@@ -625,6 +699,9 @@ Each response has the same name as the request.
 | get_advanced_config | [Response.GetAdvancedConfig](#blickfeld.protocol.Response.GetAdvancedConfig) | optional | <blockquote>Introduced in BSL v2.11 and firmware v1.11</blockquote> Refer to [Response.GetAdvanced](#blickfeld.protocol.Response.GetAdvancedConfig) |
 | attempt_error_recovery | [Response.AttemptErrorRecovery](#blickfeld.protocol.Response.AttemptErrorRecovery) | optional | <blockquote>Introduced in BSL v2.13 and firmware v1.13</blockquote> Refer to [Response.AttemptErrorRecovery](#blickfeld.protocol.Response.AttemptErrorRecovery) |
 | get_scan_pattern_constraints | [Response.GetScanPatternConstraints](#blickfeld.protocol.Response.GetScanPatternConstraints) | optional | <blockquote>Introduced in BSL v2.14 and firmware v1.14</blockquote> Refer to [Response.GetScanPatternConstraints](#blickfeld.protocol.Response.GetScanPatternConstraints) |
+| get_named_scan_patterns | [Response.GetNamedScanPatterns](#blickfeld.protocol.Response.GetNamedScanPatterns) | optional | <blockquote>Introduced in BSL v2.15 and firmware v1.16</blockquote> Refer to [Response.GetNamedScanPatterns](#blickfeld.protocol.Response.GetNamedScanPatterns) |
+| store_named_scan_pattern | [Response.StoreNamedScanPattern](#blickfeld.protocol.Response.StoreNamedScanPattern) | optional | <blockquote>Introduced in BSL v2.15 and firmware v1.16</blockquote> Refer to [Response.StoreNamedScanPattern](#blickfeld.protocol.Response.StoreNamedScanPattern) |
+| delete_named_scan_pattern | [Response.DeleteNamedScanPattern](#blickfeld.protocol.Response.DeleteNamedScanPattern) | optional | <blockquote>Introduced in BSL v2.15 and firmware v1.16</blockquote> Refer to [Response.DeleteNamedScanPattern](#blickfeld.protocol.Response.DeleteNamedScanPattern) |
 | _asJSON | [string](#string) | optional | Internal use only |
 
 
@@ -638,6 +715,18 @@ Each response has the same name as the request.
 > Introduced in BSL v2.13 and firmware v1.13
 
 This response is sent out after sending AttemptErrorRecovery.
+
+
+
+
+
+
+<a name="blickfeld.protocol.Response.DeleteNamedScanPattern"></a>
+
+### Response.DeleteNamedScanPattern
+> Introduced in BSL v2.15 and firmware v1.16
+
+This response is sent out after sending DeleteNamedScanPattern.
 
 
 
@@ -681,6 +770,23 @@ This response is returned after a request to get the current [Advanced](#blickfe
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | config | [config.Advanced](#blickfeld.protocol.config.Advanced) | optional | Refer to [Advanced](#blickfeld.protocol.config.Advanced) |
+
+
+
+
+
+
+<a name="blickfeld.protocol.Response.GetNamedScanPatterns"></a>
+
+### Response.GetNamedScanPatterns
+> Introduced in BSL v2.15 and firmware v1.16
+
+This response is sent out after sending GetNamedScanPatterns.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| configs | [config.NamedScanPattern](#blickfeld.protocol.config.NamedScanPattern) | repeated | List of named scan patterns, refer to [NamedScanPattern](#blickfeld.protocol.config.NamedScanPattern) |
 
 
 
@@ -769,6 +875,18 @@ This response is sent out after setting an SetAdvancedConfig.
 
 ### Response.SetScanPattern
 This response is sent out after setting a scan pattern.
+
+
+
+
+
+
+<a name="blickfeld.protocol.Response.StoreNamedScanPattern"></a>
+
+### Response.StoreNamedScanPattern
+> Introduced in BSL v2.15 and firmware v1.16
+
+This response is sent out after sending StoreNamedScanPattern.
 
 
 
@@ -1239,6 +1357,43 @@ Internal use only
 
 
 
+<a name="blickfeld/config/named_scan_pattern.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## blickfeld/config/named_scan_pattern.proto
+
+
+
+<a name="blickfeld.protocol.config.NamedScanPattern"></a>
+
+### NamedScanPattern
+> Introduced in BSL v2.15 and firmware v1.16
+
+Named scan patterns are saved on the device. There are two kinds of named scan patterns:
+1. Default scan patterns: Each device has default scan patterns, these are saved on the device with the firmware. They are not changeable.
+2. Custom scan patterns: Users can save scan patterns on the device for later use. If the scan pattern is saved as a named scan pattern, the time changing to this scan pattern will greatly decrease.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| name | [string](#string) | optional | The name has to be different of the default scan patterns and can only contain letters, numbers, space, underscore and minus. |
+| config | [ScanPattern](#blickfeld.protocol.config.ScanPattern) | optional | Scan pattern config, refer to [ScanPattern](#blickfeld.protocol.config.ScanPattern) |
+| read_only | [bool](#bool) | optional | this is an read_only flag and it will be set if this is a default scan pattern, which can't be changed or deleted. Default: false |
+
+
+
+
+
+ <!-- end messages -->
+
+ <!-- end enums -->
+
+ <!-- end HasExtensions -->
+
+ <!-- end services -->
+
+
+
 <a name="blickfeld/config/scan_pattern.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
@@ -1363,10 +1518,109 @@ This section defines the pattern in which the laser pulses and captures sample p
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| angle_spacing | [float](#float) | optional | Unit: [rad] – this defines the angle within which the horizontal mirror moves between two laser pulses. This parameter therefore defines the horizontal sampling resolution. |
+| angle_spacing | [float](#float) | optional | Unit: [rad] – This defines the angle within which the horizontal mirror moves between two laser pulses. This parameter therefore defines the horizontal sampling resolution. |
 | type | [ScanPattern.Pulse.Type](#blickfeld.protocol.config.ScanPattern.Pulse.Type) | optional | Refer to [ScanPattern.Pulse.Type](#blickfeld.protocol.config.ScanPattern.Pulse.Type) Default: INTERLEAVE |
 | frame_mode | [ScanPattern.Pulse.FrameMode](#blickfeld.protocol.config.ScanPattern.Pulse.FrameMode) | optional | Refer to [ScanPattern.Pulse.FrameMode](#blickfeld.protocol.config.ScanPattern.Pulse.FrameMode) Default: COMBINE_UP_DOWN |
 | distortion_correction | [bool](#bool) | optional | This parameter defines whether the distortion correction is applied when calculating the laser pulse angles. Default: True Default: true |
+| custom | [ScanPattern.Pulse.Custom](#blickfeld.protocol.config.ScanPattern.Pulse.Custom) | optional | <blockquote>Introduced in BSL v2.15 and firmware v1.16</blockquote> Refer to [ScanPattern.Pulse.Custom](#blickfeld.protocol.config.ScanPattern.Pulse.Custom) |
+
+
+
+
+
+
+<a name="blickfeld.protocol.config.ScanPattern.Pulse.Custom"></a>
+
+### ScanPattern.Pulse.Custom
+> Introduced in BSL v2.15 and firmware v1.16
+
+Custom scan pattern configuration. Required for different use cases, as e.g. angle triggers, point triggers, or detector recordings.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| angle_trigger | [ScanPattern.Pulse.Custom.AngleTrigger](#blickfeld.protocol.config.ScanPattern.Pulse.Custom.AngleTrigger) | optional |  |
+| point_trigger | [ScanPattern.Pulse.Custom.PointTrigger](#blickfeld.protocol.config.ScanPattern.Pulse.Custom.PointTrigger) | optional |  |
+| duration | [ScanPattern.Pulse.Custom.Duration](#blickfeld.protocol.config.ScanPattern.Pulse.Custom.Duration) | optional |  |
+
+
+
+
+
+
+<a name="blickfeld.protocol.config.ScanPattern.Pulse.Custom.AngleTrigger"></a>
+
+### ScanPattern.Pulse.Custom.AngleTrigger
+Allows to trigger based on horizontal angles.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| angles | [ScanPattern.Pulse.Custom.AngleTrigger.Angle](#blickfeld.protocol.config.ScanPattern.Pulse.Custom.AngleTrigger.Angle) | repeated | List of angles |
+
+
+
+
+
+
+<a name="blickfeld.protocol.config.ScanPattern.Pulse.Custom.AngleTrigger.Angle"></a>
+
+### ScanPattern.Pulse.Custom.AngleTrigger.Angle
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| horizontal_angle | [float](#float) | optional | in [rad] |
+| scanline_id | [uint64](#uint64) | optional | Define in which scanline the trigger should occur, if none is given, it will trigger in all scanlines |
+| enabled_triggers | [ScanPattern.Pulse.Custom.Trigger](#blickfeld.protocol.config.ScanPattern.Pulse.Custom.Trigger) | repeated |  |
+
+
+
+
+
+
+<a name="blickfeld.protocol.config.ScanPattern.Pulse.Custom.Duration"></a>
+
+### ScanPattern.Pulse.Custom.Duration
+Specify duration for trigger type in seconds.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| external_0 | [float](#float) | optional | in [s] Default: 0.0001 |
+| external_1 | [float](#float) | optional | in [s] Default: 0.0001 |
+
+
+
+
+
+
+<a name="blickfeld.protocol.config.ScanPattern.Pulse.Custom.PointTrigger"></a>
+
+### ScanPattern.Pulse.Custom.PointTrigger
+Set point triggers for the normal equi-distant horizontal scan pattern.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| points | [ScanPattern.Pulse.Custom.PointTrigger.Point](#blickfeld.protocol.config.ScanPattern.Pulse.Custom.PointTrigger.Point) | repeated |  |
+
+
+
+
+
+
+<a name="blickfeld.protocol.config.ScanPattern.Pulse.Custom.PointTrigger.Point"></a>
+
+### ScanPattern.Pulse.Custom.PointTrigger.Point
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| id | [uint64](#uint64) | optional | Define which point ID should be triggered |
+| enabled_triggers | [ScanPattern.Pulse.Custom.Trigger](#blickfeld.protocol.config.ScanPattern.Pulse.Custom.Trigger) | repeated |  |
 
 
 
@@ -1399,6 +1653,20 @@ For a more detailed explanation, see: [Scan Pattern documentation](Scan_Pattern)
 
 
  <!-- end messages -->
+
+
+<a name="blickfeld.protocol.config.ScanPattern.Pulse.Custom.Trigger"></a>
+
+### ScanPattern.Pulse.Custom.Trigger
+List of available device triggers.
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| TRG_EXTERNAL_0 | 1 | External output pin, routed to TEST0 on the debug board. |
+| TRG_EXTERNAL_1 | 2 | External output pin, routed to TEST1 on the debug board. |
+| TRG_DETECTOR | 3 | Internal detector recording, which can retrieved with the detector stream. |
+| TRG_LASER | 4 | Trigger laser. |
+
 
 
 <a name="blickfeld.protocol.config.ScanPattern.Pulse.FrameMode"></a>

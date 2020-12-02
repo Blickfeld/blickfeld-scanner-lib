@@ -1,0 +1,19 @@
+syntax = "proto2";
+
+import "blickfeld/options.proto";
+import "blickfeld/config/scan_pattern.proto";
+
+package blickfeld.protocol.config;
+
+/**
+ * > Introduced in BSL v2.15 and firmware v1.16
+ *
+ * Named scan patterns are saved on the device. There are two kinds of named scan patterns:
+ * 1. Default scan patterns: Each device has default scan patterns, these are saved on the device with the firmware. They are not changeable.
+ * 2. Custom scan patterns: Users can save scan patterns on the device for later use. If the scan pattern is saved as a named scan pattern, the time changing to this scan pattern will greatly decrease.
+ */
+message NamedScanPattern {
+	optional string name = 1 [ (regex) = "[a-zA-Z0-9]([a-zA-Z0-9]|[_ \\-][a-zA-Z0-9])*"];  // The name has to be different of the default scan patterns and can only contain letters, numbers, space, underscore and minus.
+	optional config.ScanPattern config = 2;  // Scan pattern config, refer to [ScanPattern](#blickfeld.protocol.config.ScanPattern)
+	optional bool read_only = 3 [ default=false ]; // this is an read_only flag and it will be set if this is a default scan pattern, which can't be changed or deleted.
+}

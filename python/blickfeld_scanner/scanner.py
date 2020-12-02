@@ -179,17 +179,27 @@ class scanner(object):
         """
         return stream.point_cloud(from_file=dump_filename)
     
-    def set_scan_pattern(self, config, persist = False):
+    def set_scan_pattern(self, config=None, name=None, persist = False):
         """ Function to set a new scan pattern, see: :any:`protobuf_protocol`.
         First call :py:func:`blickfeld_scanner.scanner.scanner.fill_scan_pattern` with the scan pattern you want to set and
         then use that returned scan pattern as a config in this function.
 
+        > Changed in BSL v2.15 and firmware v1.16
+
+        It is now possible to set a named scan pattern. Either a scan pattern config or a name of a named scan pattern can be provided.
+
         :param config: scan pattern to be set
+        :param name: name of named scan pattern to be set
         :param persist: Persist scan pattern on device and reload it after a power-cycle, see: :any:`protobuf_protocol` scan pattern
         :return: response scan pattern, see :any:`protobuf_protocol` Connection, see :any:`protobuf_protocol` Connection
         """
         req = connection_pb2.Request()
-        req.set_scan_pattern.config.MergeFrom(config)
+        if name and config:
+            raise ValueError("Provide either config or named scan pattern name.")
+        if name:
+            req.set_scan_pattern.name = name
+        else:
+            req.set_scan_pattern.config.MergeFrom(config)
         req.set_scan_pattern.persist = persist
         return self._connection.send_request(req).set_scan_pattern
     
@@ -320,6 +330,45 @@ class scanner(object):
         req = connection_pb2.Request()
         req.attempt_error_recovery.SetInParent()
         return self._connection.send_request(req).attempt_error_recovery
+    
+    def get_named_scan_patterns(self):
+        """> Introduced in BSL v2.15 and firmware v1.16
+        
+        Get protobuf list of named scan patterns. There are two types of named scan patterns:
+        1. Default scan patterns, which are not changeable.
+        2. User defined named scan patterns, which are changeable.
+
+        :return: List of named scan patterns, see :any:`protobuf_protocol` Response.GetNamedScanPatterns
+        """
+        req = connection_pb2.Request()
+        req.get_named_scan_patterns.SetInParent()
+        return self._connection.send_request(req).get_named_scan_patterns
+    
+    def store_named_scan_pattern(self, name, config):
+        """> Introduced in BSL v2.15 and firmware v1.16
+        
+        Store a named scan patterns.
+        The default scan patterns can't be overwritten.
+
+        :param name: Name of the scan pattern
+        :param config: Config of the scan pattern, see :any:`protobuf_protocol` ScanPattern
+        """
+        req = connection_pb2.Request()
+        req.store_named_scan_pattern.name = name
+        req.store_named_scan_pattern.config.CopyFrom(config)
+        return self._connection.send_request(req).store_named_scan_pattern
+    
+    def delete_named_scan_pattern(self, name):
+        """> Introduced in BSL v2.15 and firmware v1.16
+
+        Delete a named scan patterns.
+        The default scan patterns can't be deleted.
+
+        :param name: Name of the scan pattern
+        """
+        req = connection_pb2.Request()
+        req.delete_named_scan_pattern.name = name
+        return self._connection.send_request(req).delete_named_scan_pattern
  
     @staticmethod
     def sync(devices, scan_pattern = None, target_frame_rate = None, max_time_difference = 0.1):
