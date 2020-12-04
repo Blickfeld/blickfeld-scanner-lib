@@ -26,7 +26,7 @@ message ScanPattern {
 		 * optical field of view of the horizontal mirror.
 		 * Note: In v2.2* and below, this was defined as a mechanical FoV.
 		 */
-		optional float fov = 1;
+		optional float fov = 1 [(unit) = "rad", (ui_unit) = "deg", (ui_scale) = 57.295779513, (ui_decimal_places) = 2];
 	}
 
 	/**
@@ -49,7 +49,7 @@ message ScanPattern {
 		 * FoV in the center of the frame.
 		 * Due to the eye shape of the scan pattern, the vertical FoV decreases the outer boundaries of the horizontal mirror.
 		 */
-		optional float fov = 1;
+		optional float fov = 1 [(unit) = "rad", (ui_unit) = "deg", (ui_scale) = 57.295779513, (ui_decimal_places) = 2];
 
 		/**
 		 * Configures the number of scan lines required for the up-ramping phase.
@@ -117,15 +117,70 @@ message ScanPattern {
 			SEPARATE = 4;
 		}
 
-		extensions 1; // Deprecated key 'padding'. [ScanPattern.Horizontal.fov](#blickfeld.protocol.config.ScanPattern.Horizontal.fov) now sets the optical horizontal field of view.
+		/*
+		 * > Introduced in BSL v2.15 and firmware v1.16
+		 *
+		 * Custom scan pattern configuration. Required for different use cases, as e.g. angle triggers, point triggers, or detector recordings.
+		 */
+		message Custom {
+			/*
+			 * List of available device triggers.
+			 */
+			enum Trigger {
+				TRG_EXTERNAL_0 = 1; // External output pin, routed to TEST0 on the debug board.
+				TRG_EXTERNAL_1 = 2; // External output pin, routed to TEST1 on the debug board.
+				TRG_DETECTOR = 3; // Internal detector recording, which can retrieved with the detector stream.
+				TRG_LASER = 4; // Trigger laser.
+			}
+
+			/*
+			 * Specify duration for trigger type in seconds.
+			 */
+			message Duration {
+				optional float external_0 = 1 [ default = 0.0001, (d_min) = 8e-9, (d_max) = 0.1 ]; // in [s]
+				optional float external_1 = 2 [ default = 0.0001, (d_min) = 8e-9, (d_max) = 0.1 ]; // in [s]
+			}
+
+			/*
+			 * Allows to trigger based on horizontal angles.
+			 */
+			message AngleTrigger {
+				message Angle {
+					optional float horizontal_angle = 1; // in [rad]
+					optional uint64 scanline_id = 2 [(optional) = true];  // Define in which scanline the trigger should occur, if none is given, it will trigger in all scanlines
+					repeated Trigger enabled_triggers = 3;
+				}
+
+				repeated Angle angles = 1; // List of angles
+			}
+
+			/*
+			 * Set point triggers for the normal equi-distant horizontal scan pattern.
+			 */
+			message PointTrigger {
+				message Point {
+					optional uint64 id = 1;  // Define which point ID should be triggered
+					repeated Trigger enabled_triggers = 2;
+				}
+
+				repeated Point points = 1;
+			}
+
+			oneof custom_type {
+				AngleTrigger angle_trigger = 1;
+				PointTrigger point_trigger = 2;
+			}
+
+			optional Duration duration = 3;
+		}
 
 		/**
 		 * Unit: [rad]
 		 * –
-		 * this defines the angle within which the horizontal mirror moves between two laser pulses.
+		 * This defines the angle within which the horizontal mirror moves between two laser pulses.
 		 * This parameter therefore defines the horizontal sampling resolution.
 		 */
-		optional float angle_spacing = 2;
+		optional float angle_spacing = 2 [(unit) = "rad", (ui_unit) = "deg", (ui_scale) = 57.295779513, (ui_decimal_places) = 2];
 		optional Type type = 3 [default = INTERLEAVE];  // Refer to [ScanPattern.Pulse.Type](#blickfeld.protocol.config.ScanPattern.Pulse.Type)
 		optional FrameMode frame_mode = 4 [default = COMBINE_UP_DOWN];  // Refer to [ScanPattern.Pulse.FrameMode](#blickfeld.protocol.config.ScanPattern.Pulse.FrameMode)
 
@@ -133,6 +188,10 @@ message ScanPattern {
 		 * This parameter defines whether the distortion correction is applied when calculating the laser pulse angles. Default: True
 		 */
 		optional bool distortion_correction = 5 [default = true];
+
+		optional Custom custom = 8 [(optional) = true]; // <blockquote>Introduced in BSL v2.15 and firmware v1.16</blockquote> Refer to [ScanPattern.Pulse.Custom](#blickfeld.protocol.config.ScanPattern.Pulse.Custom)
+
+		extensions 1; // Deprecated key 'padding'. [ScanPattern.Horizontal.fov](#blickfeld.protocol.config.ScanPattern.Horizontal.fov) now sets the optical horizontal field of view.
 		extensions 6, 7; // Developer
 	}
 
@@ -141,14 +200,14 @@ message ScanPattern {
 	 * The feature is described in the [Time synchronization documentation](Sync).
 	 */
 	message FrameRate {
-		optional double target = 1 [(optional) = true]; // Target frame rate during synchronization between several LiDAR devices
-		optional double maximum = 2 [(optional) = true]; // Read-only parameter for maximum achievable frame rate.
+		optional double target = 1 [(unit) = "Hz", (ui_decimal_places) = 2, (optional) = true]; // Target frame rate during synchronization between several LiDAR devices
+		optional double maximum = 2 [(unit) = "Hz", (ui_decimal_places) = 2, (optional) = true]; // Read-only parameter for maximum achievable frame rate.
 
 		/**
 		 * In [s]. Adds a constant value to the Unix reference time, starting from 00:00:00 UTC on January 1, 1970.
 		 * It can be used to compensate delays or to interleave LiDAR devices. Default: 0
 		 */
-		optional double reference_time_offset = 3 [default = 0];
+		optional double reference_time_offset = 3 [(unit) = "s", (ui_unit) = "ms", (ui_decimal_places) = 1, (ui_scale) = 1e-3,  default = 0];
 	}
 
 	/**
@@ -163,12 +222,20 @@ message ScanPattern {
 		 *
 		 * This is a preliminary interface to control the noise filter on the device.
 		 * All points, which have a lower intensity than the minimum intensity calculated by this filter will be filtered out.
+		 *
+		 * > Changed in firmware v1.15. Please re-adjust filter configurations in scan patterns.
+		 *
+		 * The internal algorithm implements a non-linear function, which describes the noise level for different ambient light levels.
+		 * The function can be scaled with the gain and shifted with the offset.
+		 *
+		 * > Before firmware v1.15
+		 *
 		 * The formula is: minimum_intensity = offset + gain * point.ambient_light_level,
 		 * where the point.ambient_light_level is the ambient light level of the point the laser shoots at.
 		 */
 		message Noise {
 			optional uint32 offset = 1 [ (d_min) = 0, (d_max) = 50 ]; // Can be seen as minimum intensity filter, if there is no ambient light.
-			optional float gain = 2 [ (d_min) = 0, (d_max) = 0.5 ]; // The gain will be multiplied with the ambient light level of the point the laser shoots at.
+			optional float gain = 2 [ (d_min) = 0, (d_max) = 0.5 ]; // The gain scales a non-linear function, which uses the ambient light level of the point the laser shoots at, as an input.
 		}
 
 		optional uint32 max_number_of_returns_per_point = 1 [ default = 1, (d_min) = 1, (d_max) = 3 ]; // Set maximum number of returns per point. By default, secondary returns are disabled. Set this, e.g. to 2, to enable secondary returns.
@@ -185,4 +252,5 @@ message ScanPattern {
 	extensions 5; // Developer
 	extensions 6; // Developer
 	optional Filter filter = 7; // <blockquote>Introduced in BSL v2.11 and firmware v1.11</blockquote> Refer to [Filter](#blickfeld.protocol.config.ScanPattern.Filter)
+	repeated Constraint constraints = 8;
 }

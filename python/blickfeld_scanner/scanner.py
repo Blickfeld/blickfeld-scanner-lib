@@ -90,9 +90,9 @@ class scanner(object):
         This returns a status stream, which only delivers updates when the device has changed.
         Do not use this in a synchronous blocking call. Use the `get_status` method instead.
 
-        :returns: :py:class:`blickfeld_scanner.scanner.status_stream` object
+        :returns: :py:class:`blickfeld_scanner.scanner.stream.status` object
         """
-        return status_stream(self.create_connection())
+        return stream.status(self.create_connection())
 
     def get_point_cloud_stream(self, filter=None, reference_frame=None, point_filter=None):
         """ Request point cloud stream of device
@@ -179,17 +179,27 @@ class scanner(object):
         """
         return stream.point_cloud(from_file=dump_filename)
     
-    def set_scan_pattern(self, config, persist = False):
+    def set_scan_pattern(self, config=None, name=None, persist = False):
         """ Function to set a new scan pattern, see: :any:`protobuf_protocol`.
         First call :py:func:`blickfeld_scanner.scanner.scanner.fill_scan_pattern` with the scan pattern you want to set and
         then use that returned scan pattern as a config in this function.
 
+        > Changed in BSL v2.15 and firmware v1.16
+
+        It is now possible to set a named scan pattern. Either a scan pattern config or a name of a named scan pattern can be provided.
+
         :param config: scan pattern to be set
+        :param name: name of named scan pattern to be set
         :param persist: Persist scan pattern on device and reload it after a power-cycle, see: :any:`protobuf_protocol` scan pattern
         :return: response scan pattern, see :any:`protobuf_protocol` Connection, see :any:`protobuf_protocol` Connection
         """
         req = connection_pb2.Request()
-        req.set_scan_pattern.config.MergeFrom(config)
+        if name and config:
+            raise ValueError("Provide either config or named scan pattern name.")
+        if name:
+            req.set_scan_pattern.name = name
+        else:
+            req.set_scan_pattern.config.MergeFrom(config)
         req.set_scan_pattern.persist = persist
         return self._connection.send_request(req).set_scan_pattern
     
@@ -211,6 +221,21 @@ class scanner(object):
         req = connection_pb2.Request()
         req.get_scan_pattern.SetInParent()
         return self._connection.send_request(req).get_scan_pattern.config
+    
+    def get_scan_pattern_constraints(self):
+        """This request returns a list of constraints which are applied on scan patterns.
+        
+        > Introduced in BSL v2.14 and firmware v1.14
+        
+        The constraints define the constant and dynamic relationships between field values.
+        The constraints are equal for a device type and firmware, but might vary for firmware releases and device variants.
+        It is mainly used to visualize the constraints in the scan pattern configuration of the web gui.
+
+        :return: List of active constraints, see :any:`protobuf_protocol` common
+        """
+        req = connection_pb2.Request()
+        req.get_scan_pattern_constraints.SetInParent()
+        return self._connection.send_request(req).get_scan_pattern_constraints.constraints
     
     def set_advanced_config(self, config, persist = False):
         """ Function to set advanced config, see: :any:`protobuf_protocol`.
@@ -305,6 +330,45 @@ class scanner(object):
         req = connection_pb2.Request()
         req.attempt_error_recovery.SetInParent()
         return self._connection.send_request(req).attempt_error_recovery
+    
+    def get_named_scan_patterns(self):
+        """> Introduced in BSL v2.15 and firmware v1.16
+        
+        Get protobuf list of named scan patterns. There are two types of named scan patterns:
+        1. Default scan patterns, which are not changeable.
+        2. User defined named scan patterns, which are changeable.
+
+        :return: List of named scan patterns, see :any:`protobuf_protocol` Response.GetNamedScanPatterns
+        """
+        req = connection_pb2.Request()
+        req.get_named_scan_patterns.SetInParent()
+        return self._connection.send_request(req).get_named_scan_patterns
+    
+    def store_named_scan_pattern(self, name, config):
+        """> Introduced in BSL v2.15 and firmware v1.16
+        
+        Store a named scan patterns.
+        The default scan patterns can't be overwritten.
+
+        :param name: Name of the scan pattern
+        :param config: Config of the scan pattern, see :any:`protobuf_protocol` ScanPattern
+        """
+        req = connection_pb2.Request()
+        req.store_named_scan_pattern.name = name
+        req.store_named_scan_pattern.config.CopyFrom(config)
+        return self._connection.send_request(req).store_named_scan_pattern
+    
+    def delete_named_scan_pattern(self, name):
+        """> Introduced in BSL v2.15 and firmware v1.16
+
+        Delete a named scan patterns.
+        The default scan patterns can't be deleted.
+
+        :param name: Name of the scan pattern
+        """
+        req = connection_pb2.Request()
+        req.delete_named_scan_pattern.name = name
+        return self._connection.send_request(req).delete_named_scan_pattern
  
     @staticmethod
     def sync(devices, scan_pattern = None, target_frame_rate = None, max_time_difference = 0.1):
@@ -501,33 +565,3 @@ class connection(object):
         """
         if hasattr(self, "socket"):
             self.socket.close()
-
-
-
-class status_stream(object):
-    """Class to request a status stream
-
-    :param connection: connection to the device
-    :type connection: :py:class:`blickfeld_scanner.scanner.connection`
-    """
-    def __init__(self, connection):
-        self._connection = connection
-
-        req = connection_pb2.Request()
-        req.subscribe.status.SetInParent()
-        ret = self._connection.send_request(req)
-
-    def __del__(self):
-        self.close()
-
-    def close(self):
-        """ Close stream and connection
-        """
-        self._connection.close()
-
-    def recv_status(self):
-        """ Receive status update
-
-        :return: Status messages of the device, see: :any:`protobuf_protocol`
-        """
-        return self._connection.recv().event.status

@@ -12,7 +12,9 @@ from __future__ import print_function
 __all__ = [
     "point_cloud",
     "raw",
+    "status",
 ]
 
 from .point_cloud import point_cloud
 from .raw import raw
+from .status import status

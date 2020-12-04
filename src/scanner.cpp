@@ -63,7 +63,7 @@ void convert_point_cloud(const protocol::data::Frame& frame_i, protocol::data::F
 }
 
 template<class frame_t>
-scanner::point_cloud_stream<frame_t>::point_cloud_stream(std::shared_ptr<connection> conn, const protocol::config::ScanPattern_Filter* filter, const protocol::data::Frame* reference_frame) :
+scanner::point_cloud_stream<frame_t>::point_cloud_stream(std::shared_ptr<connection> conn, const protocol::config::ScanPattern_Filter* filter, const protocol::data::Frame* reference_frame, const protocol::stream::Subscribe::PointCloud* extend_subscription) :
 	conn(conn),
 	resp(new protocol::Response()),
 	metadata(new protocol::file::PointCloud::Metadata()),
@@ -76,6 +76,8 @@ scanner::point_cloud_stream<frame_t>::point_cloud_stream(std::shared_ptr<connect
 		req.mutable_subscribe()->mutable_point_cloud()->mutable_filter()->CopyFrom(*filter);
 	if (reference_frame)
 		req.mutable_subscribe()->mutable_point_cloud()->mutable_reference_frame()->CopyFrom(*reference_frame);
+	if (extend_subscription)
+		req.mutable_subscribe()->mutable_point_cloud()->MergeFrom(*extend_subscription);
 	conn->send_request(req, resp);
 	metadata->mutable_header()->mutable_device()->CopyFrom(resp.event().point_cloud().header());
 }
@@ -445,6 +447,10 @@ std::shared_ptr<scanner::point_cloud_stream<protocol::data::Frame> > scanner::ge
 	return std::make_shared<point_cloud_stream<protocol::data::Frame> >(create_connection(), &filter, &reference_frame);
 }
 
+std::shared_ptr<scanner::point_cloud_stream<protocol::data::Frame> > scanner::get_point_cloud_stream(const protocol::config::ScanPattern::Filter filter, const protocol::data::Frame reference_frame, const protocol::stream::Subscribe::PointCloud extend_subscription) {
+	return std::make_shared<point_cloud_stream<protocol::data::Frame> >(create_connection(), &filter, &reference_frame, &extend_subscription);
+}
+
 #ifdef BSL_RECORDING
 std::shared_ptr<scanner::point_cloud_stream<protocol::data::Frame> > scanner::file_point_cloud_stream(std::istream* istream) {
 	return std::make_shared<point_cloud_stream<protocol::data::Frame> >(istream);
@@ -489,6 +495,38 @@ void scanner::set_scan_pattern(const protocol::config::ScanPattern& config, bool
 	protocol::Response resp;
 	req.mutable_set_scan_pattern()->mutable_config()->MergeFrom(config);
 	req.mutable_set_scan_pattern()->set_persist(persist);
+	conn->send_request(req, resp);
+}
+
+void scanner::set_scan_pattern(const std::string name, bool persist) {
+	protocol::Request req;
+	protocol::Response resp;
+	req.mutable_set_scan_pattern()->set_name(name);
+	req.mutable_set_scan_pattern()->set_persist(persist);
+	conn->send_request(req, resp);
+}
+
+std::list<protocol::config::NamedScanPattern> scanner::get_named_scan_patterns() {
+	protocol::Request req;
+	protocol::Response resp;
+	req.mutable_get_named_scan_patterns();
+	conn->send_request(req, resp);
+	std::list<protocol::config::NamedScanPattern> ret(resp.get_named_scan_patterns().configs().begin(), resp.get_named_scan_patterns().configs().end());
+	return ret;
+}
+
+void scanner::store_named_scan_pattern(std::string name, const protocol::config::ScanPattern& config) {
+	protocol::Request req;
+	protocol::Response resp;
+	req.mutable_store_named_scan_pattern()->set_name(name);
+	req.mutable_store_named_scan_pattern()->mutable_config()->MergeFrom(config);
+	conn->send_request(req, resp);
+}
+
+void scanner::delete_named_scan_pattern(std::string name) {
+	protocol::Request req;
+	protocol::Response resp;
+	req.mutable_delete_named_scan_pattern()->set_name(name);
 	conn->send_request(req, resp);
 }
 

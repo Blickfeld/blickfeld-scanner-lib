@@ -89,6 +89,9 @@ class raw(object):
 
         :return: all remaining bytes accumalated
         """
+        if self._connection.socket._closed:
+            return b""
+
         req = connection_pb2.Request()
         req.unsubscribe.raw_file.CopyFrom(self._req)
         self._connection.send(req)
@@ -104,5 +107,7 @@ class raw(object):
         if self._ofile:
             self._ofile.close()
             self._ofile = None
+
+        self._connection.close()
 
         return raw_file

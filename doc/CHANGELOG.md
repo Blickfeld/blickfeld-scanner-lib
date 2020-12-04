@@ -13,6 +13,34 @@ influence the resulting point cloud.
 
 ### Removed
 
+## [2.15.0] - 2020.12.02
+
+### Added
+* CPP: Add support for point cloud streams using extensions
+* [Introduced in firmware v1.16] API: Add custom trigger API, which allows to control external trigger outputs for special product variants
+* [Introduced in firmware v1.16] API: Add named scan pattern API. Multiple patterns can be persisted and are pre-loaded.
+
+## [2.14.2] - 2020.11.25
+
+### Changed
+* Python: Raise minimum required Protobuf version due to incompability with currently specified version
+
+## [2.14.1] - 2020.11.09
+
+### Changed
+* Python: Moved status stream to stream folder.
+* Python: Unified stop and close in the different streams. Please now use stop in all the streams.
+* [Introduced in firmware v1.15] Replaced linear filter with non-linear function. Please re-adjust filter configurations in scan patterns stored on the device.
+
+## [2.14.0] - 2020.10.19
+
+### Added
+* [Introduced in firmware v1.14] API request to fetch constraints for allowed scan pattern configurations. This improves the Web GUI and results in improved validation error messages.
+
+### Changed
+* Python: Fixed point cloud stream close to first call stop and unsubscribe
+* Python: Fixed bug when stopping a raw stream and deleting it afterwards, it would call stop again
+
 ## [2.13.0] - 2020.09.25
 
 ### Added

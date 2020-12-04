@@ -27,4 +27,5 @@ The blickfeld_scanner python library is used for connecting to a device (:ref:`p
    python_scanner
    python_discover
    python_point_cloud_stream
+   python_status_stream
    python_raw_stream

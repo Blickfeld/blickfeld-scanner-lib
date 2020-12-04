@@ -187,7 +187,7 @@ class point_cloud(object):
             self._file.seek(offset_data)
 
     def __del__(self):
-        self.close()
+        self.stop()
 
     def __str__(self):
         return "<Blickfeld Point Cloud Stream: %u frames, %u returns, %s>" % (
@@ -199,13 +199,13 @@ class point_cloud(object):
 
     def close(self):
         """ Close point cloud stream and connection. Always call this function before deleting a point_cloud_stream object.
-        """
-        self.stop_recording()
 
-        if self._connection:
-            self._connection.close()
-        else:
-            self._file.close()
+        .. deprecated:: 2.15.0
+            Since BSL v2.15.0 this function is deprecated, please use scanner.stream.point_cloud.point_cloud.stop to stop a stream.
+        """
+        warnings.warn("This function is deprecated, please use scanner.stream.point_cloud.point_cloud.stop to stop a stream.", DeprecationWarning, stacklevel=2)
+
+        self.stop()
 
     def _get_file_block(self):
         buf = self._file.read(4)
@@ -243,7 +243,7 @@ class point_cloud(object):
 
         # If stream is closed with CTRL-C it will still write the footer and save the file
         if terminate:
-            self.close()
+            self.stop()
             raise Exception("Detected SIGINT during recv_frame, point cloud stream closed ungracefully.")
 
         if self._connection:
@@ -335,13 +335,18 @@ class point_cloud(object):
             self._ofile = None
 
     def stop(self):
-        """ Stop and unsubscribe of the stream
+        """Unsubscribe of the point cloud stream and close connection. Always call this function before deleting a point_cloud_stream object.
         """
         self.stop_recording()
-        
+
         if self._connection:
+            if self._connection.socket._closed:
+                return
+
             req = connection_pb2.Request()
             req.unsubscribe.point_cloud.SetInParent()
             self._connection.send(req)
+
+            self._connection.close()
         else:
-            raise NotImplementedError("File stream not supported.")
+            self._file.close()
