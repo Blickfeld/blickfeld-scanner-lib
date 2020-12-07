@@ -51,16 +51,23 @@ for tag in local_repo.tags:
         fetch_artifacts(namedtuple('Args', args.keys())(*args.values()))
         
         # Upload package to PyPI
-        os.system(f"twine upload --username __token__ --password {os.environ['PIP_TOKEN']} build_amd64_python/python/dist/blickfeld_scanner-{release_tag[1:]}.tar.gz")
+        try:
+            os.system(f"twine upload --username __token__ --password {os.environ['PIP_TOKEN']} build_amd64_python/python/dist/blickfeld_scanner-{release_tag[1:]}.tar.gz")
+        except:
+            print(f"Failed to upload python package to PyPI for {release_tag}.", sys.exc_info()[0])
 
-        # Delete existing assets
-        for asset in release.get_assets():
-            asset.delete_asset()
-        
-        # Upload assets
-        release.upload_asset("build/blickfeld-scanner-lib-dev-Linux.deb")
-        release.upload_asset("build/blickfeld-scanner-lib-dev-standalone-Linux.deb")
-        release.upload_asset("build/blickfeld-scanner-lib-dev-testing-Linux.deb")
-        release.upload_asset("build_amd64_python/python/dist/blickfeld_scanner.tar.gz", name="python_blickfeld_scanner.tar.gz")   
+        # Upload artifacts to GitHub
+        try:
+            # Delete existing assets
+            for asset in release.get_assets():
+                asset.delete_asset()
+            
+            # Upload assets
+            release.upload_asset("build/blickfeld-scanner-lib-dev-Linux.deb")
+            release.upload_asset("build/blickfeld-scanner-lib-dev-standalone-Linux.deb")
+            release.upload_asset("build/blickfeld-scanner-lib-dev-testing-Linux.deb")
+            release.upload_asset("build_amd64_python/python/dist/blickfeld_scanner.tar.gz", name="python_blickfeld_scanner.tar.gz")   
+        except:
+            print(f"Failed to upload artifacts to GitHub for {release_tag}.", sys.exc_info()[0])
     except:
-        print(f"Failed to upload artifacts for {release_tag}.", sys.exc_info()[0])
+        print(f"Failed to fetch artifacts for {release_tag}.", sys.exc_info()[0])
