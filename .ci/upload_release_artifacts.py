@@ -1,4 +1,4 @@
-import os
+import sys, os
 import requests
 from collections import namedtuple
 
@@ -19,8 +19,8 @@ for tag in local_repo.tags:
     try:
         release = remote_repo.get_release(release_tag)
         
-        if release.body:
-            print(f"Skipping {release_tag} as release notes are already set")
+        if release.body and len(release.get_assets()) > 0:
+            print(f"Skipping {release_tag} as release notes and artifacts are already set")
             continue
     except:
         print("Create release for", release_tag)
@@ -63,4 +63,4 @@ for tag in local_repo.tags:
         release.upload_asset("build/blickfeld-scanner-lib-dev-testing-Linux.deb")
         release.upload_asset("build_amd64_python/python/dist/blickfeld_scanner.tar.gz", name="python_blickfeld_scanner.tar.gz")   
     except:
-        print(f"Failed to upload artifacts for {release_tag}.")
+        print(f"Failed to upload artifacts for {release_tag}.", sys.exc_info()[0])
