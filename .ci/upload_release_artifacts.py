@@ -19,7 +19,7 @@ for tag in local_repo.tags:
     try:
         release = remote_repo.get_release(release_tag)
         
-        if release.body and len(release.get_assets()) > 0:
+        if release.body and len(list(release.get_assets())) > 0:
             print(f"Skipping {release_tag} as release notes and artifacts are already set")
             continue
     except:
