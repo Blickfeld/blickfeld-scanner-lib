@@ -20,7 +20,9 @@ message Error {
 	 * The firmware on the device is not compatible with the BSL version. Update the device or downgrade the BSL.
 	 */
 	message NotImplemented {
-		option (e_desc) = "The request is not implemented on the server side. Check the versions of the client and firmware software.";
+		option (e_desc) = "The request is not implemented on the server side. Check the versions of the client or firmware software. The changelog might provide more information.\n\tReason: {reason:%s}";
+
+		optional string reason = 1 [ default = "No detailed reason available." ]; // Description why this is not implemented
 	}
 
 	/**
@@ -152,6 +154,15 @@ message Error {
 		optional string unit = 5 [default = ""];          // Unit of the parameter
 	}
 
+	/**
+	 * The action is not supported by the current client or server API. Check the versions of the client and firmware software and read the changelog.
+	 */
+	message NotSupported {
+		option (e_desc) = "The action is not supported by the current client or server API. Check the versions of the client or firmware software and read the changelog.\n\tReason: {reason:%s}";
+
+		optional string reason = 1 [ default = "No detailed reason available." ]; // Description why this is not supported
+	}
+
 	oneof error {
 		Unknown unknown = 1;  // Refer to [Unknown](#blickfeld.protocol.Error.Unknown)
 		NotImplemented not_implemented = 2;  // Refer to [NotImplemented](#blickfeld.protocol.Error.NotImplemented)
@@ -171,6 +182,7 @@ message Error {
 		NotInRange not_in_range = 22;  // Refer to [NotInRange](#blickfeld.protocol.Error.NotInRange)
 		TimeSyncFailed time_sync_failed = 23;  // Refer to [TimeSyncFailed](#blickfeld.protocol.Error.TimeSyncFailed)
 		NoDeviceDiscovered no_device_discovered = 24;  // Refer to [NoDeviceDiscovered](#blickfeld.protocol.Error.NoDeviceDiscovered)
+		NotSupported not_supported = 25; // Refer to [NotSupported](#blickfeld.protocol.Error.NotSupported)
 	}
 
 	reserved 7 to 10, 19, 20;

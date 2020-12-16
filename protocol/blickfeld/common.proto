@@ -14,6 +14,24 @@ message OptionalValueRange {
 	optional float maximum = 2 [(optional)=true];
 }
 
+enum Language {
+	CPP = 1;
+	PYTHON = 2;
+	TYPESCRIPT = 3;
+}
+
+message SoftwareVersion {
+	optional string name = 1; // Tag or reference name of the version. It is not the the name of the software.
+	optional string revision = 2 [ (optional)=true ]; // The GIT revision of the software version if available.
+	optional uint32 ci_job_id = 3 [ (optional)=true ]; // The unique continuous integration job ID if available.
+}
+
+message HardwareModule {
+	optional string serial_number = 1 [(optional)=true, (regex) = "[A-Z2-7]{9}", (legacy_field_id)=2]; // Serial number of the hardware module
+	optional string legacy_serial_number = 2 [ deprecated=true ]; // Deprecated legacy serial number format
+	optional string version = 3 [(optional)=true, (regex)="v[0-9]+\\.[0-9]+\\.[0-9]+"]; // Hardware version of the hardware module if available.
+}
+
 /**
  * > Introduced in BSL v2.14 and firmware v1.14
  *

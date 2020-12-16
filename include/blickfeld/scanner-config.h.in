@@ -1,7 +1,7 @@
 #ifndef BLICKFELD_SCANNER_CONFIG_H
 #define BLICKFELD_SCANNER_CONFIG_H
 
-#define BSL_VERSION "@PROJECT_VERSION@"
+#define BSL_VERSION "@PROJECT_GIT_DESCRIBE@"
 
 #define SERVER_PORT @SERVER_PORT@
 
@@ -28,8 +28,14 @@
 
 #define DEFAULT_LOG_MSGS_KEPT_IN_MEM @DEFAULT_LOG_MSGS_KEPT_IN_MEM@
 
+#ifdef HAVE_WINDOWS_H
 #ifndef BF_DLLEXPORT
   #define BF_DLLEXPORT __declspec(dllimport)  
+#endif
+#else
+#ifndef BF_DLLEXPORT
+  #define BF_DLLEXPORT
+#endif
 #endif
 
 #ifndef BSL_STANDALONE

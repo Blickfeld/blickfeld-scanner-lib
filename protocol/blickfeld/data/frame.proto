@@ -11,16 +11,47 @@ package blickfeld.protocol.data;
  * This section describes the contents of a point cloud frame.
  */
 message Frame {
-	optional uint64 id = 1 [(optional)=true]; // Incremental frame ID since startup of the device
-	repeated Scanline scanlines = 2 [(optional)=true]; // Refer to [Scanline](#blickfeld.protocol.data.Scanline)
+	/**
+	 * > Introduced in BSL v2.16 and firmware v1.17
+	 *
+	 * This format returns point clouds as flat binary structures.
+	 * These can be efficiently encoded & decoded, which increases the performance on low-performance clients significantly.
+	 * The network bandwidth is usually slightly higher as the data is not encoded.
+	 *
+	 * Note:
+	 * The reference frame concept is handled differently for packed structures.
+	 * To activate the packed format, it is sufficient to set an empty packed message in the reference frame.
+	 * The requested fields need to be selected in the scanlines structure.
+	 * Refer to REF_FRAME_PACKED in the client implementations.
+	 */
+	message Packed {
+		optional uint32 length = 1; // Length of arrays
+
+		optional bytes cartesian = 2 [ (optional)=true ]; // Cartesian coordinates. 3-dimensional array in row-major format with [x, y, z] tuples. Unit: [m]. Type: Float32. Byte Order: Big Endian.
+		optional bytes direction = 3 [ (optional)=true ]; // Polar coordinates. 2-dimensional array in row-major format with [azimuth, elevation] tuples. Unit: [rad]. Type: Float32. Byte Order: Big Endian.
+		optional bytes range = 4 [ (optional)=true ]; // Distance to the return. 1-dimensional array. Unit: [m]. Type: Float32. Byte Order: Big Endian.
+		optional bytes intensity = 5 [ (optional)=true ]; // Intensity of the returned laser pulse. 1-dimensional array. Type: UInt32. Byte Order: Big Endian.
+		optional bytes ambient_light_level = 6 [ (optional)=true ]; // Ambient light level in the direction of the point. 1-dimensional array. Type: UInt32. Byte Order: Big Endian.
+		optional bytes start_offset_ns = 7 [ (optional)=true ]; // Starting time of the point in relation to [Frame.start_time_ns](#blickfeld.protocol.data.Frame.start_time_ns). 1-dimensional array. Unit: [ns]. Type: UInt64. Byte Order: Big Endian.
+
+		optional bytes point_id = 8 [ (optional)=true ]; // Unique point identifier within a frame and scan pattern. 1-dimensional array. Type: UInt32. Byte Order: Big Endian.
+		optional bytes channel_id = 9 [ (optional)=true ]; // Identifier of the channel that detected the point. 1-dimensional array. Type: UInt8.
+		optional bytes return_id = 10 [ (optional)=true ]; // Identifier of the return. Note: Returns are ordered by intensity not by distance. 1-dimensional array. Type: UInt8.
+	}
+
+	optional uint64 id = 1; // Incremental frame ID since startup of the device
 	optional uint64 start_time_ns = 3 [(optional)=true]; // Unit: [s] – start frame timestamp
 	optional config.ScanPattern scan_pattern = 5 [(optional)=true]; // Refer to [ScanPattern](#blickfeld.protocol.config.ScanPattern)
-	optional uint32 total_number_of_points = 6 [(optional)=true]; // Number of laser pulses emitted in this frame.
+	optional bool is_ramp_up_phase = 9 [(optional)=true]; // <blockquote>Introduced in BSL v2.16 and firmware v1.17</blockquote> If the frame_mode in the scan pattern is set to SEPARATE, this value indicates if the given frame was captured during up-ramping or down-ramping.
+	optional uint32 total_number_of_points = 6; // Number of laser pulses emitted in this frame.
 
 	/**
 	 * Number of returned points recorded:
 	 *
 	 * Each point of the [total_number_of_points](#blickfeld.protocol.data.Frame.total_number_of_points) can produce several returns.
 	 */
-	optional uint32 total_number_of_returns = 7 [(optional)=true];
+	optional uint32 total_number_of_returns = 7;
+
+	repeated Scanline scanlines = 2 [(optional)=true]; // Refer to [Scanline](#blickfeld.protocol.data.Scanline)
+	optional Packed packed = 8 [(optional)=true]; // <blockquote>Introduced in BSL v2.16 and firmware v1.17</blockquote> Refer to [Packed](#blickfeld.protocol.data.Frame.Packed)
 }

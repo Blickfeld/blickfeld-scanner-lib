@@ -5,8 +5,8 @@ import "blickfeld/options.proto";
 import "blickfeld/error.proto";
 import "blickfeld/common.proto";
 import "blickfeld/config/advanced.proto";
+import "blickfeld/config/product.proto";
 import "blickfeld/config/scan_pattern.proto";
-import "blickfeld/config/secure.proto";
 import "blickfeld/status/main.proto";
 import "blickfeld/stream/connection.proto";
 import "blickfeld/stream/event.proto";
@@ -25,7 +25,17 @@ message Request {
 	 */
 	message Hello {
 		optional uint32 protocol_version = 1;  // Version of the Blickfeld protocol
-		// @exclude TODO: Version information about client build
+		optional string library_version = 2 [ (regex)="[0-9]+\\.[0-9]+\\.[0-9]+[[:alnum:]\\.\\+\\-]*", (optional)=true ]; // <blockquote>Introduced in BSL v2.16 and firmware v1.17</blockquote>  Library version
+		optional Language language = 3 [ (optional)=true ]; // <blockquote>Introduced in BSL v2.16 and firmware v1.17</blockquote>  Library language
+	}
+
+	/**
+	 * Internal use only
+	 *
+	 * This request is used by internal proxy implementation to forward the correct ip address to the server.
+	 */
+	message ProxyHello {
+		optional string ip_address = 1 [ (regex) = "([0-9]{1,3}\\.){3}[0-9]{1,3}" ]; // IP address of the real client
 	}
 
 	/**
@@ -170,6 +180,7 @@ message Request {
 		GetNamedScanPatterns get_named_scan_patterns = 26; // <blockquote>Introduced in BSL v2.15 and firmware v1.16</blockquote> Refer to [Request.GetNamedScanPatterns](#blickfeld.protocol.Request.GetNamedScanPatterns)
 		StoreNamedScanPattern store_named_scan_pattern = 27; // <blockquote>Introduced in BSL v2.15 and firmware v1.16</blockquote> Refer to [Request.StoreNamedScanPattern](#blickfeld.protocol.Request.StoreNamedScanPattern)
 		DeleteNamedScanPattern delete_named_scan_pattern = 28; // <blockquote>Introduced in BSL v2.15 and firmware v1.16</blockquote> Refer to [Request.DeleteNamedScanPattern](#blickfeld.protocol.Request.DeleteNamedScanPattern)
+		ProxyHello proxy_hello = 29; // <blockquote>Introduced in BSL v2.16 and firmware v1.17</blockquote> Refer to [Request.ProxyHello](#blickfeld.protocol.Request.ProxyHello)
 
 		string _asJSON = 100; // Internal use only
 	}
@@ -189,8 +200,35 @@ message Response {
 	 * This response is sent out after establishing a connection.
 	 */
 	message Hello {
-		// @exclude TODO: Greeting and version information
 		optional uint32 protocol_version = 1;  // Version of the Blickfeld Protocol
+		optional string library_version = 2 [ (regex)="[0-9]+\\.[0-9]+\\.[0-9]+[[:alnum:]\\.\\+\\-]*" ]; // <blockquote>Introduced in BSL v2.16 and firmware v1.17</blockquote> Library version
+		optional Language language = 3; // <blockquote>Introduced in BSL v2.16 and firmware v1.17</blockquote> Library language
+		optional config.Product product = 4 [(optional)=true]; // <blockquote>Introduced in BSL v2.16 and firmware v1.17</blockquote> Refer to [Product](#blickfeld.protocol.config.Product).
+
+		oneof oneof_serial_number {
+			option (optional_one_of) = true;
+			string serial_number = 5 [ (regex) = "[A-Z2-7]{9}", (legacy_field_id)=6 ]; // <blockquote>Introduced in BSL v2.16 and firmware v1.17</blockquote> Cube serial number
+			string legacy_serial_number = 6 [ (regex) = "msb-[0-9]{4}", deprecated=true ]; // <blockquote>Introduced in BSL v2.16 and firmware v1.17</blockquote> Deprecated legacy serial number
+		}
+
+		/**
+		 * > Introduced in BSL v2.16 and firmware v1.17
+		 *
+		 * Contains all firmware names, versions, and revisions.
+		 */
+		message Firmware {
+			optional SoftwareVersion version = 1; // Baseline version of firmware. Refer to [SoftwareVersion](#blickfeld.protocol.SoftwareVersion).
+			map<string, SoftwareVersion> module_versions = 2; // Version of software modules. The key of the map is the name and the object is the [SoftwareVersion](#blickfeld.protocol.SoftwareVersion).
+		}
+
+		optional Firmware firmware = 7; // <blockquote>Introduced in BSL v2.16 and firmware v1.17</blockquote> Refer to [Firmware](#blickfeld.protocol.Response.Hello.Firmware).
+		map<string, HardwareModule> hardware_modules = 8; // <blockquote>Introduced in BSL v2.16 and firmware v1.17</blockquote> Hardware module map, where the key is the name and the object is the [HardwareModule](#blickfeld.protocol.HardwareModule).
+	}
+
+	/**
+	 * Internal use only
+	 */
+	message ProxyHello {
 	}
 
 	/**
@@ -315,6 +353,7 @@ message Response {
 		GetNamedScanPatterns get_named_scan_patterns = 26; // <blockquote>Introduced in BSL v2.15 and firmware v1.16</blockquote> Refer to [Response.GetNamedScanPatterns](#blickfeld.protocol.Response.GetNamedScanPatterns)
 		StoreNamedScanPattern store_named_scan_pattern = 27; // <blockquote>Introduced in BSL v2.15 and firmware v1.16</blockquote> Refer to [Response.StoreNamedScanPattern](#blickfeld.protocol.Response.StoreNamedScanPattern)
 		DeleteNamedScanPattern delete_named_scan_pattern = 28; // <blockquote>Introduced in BSL v2.15 and firmware v1.16</blockquote> Refer to [Response.DeleteNamedScanPattern](#blickfeld.protocol.Response.DeleteNamedScanPattern)
+		ProxyHello proxy_hello = 29; // <blockquote>Introduced in BSL v2.16 and firmware v1.17</blockquote> Refer to [Response.ProxyHello](#blickfeld.protocol.Response.ProxyHello)
 
 		string _asJSON = 100; // Internal use only
 	}

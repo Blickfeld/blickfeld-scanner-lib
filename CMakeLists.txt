@@ -15,12 +15,7 @@ set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS 1)
 set(CMAKE_DEBUG_POSTFIX d)
 
 # Options
-# BF_USE_SYSTEM_PROTOBUF: defaults to ON on normal build, OFF on cross-compile
-if (CMAKE_CROSSCOMPILING)
-  option(BF_USE_SYSTEM_PROTOBUF "Use system wide protobuf" OFF)
-else()
-  option(BF_USE_SYSTEM_PROTOBUF "Use system wide protobuf" ON)
-endif()
+option(BF_USE_SYSTEM_PROTOBUF "Use system wide protobuf" ON)
 option(BF_BUILD_EXAMPLES "Build ${CMAKE_PROJECT_NAME} examples" ON)  # Build cpp examples, defaults is ON
 option(BF_BUILD_TESTS "Build ${CMAKE_PROJECT_NAME} tests" ON)  # Build tests for the BSL, defaults is ON
 option(BF_BUILD_PYTHON "Build ${CMAKE_PROJECT_NAME} python package" ON)  # Build python package blickfeld_scanner, defaults is ON
@@ -209,11 +204,13 @@ set(BLICKFELD_SCANNER_SOURCES
   src/connection.cpp
   src/discover.cpp
   src/point_cloud_record.cpp
+  src/point_cloud_stream.cpp
 )
 set(BLICKFELD_SCANNER_INCLUDES
   ${Protobuf_INCLUDE_DIRS}
   include
   src
+  thirdparty/portable_endian
   thirdparty/asio/asio/include
   ${PROJECT_BINARY_DIR}/include
 )

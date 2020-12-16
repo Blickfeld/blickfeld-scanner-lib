@@ -56,6 +56,7 @@
 #include <cmath>
 
 namespace blickfeld {
+
 namespace os {
 
 double get_time();
@@ -63,8 +64,22 @@ uint64_t get_time_ns();
 std::string get_time_string(double ts);
 std::string read_file(std::string filename);
 void write_file(std::string filename, std::string data);
+float be32tofloat(uint32_t be);
+uint32_t floattobe32(float val);
 
 }
+
+namespace protocol {
+namespace data {
+class Frame;
+
+int get_total_number_of_scanlines(const Frame& frame);
+int number_of_points_per_scanline(const Frame& frame);
+int get_scanline_id_by_point_id(const Frame& frame, const uint32_t point_id);
+
+} // namespace data
+} // namespace protocol
+
 }
 
 #endif // BLICKFELD_UTILS_H

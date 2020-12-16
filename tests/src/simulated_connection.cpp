@@ -46,7 +46,7 @@ void simulated_connection::send(const protocol::Request &req) {
 
 					protocol::Response resp;
 					resp.mutable_event()->mutable_point_cloud()->mutable_frame()->CopyFrom(dump_stream->recv_frame());
-					if (last_ts) {
+					if (last_ts > 0) {
 						uint64_t wait_ns = resp.event().point_cloud().frame().start_time_ns() - last_ts;
 						std::this_thread::sleep_for(std::chrono::milliseconds((uint64_t)(wait_ns / 1e6)));
 					}

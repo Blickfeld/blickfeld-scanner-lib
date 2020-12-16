@@ -17,11 +17,13 @@ import ssl
 import tempfile
 import os
 import warnings
+import time
 
 from .protocol import connection_pb2
 from .protocol.stream import connection_pb2 as stream_connection_pb2
-from .protocol import options_pb2
+from .protocol import options_pb2, common_pb2
 from . import stream
+from .version import __version__
 
 log = logging.getLogger(__name__)
 
@@ -64,9 +66,9 @@ class scanner(object):
         
         self._connection = self.create_connection()
         
-        req = connection_pb2.Request()
-        req.hello.protocol_version = self.protocol_version
-        self._connection.send_request(req)
+        hello = self.hello()
+        if __version__ != hello.library_version:
+            warnings.warn("Warning: The client BSL version does not match the server BSL version. Client has '%s', server has '%s'." % (__version__, hello.library_version), DeprecationWarning, stacklevel=2)
 
     def __del__(self):
         if hasattr(self, "_connection"):
@@ -74,6 +76,38 @@ class scanner(object):
             
     def __repr__(self):
         return "<Blickfeld Scanner '%s'>" % ( self.name )
+
+    def hello(self):
+        """ Send hello to device and retrieve device, software, and hardware information
+
+        :returns: Hello object, see :any:`protobuf_protocol` Response.Hello
+        """
+        req = connection_pb2.Request()
+        req.hello.protocol_version = self.protocol_version
+        req.hello.library_version = __version__
+        req.hello.language = common_pb2.Language.PYTHON
+        return self._connection.send_request(req).hello
+
+    def serial_number(self):
+        """ > Introduced in BSL v2.16 and firmware v1.17
+
+        Retrieve unique serial number of the device.
+        Consider using hello() to retrieve more information.
+
+        :returns: Unique serial number of the device
+        """
+        hello = self.hello()
+        return hello.serial_number if hello.HasField("serial_number") else hello.legacy_serial_number
+
+    def product(self):
+        """ > Introduced in BSL v2.16 and firmware v1.17
+
+        Retrieve product type.
+        Consider using hello() to retrieve more information.
+
+        :returns: Product type of the device, see :any:`protobuf_protocol` config.Product
+        """
+        return self.hello().product
 
     def get_status(self):
         """ Request status of device
@@ -94,7 +128,7 @@ class scanner(object):
         """
         return stream.status(self.create_connection())
 
-    def get_point_cloud_stream(self, filter=None, reference_frame=None, point_filter=None):
+    def get_point_cloud_stream(self, filter=None, reference_frame=None, point_filter=None, as_numpy=False):
         """ Request point cloud stream of device
 
         :param filter: DEPRECATED
@@ -110,6 +144,14 @@ class scanner(object):
             > Introduced in BSL v2.13 and firmware v1.9
 
             Filter points and returns by point attributes during the post-processing on the device. This replaces the 'filter' parameter
+        :param as_numpy:
+            > Introduced in BSL v2.16
+    
+            This enables numpy support of the point cloud stream. Use recv_frame_as_numpy() to fetch frames as numpy structured arrays.
+            Specify the required attributes via the reference_frame attribute.
+            
+            Note: With devices with an firmware version older than v1.17, the performance is significantly worse than with up-to-date devices as the format needs to be converted on the client side. Consider updating the device.
+    
         :returns: :py:class:`blickfeld_scanner.scanner.stream.point_cloud` object
         """
         if filter and point_filter:
@@ -117,7 +159,7 @@ class scanner(object):
         if filter:
             warnings.warn("Please use 'point_filter' instead of 'filter'. 'filter' is deprecated.", DeprecationWarning, stacklevel=2)
             point_filter = filter
-        return stream.point_cloud(self.create_connection(), point_filter=point_filter, reference_frame=reference_frame)
+        return stream.point_cloud(self.create_connection(), point_filter=point_filter, reference_frame=reference_frame, as_numpy=as_numpy)
 
     def get_raw_point_cloud_stream(self, point_filter=None, reference_frame=None):
         """ Request raw point cloud stream of device
@@ -543,8 +585,9 @@ class connection(object):
         :return: Response of the device, see: :any:`protobuf_protocol`
         """
         len = struct.unpack('<I', self.__recv_all(4))[0]
+        data = self.__recv_all(len)
         recv = connection_pb2.Response()
-        recv.ParseFromString(self.__recv_all(len))
+        recv.ParseFromString(data)
 
         if recv.HasField('error'):
             raise protocol_exception(recv.error)

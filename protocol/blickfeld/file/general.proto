@@ -1,16 +1,11 @@
 syntax = "proto2";
 
 import "blickfeld/options.proto";
+import "blickfeld/common.proto";
 
 package blickfeld.protocol.file;
 
 message Client {
-	enum Language {
-		CPP = 1;
-		PYTHON = 2;
-		TYPESCRIPT = 3;
-	}
-
 	optional string library_version = 1 [(regex)="v[0-9]+\\.[0-9]+\\.[0-9]+"]; // Library version
 	optional uint64 file_time_ns = 2; // Unit: [ns] - File time stamp
 	optional Language language = 3; // Used library language for file creation

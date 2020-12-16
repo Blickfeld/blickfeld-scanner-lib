@@ -243,6 +243,19 @@ message ScanPattern {
 		optional OptionalValueRange ambient_light_level = 3; // Filter all points, which ambient light level values are not within this value range.
 		optional OptionalValueRange range = 4; // Filter all points, which range values are not within this value range.
 		optional Noise noise = 5 [(optional) = true]; // <blockquote>Introduced in BSL v2.11 and firmware v1.11</blockquote> Refer to [Filter.Noise](#blickfeld.protocol.config.ScanPattern.Filter.Noise)
+
+		/*
+		 * <blockquote> Introduced in BSL v2.16 and firmware v1.17</blockquote>
+		 *
+		 * All points without any returns are filtered if this setting is true.
+		 * With active algorithms, such as background subtraction, this can reduce the bandwidth significantly.
+		 *
+		 * Note:
+		 * It is recommended to not estimate required network bandwidths when this setting is active.
+		 * In scenarios, where from one frame to another, all points have returns (e.g. due to environmental changes),
+		 * the peak bandwidths might increase significantly. This could result, in these scenarios, in frame losses.
+		 */
+		optional bool points_with_no_returns = 6 [ default = false ];
 	}
 
 	optional Horizontal horizontal = 1; // Refer to [ScanPattern.Horizontal](#blickfeld.protocol.config.ScanPattern.Horizontal)
