@@ -255,7 +255,7 @@ message ScanPattern {
 		 * In scenarios, where from one frame to another, all points have returns (e.g. due to environmental changes),
 		 * the peak bandwidths might increase significantly. This could result, in these scenarios, in frame losses.
 		 */
-		optional bool points_with_no_returns = 6 [ default = false ];
+		optional bool delete_points_without_returns = 6 [ default = false ];
 	}
 
 	optional Horizontal horizontal = 1; // Refer to [ScanPattern.Horizontal](#blickfeld.protocol.config.ScanPattern.Horizontal)

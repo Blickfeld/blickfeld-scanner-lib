@@ -61,6 +61,6 @@ INSTANTIATE_TEST_CASE_P(
 	simulate_record_and_read,
 	file_simulate_record_and_read,
 	::testing::Values(
-		"../tests/assets/dump.bfpc"
-		// "../tests/assets/packed_dump.bfpc"
+		"../tests/assets/dump.bfpc",
+		"../tests/assets/packed.bfpc"
 		));

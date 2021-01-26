@@ -212,14 +212,21 @@ class scanner(object):
         return stream.raw(self.create_connection(), req, file_name)
 
     @staticmethod
-    def file_point_cloud_stream(dump_filename):
+    def file_point_cloud_stream(dump_filename, as_numpy=False):
         """ Request a point_cloud_stream, which streams off a .bfpc file.
         No device (and connection to a device) is needed for this operation.
 
         :param dump_filename: path to .bfpc file
+        :param as_numpy:
+            > Introduced in BSL v2.16
+
+            This enables numpy support of the point cloud stream. Use recv_frame_as_numpy() to fetch frames as numpy structured arrays.
+            Specify the required attributes via the reference_frame attribute.
+
+            Note: The performance of this option is significantly better with files that were recorded in the packed format. Packed recordings are available in firmware versions >= v1.17.
         :return: :py:class:`blickfeld_scanner.scanner.stream.point_cloud` object
         """
-        return stream.point_cloud(from_file=dump_filename)
+        return stream.point_cloud(from_file=dump_filename, as_numpy=as_numpy)
     
     def set_scan_pattern(self, config=None, name=None, persist = False):
         """ Function to set a new scan pattern, see: :any:`protobuf_protocol`.

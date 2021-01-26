@@ -13,6 +13,15 @@ influence the resulting point cloud.
 
 ### Removed
 
+## [2.16.1] - 2021.01.26
+
+### Added
+* Python: Structured numpy interface flag is now available for file streams
+
+### Changed
+* Bugfix: Do not enforce the legacy serial number for hardware modules
+* API: Rename filter `points_with_no_returns` to `delete_points_without_returns`
+
 ## [2.16.0] - 2020.12.16
 
 ### Added

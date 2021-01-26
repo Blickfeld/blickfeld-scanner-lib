@@ -1637,7 +1637,7 @@ This can be used to e.g. filter points with low intensity or to enable secondary
 | ambient_light_level | [blickfeld.protocol.OptionalValueRange](#blickfeld.protocol.OptionalValueRange) | optional | Filter all points, which ambient light level values are not within this value range. |
 | range | [blickfeld.protocol.OptionalValueRange](#blickfeld.protocol.OptionalValueRange) | optional | Filter all points, which range values are not within this value range. |
 | noise | [ScanPattern.Filter.Noise](#blickfeld.protocol.config.ScanPattern.Filter.Noise) | optional | <blockquote>Introduced in BSL v2.11 and firmware v1.11</blockquote> Refer to [Filter.Noise](#blickfeld.protocol.config.ScanPattern.Filter.Noise) |
-| points_with_no_returns | [bool](#bool) | optional | <blockquote> Introduced in BSL v2.16 and firmware v1.17</blockquote>
+| delete_points_without_returns | [bool](#bool) | optional | <blockquote> Introduced in BSL v2.16 and firmware v1.17</blockquote>
 
 All points without any returns are filtered if this setting is true. With active algorithms, such as background subtraction, this can reduce the bandwidth significantly.
 
