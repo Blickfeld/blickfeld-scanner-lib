@@ -7,7 +7,9 @@
  */
 #include "blickfeld/utils.h"
 #include "blickfeld/scanner-config.h"
-#include "blickfeld/exception.h"
+#include "blickfeld/error.custom.pb.h"
+#include "blickfeld/data/frame.pb.h"
+#include "portable_endian.h"
 
 #include <stdio.h>
 #include <sstream>
@@ -93,5 +95,50 @@ void write_file(string filename, string data) {
 	file.write(data.c_str(), static_cast<long>(data.size()));
 }
 
+float be32tofloat(uint32_t be) {
+	be = be32toh(be);
+	float* tmp = (float*) &be;
+	return *tmp;
+}
+
+uint32_t floattobe32(float val) {
+	uint32_t* tmp = (uint32_t*) &val;
+	return htobe32(*tmp);
+}
+
 } // namespace os
+
+namespace protocol {
+namespace data {
+class Frame;
+
+int get_total_number_of_scanlines(const Frame& frame) {
+	if (!frame.has_scan_pattern()) {
+		if (frame.scanlines_size() > 0)
+			return frame.scanlines_size();
+		return -1;
+	}
+
+	uint32_t scanlines = 0; auto pulse = frame.scan_pattern().pulse();
+	if (pulse.frame_mode() == pulse.ONLY_UP || pulse.frame_mode() == pulse.COMBINE_UP_DOWN ||
+	    (pulse.frame_mode() == pulse.SEPARATE && frame.is_ramp_up_phase()) )
+		scanlines += frame.scan_pattern().vertical().scanlines_up();
+	if (pulse.frame_mode() == pulse.ONLY_DOWN || pulse.frame_mode() == pulse.COMBINE_UP_DOWN ||
+	    (pulse.frame_mode() == pulse.SEPARATE && !frame.is_ramp_up_phase()))
+		scanlines += frame.scan_pattern().vertical().scanlines_down();
+	return scanlines;
+}
+
+int number_of_points_per_scanline(const Frame& frame) {
+	// TODO This needs to be re-worked with partial frames
+	return frame.total_number_of_points() / get_total_number_of_scanlines(frame);
+}
+
+int get_scanline_id_by_point_id(const Frame& frame, const uint32_t point_id) {
+	return std::floor(point_id / number_of_points_per_scanline(frame));
+}
+
+} // namespace data
+} // namespace protocol
+
 } // namespace blickfeld

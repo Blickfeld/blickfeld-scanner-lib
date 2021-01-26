@@ -30,7 +30,7 @@ int example(int argc, char* argv[]) {
 
 	// Reference Frame with X, Y, Z coordinates, intensity and point IDs
 	// The frame represents the desired data. To request a field, set it to any value (also in submessages). For a repeated field, add at least one element.
-	auto reference_frame = scanner->REF_FRAME_XYZ_I_ID;
+	auto reference_frame = blickfeld::scanner::REF_FRAME_XYZ_I_ID;
 
 	// Create filter to filter points and returns by point attributes during the post-processing on the device.
 	blickfeld::protocol::config::ScanPattern::Filter filter;

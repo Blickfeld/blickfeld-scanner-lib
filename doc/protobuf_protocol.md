@@ -17,9 +17,12 @@ The data, such as a point cloud, are also packed in protobuf messages.
     - [Constraint.Polynomial](#blickfeld.protocol.Constraint.Polynomial)
     - [Field](#blickfeld.protocol.Field)
     - [Field.Identifier](#blickfeld.protocol.Field.Identifier)
+    - [HardwareModule](#blickfeld.protocol.HardwareModule)
     - [OptionalValueRange](#blickfeld.protocol.OptionalValueRange)
+    - [SoftwareVersion](#blickfeld.protocol.SoftwareVersion)
     - [ValueRange](#blickfeld.protocol.ValueRange)
   
+    - [Language](#blickfeld.protocol.Language)
   
   
   
@@ -35,6 +38,7 @@ The data, such as a point cloud, are also packed in protobuf messages.
     - [Request.GetScanPattern](#blickfeld.protocol.Request.GetScanPattern)
     - [Request.GetScanPatternConstraints](#blickfeld.protocol.Request.GetScanPatternConstraints)
     - [Request.Hello](#blickfeld.protocol.Request.Hello)
+    - [Request.ProxyHello](#blickfeld.protocol.Request.ProxyHello)
     - [Request.RunSelfTest](#blickfeld.protocol.Request.RunSelfTest)
     - [Request.SetAdvancedConfig](#blickfeld.protocol.Request.SetAdvancedConfig)
     - [Request.SetScanPattern](#blickfeld.protocol.Request.SetScanPattern)
@@ -50,6 +54,10 @@ The data, such as a point cloud, are also packed in protobuf messages.
     - [Response.GetScanPattern](#blickfeld.protocol.Response.GetScanPattern)
     - [Response.GetScanPatternConstraints](#blickfeld.protocol.Response.GetScanPatternConstraints)
     - [Response.Hello](#blickfeld.protocol.Response.Hello)
+    - [Response.Hello.Firmware](#blickfeld.protocol.Response.Hello.Firmware)
+    - [Response.Hello.Firmware.ModuleVersionsEntry](#blickfeld.protocol.Response.Hello.Firmware.ModuleVersionsEntry)
+    - [Response.Hello.HardwareModulesEntry](#blickfeld.protocol.Response.Hello.HardwareModulesEntry)
+    - [Response.ProxyHello](#blickfeld.protocol.Response.ProxyHello)
     - [Response.RunSelfTest](#blickfeld.protocol.Response.RunSelfTest)
     - [Response.SetAdvancedConfig](#blickfeld.protocol.Response.SetAdvancedConfig)
     - [Response.SetScanPattern](#blickfeld.protocol.Response.SetScanPattern)
@@ -71,6 +79,7 @@ The data, such as a point cloud, are also packed in protobuf messages.
     - [Error.NotFound](#blickfeld.protocol.Error.NotFound)
     - [Error.NotImplemented](#blickfeld.protocol.Error.NotImplemented)
     - [Error.NotInRange](#blickfeld.protocol.Error.NotInRange)
+    - [Error.NotSupported](#blickfeld.protocol.Error.NotSupported)
     - [Error.OutdatedClientProtocol](#blickfeld.protocol.Error.OutdatedClientProtocol)
     - [Error.OutdatedServerProtocol](#blickfeld.protocol.Error.OutdatedServerProtocol)
     - [Error.ScannerBusy](#blickfeld.protocol.Error.ScannerBusy)
@@ -88,8 +97,6 @@ The data, such as a point cloud, are also packed in protobuf messages.
 - [blickfeld/options.proto](#blickfeld/options.proto)
   
   
-    - [File-level Extensions](#blickfeld/options.proto-extensions)
-    - [File-level Extensions](#blickfeld/options.proto-extensions)
     - [File-level Extensions](#blickfeld/options.proto-extensions)
     - [File-level Extensions](#blickfeld/options.proto-extensions)
     - [File-level Extensions](#blickfeld/options.proto-extensions)
@@ -136,6 +143,13 @@ The data, such as a point cloud, are also packed in protobuf messages.
   
   
 
+- [blickfeld/config/product.proto](#blickfeld/config/product.proto)
+  
+    - [Product](#blickfeld.protocol.config.Product)
+  
+  
+  
+
 - [blickfeld/config/scan_pattern.proto](#blickfeld/config/scan_pattern.proto)
     - [ScanPattern](#blickfeld.protocol.config.ScanPattern)
     - [ScanPattern.Filter](#blickfeld.protocol.config.ScanPattern.Filter)
@@ -169,6 +183,7 @@ The data, such as a point cloud, are also packed in protobuf messages.
 
 - [blickfeld/data/frame.proto](#blickfeld/data/frame.proto)
     - [Frame](#blickfeld.protocol.data.Frame)
+    - [Frame.Packed](#blickfeld.protocol.data.Frame.Packed)
   
   
   
@@ -202,7 +217,6 @@ The data, such as a point cloud, are also packed in protobuf messages.
 - [blickfeld/file/general.proto](#blickfeld/file/general.proto)
     - [Client](#blickfeld.protocol.file.Client)
   
-    - [Client.Language](#blickfeld.protocol.file.Client.Language)
   
   
   
@@ -393,6 +407,23 @@ Describes unique identifier of (sub) field
 
 
 
+<a name="blickfeld.protocol.HardwareModule"></a>
+
+### HardwareModule
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| serial_number | [string](#string) | optional | Serial number of the hardware module |
+| legacy_serial_number | [string](#string) | optional | Deprecated legacy serial number format |
+| version | [string](#string) | optional | Hardware version of the hardware module if available. |
+
+
+
+
+
+
 <a name="blickfeld.protocol.OptionalValueRange"></a>
 
 ### OptionalValueRange
@@ -403,6 +434,23 @@ Describes unique identifier of (sub) field
 | ----- | ---- | ----- | ----------- |
 | minimum | [float](#float) | optional |  |
 | maximum | [float](#float) | optional |  |
+
+
+
+
+
+
+<a name="blickfeld.protocol.SoftwareVersion"></a>
+
+### SoftwareVersion
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| name | [string](#string) | optional | Tag or reference name of the version. It is not the the name of the software. |
+| revision | [string](#string) | optional | The GIT revision of the software version if available. |
+| ci_job_id | [uint32](#uint32) | optional | The unique continuous integration job ID if available. |
 
 
 
@@ -425,6 +473,19 @@ Describes unique identifier of (sub) field
 
 
  <!-- end messages -->
+
+
+<a name="blickfeld.protocol.Language"></a>
+
+### Language
+
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| CPP | 1 |  |
+| PYTHON | 2 |  |
+| TYPESCRIPT | 3 |  |
+
 
  <!-- end enums -->
 
@@ -466,6 +527,7 @@ A request is always answered with a response. For every response, there is a req
 | get_named_scan_patterns | [Request.GetNamedScanPatterns](#blickfeld.protocol.Request.GetNamedScanPatterns) | optional | <blockquote>Introduced in BSL v2.15 and firmware v1.16</blockquote> Refer to [Request.GetNamedScanPatterns](#blickfeld.protocol.Request.GetNamedScanPatterns) |
 | store_named_scan_pattern | [Request.StoreNamedScanPattern](#blickfeld.protocol.Request.StoreNamedScanPattern) | optional | <blockquote>Introduced in BSL v2.15 and firmware v1.16</blockquote> Refer to [Request.StoreNamedScanPattern](#blickfeld.protocol.Request.StoreNamedScanPattern) |
 | delete_named_scan_pattern | [Request.DeleteNamedScanPattern](#blickfeld.protocol.Request.DeleteNamedScanPattern) | optional | <blockquote>Introduced in BSL v2.15 and firmware v1.16</blockquote> Refer to [Request.DeleteNamedScanPattern](#blickfeld.protocol.Request.DeleteNamedScanPattern) |
+| proxy_hello | [Request.ProxyHello](#blickfeld.protocol.Request.ProxyHello) | optional | <blockquote>Introduced in BSL v2.16 and firmware v1.17</blockquote> Refer to [Request.ProxyHello](#blickfeld.protocol.Request.ProxyHello) |
 | _asJSON | [string](#string) | optional | Internal use only |
 | accept_format | [Format](#blickfeld.protocol.Format) | optional | Internal use only Default: PROTOBUF |
 
@@ -590,6 +652,25 @@ This request is used for initial communication after connecting to a device and 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | protocol_version | [uint32](#uint32) | optional | Version of the Blickfeld protocol |
+| library_version | [string](#string) | optional | <blockquote>Introduced in BSL v2.16 and firmware v1.17</blockquote> Library version |
+| language | [Language](#blickfeld.protocol.Language) | optional | <blockquote>Introduced in BSL v2.16 and firmware v1.17</blockquote> Library language |
+
+
+
+
+
+
+<a name="blickfeld.protocol.Request.ProxyHello"></a>
+
+### Request.ProxyHello
+Internal use only
+
+This request is used by internal proxy implementation to forward the correct ip address to the server.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| ip_address | [string](#string) | optional | IP address of the real client |
 
 
 
@@ -702,6 +783,7 @@ Each response has the same name as the request.
 | get_named_scan_patterns | [Response.GetNamedScanPatterns](#blickfeld.protocol.Response.GetNamedScanPatterns) | optional | <blockquote>Introduced in BSL v2.15 and firmware v1.16</blockquote> Refer to [Response.GetNamedScanPatterns](#blickfeld.protocol.Response.GetNamedScanPatterns) |
 | store_named_scan_pattern | [Response.StoreNamedScanPattern](#blickfeld.protocol.Response.StoreNamedScanPattern) | optional | <blockquote>Introduced in BSL v2.15 and firmware v1.16</blockquote> Refer to [Response.StoreNamedScanPattern](#blickfeld.protocol.Response.StoreNamedScanPattern) |
 | delete_named_scan_pattern | [Response.DeleteNamedScanPattern](#blickfeld.protocol.Response.DeleteNamedScanPattern) | optional | <blockquote>Introduced in BSL v2.15 and firmware v1.16</blockquote> Refer to [Response.DeleteNamedScanPattern](#blickfeld.protocol.Response.DeleteNamedScanPattern) |
+| proxy_hello | [Response.ProxyHello](#blickfeld.protocol.Response.ProxyHello) | optional | <blockquote>Introduced in BSL v2.16 and firmware v1.17</blockquote> Refer to [Response.ProxyHello](#blickfeld.protocol.Response.ProxyHello) |
 | _asJSON | [string](#string) | optional | Internal use only |
 
 
@@ -833,7 +915,74 @@ This response is sent out after establishing a connection.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| protocol_version | [uint32](#uint32) | optional |  |
+| protocol_version | [uint32](#uint32) | optional | Version of the Blickfeld Protocol |
+| library_version | [string](#string) | optional | <blockquote>Introduced in BSL v2.16 and firmware v1.17</blockquote> Library version |
+| language | [Language](#blickfeld.protocol.Language) | optional | <blockquote>Introduced in BSL v2.16 and firmware v1.17</blockquote> Library language |
+| product | [config.Product](#blickfeld.protocol.config.Product) | optional | <blockquote>Introduced in BSL v2.16 and firmware v1.17</blockquote> Refer to [Product](#blickfeld.protocol.config.Product). |
+| serial_number | [string](#string) | optional | <blockquote>Introduced in BSL v2.16 and firmware v1.17</blockquote> Cube serial number |
+| legacy_serial_number | [string](#string) | optional | <blockquote>Introduced in BSL v2.16 and firmware v1.17</blockquote> Deprecated legacy serial number |
+| firmware | [Response.Hello.Firmware](#blickfeld.protocol.Response.Hello.Firmware) | optional | <blockquote>Introduced in BSL v2.16 and firmware v1.17</blockquote> Refer to [Firmware](#blickfeld.protocol.Response.Hello.Firmware). |
+| hardware_modules | [Response.Hello.HardwareModulesEntry](#blickfeld.protocol.Response.Hello.HardwareModulesEntry) | repeated | <blockquote>Introduced in BSL v2.16 and firmware v1.17</blockquote> Hardware module map, where the key is the name and the object is the [HardwareModule](#blickfeld.protocol.HardwareModule). |
+
+
+
+
+
+
+<a name="blickfeld.protocol.Response.Hello.Firmware"></a>
+
+### Response.Hello.Firmware
+> Introduced in BSL v2.16 and firmware v1.17
+
+Contains all firmware names, versions, and revisions.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| version | [SoftwareVersion](#blickfeld.protocol.SoftwareVersion) | optional | Baseline version of firmware. Refer to [SoftwareVersion](#blickfeld.protocol.SoftwareVersion). |
+| module_versions | [Response.Hello.Firmware.ModuleVersionsEntry](#blickfeld.protocol.Response.Hello.Firmware.ModuleVersionsEntry) | repeated | Version of software modules. The key of the map is the name and the object is the [SoftwareVersion](#blickfeld.protocol.SoftwareVersion). |
+
+
+
+
+
+
+<a name="blickfeld.protocol.Response.Hello.Firmware.ModuleVersionsEntry"></a>
+
+### Response.Hello.Firmware.ModuleVersionsEntry
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| key | [string](#string) | optional |  |
+| value | [SoftwareVersion](#blickfeld.protocol.SoftwareVersion) | optional |  |
+
+
+
+
+
+
+<a name="blickfeld.protocol.Response.Hello.HardwareModulesEntry"></a>
+
+### Response.Hello.HardwareModulesEntry
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| key | [string](#string) | optional |  |
+| value | [HardwareModule](#blickfeld.protocol.HardwareModule) | optional |  |
+
+
+
+
+
+
+<a name="blickfeld.protocol.Response.ProxyHello"></a>
+
+### Response.ProxyHello
+Internal use only
 
 
 
@@ -947,6 +1096,7 @@ The format type of response is an undocumented, internal feature required for th
 | not_in_range | [Error.NotInRange](#blickfeld.protocol.Error.NotInRange) | optional | Refer to [NotInRange](#blickfeld.protocol.Error.NotInRange) |
 | time_sync_failed | [Error.TimeSyncFailed](#blickfeld.protocol.Error.TimeSyncFailed) | optional | Refer to [TimeSyncFailed](#blickfeld.protocol.Error.TimeSyncFailed) |
 | no_device_discovered | [Error.NoDeviceDiscovered](#blickfeld.protocol.Error.NoDeviceDiscovered) | optional | Refer to [NoDeviceDiscovered](#blickfeld.protocol.Error.NoDeviceDiscovered) |
+| not_supported | [Error.NotSupported](#blickfeld.protocol.Error.NotSupported) | optional | Refer to [NotSupported](#blickfeld.protocol.Error.NotSupported) |
 
 
 
@@ -1035,6 +1185,11 @@ The requested data is not available. Please check the request parameters.
 The firmware on the device is not compatible with the BSL version. Update the device or downgrade the BSL.
 
 
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| reason | [string](#string) | optional | Description why this is not implemented Default: No detailed reason available. |
+
+
 
 
 
@@ -1052,6 +1207,21 @@ The requested parameter is not within the valid range.
 | maximum | [float](#float) | optional | Maximum value of the parameter |
 | requested | [float](#float) | optional | Requested value of the parameter |
 | unit | [string](#string) | optional | Unit of the parameter |
+
+
+
+
+
+
+<a name="blickfeld.protocol.Error.NotSupported"></a>
+
+### Error.NotSupported
+The action is not supported by the current client or server API. Check the versions of the client and firmware software and read the changelog.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| reason | [string](#string) | optional | Description why this is not supported Default: No detailed reason available. |
 
 
 
@@ -1202,8 +1372,6 @@ Change the operation mode and try again if no one else is using it.
 | allow_sparse | bool | .google.protobuf.FieldOptions | 50007 |  Default: `false` |
 | d_max | double | .google.protobuf.FieldOptions | 50001 |  Default: `inf` |
 | d_min | double | .google.protobuf.FieldOptions | 50000 |  Default: `-inf` |
-| i_max | uint64 | .google.protobuf.FieldOptions | 50003 |  Default: `18446744073709551615` |
-| i_min | sint64 | .google.protobuf.FieldOptions | 50002 |  Default: `-9223372036854775808` |
 | legacy_field_id | uint64 | .google.protobuf.FieldOptions | 50010 |  |
 | length | sint32 | .google.protobuf.FieldOptions | 50004 |  Default: `2147483647` |
 | max_length | sint32 | .google.protobuf.FieldOptions | 50009 |  Default: `2147483647` |
@@ -1394,6 +1562,34 @@ Named scan patterns are saved on the device. There are two kinds of named scan p
 
 
 
+<a name="blickfeld/config/product.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## blickfeld/config/product.proto
+
+
+ <!-- end messages -->
+
+
+<a name="blickfeld.protocol.config.Product"></a>
+
+### Product
+Product variant
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| PRODUCT_CUBE | 0 |  |
+| PRODUCT_CUBE_RANGE | 2 |  |
+
+
+ <!-- end enums -->
+
+ <!-- end HasExtensions -->
+
+ <!-- end services -->
+
+
+
 <a name="blickfeld/config/scan_pattern.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
@@ -1441,6 +1637,11 @@ This can be used to e.g. filter points with low intensity or to enable secondary
 | ambient_light_level | [blickfeld.protocol.OptionalValueRange](#blickfeld.protocol.OptionalValueRange) | optional | Filter all points, which ambient light level values are not within this value range. |
 | range | [blickfeld.protocol.OptionalValueRange](#blickfeld.protocol.OptionalValueRange) | optional | Filter all points, which range values are not within this value range. |
 | noise | [ScanPattern.Filter.Noise](#blickfeld.protocol.config.ScanPattern.Filter.Noise) | optional | <blockquote>Introduced in BSL v2.11 and firmware v1.11</blockquote> Refer to [Filter.Noise](#blickfeld.protocol.config.ScanPattern.Filter.Noise) |
+| delete_points_without_returns | [bool](#bool) | optional | <blockquote> Introduced in BSL v2.16 and firmware v1.17</blockquote>
+
+All points without any returns are filtered if this setting is true. With active algorithms, such as background subtraction, this can reduce the bandwidth significantly.
+
+Note: It is recommended to not estimate required network bandwidths when this setting is active. In scenarios, where from one frame to another, all points have returns (e.g. due to environmental changes), the peak bandwidths might increase significantly. This could result, in these scenarios, in frame losses. Default: false |
 
 
 
@@ -1785,13 +1986,49 @@ This section describes the contents of a point cloud frame.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | id | [uint64](#uint64) | optional | Incremental frame ID since startup of the device |
-| scanlines | [Scanline](#blickfeld.protocol.data.Scanline) | repeated | Refer to [Scanline](#blickfeld.protocol.data.Scanline) |
 | start_time_ns | [uint64](#uint64) | optional | Unit: [s] – start frame timestamp |
 | scan_pattern | [blickfeld.protocol.config.ScanPattern](#blickfeld.protocol.config.ScanPattern) | optional | Refer to [ScanPattern](#blickfeld.protocol.config.ScanPattern) |
+| is_ramp_up_phase | [bool](#bool) | optional | <blockquote>Introduced in BSL v2.16 and firmware v1.17</blockquote> If the frame_mode in the scan pattern is set to SEPARATE, this value indicates if the given frame was captured during up-ramping or down-ramping. |
 | total_number_of_points | [uint32](#uint32) | optional | Number of laser pulses emitted in this frame. |
 | total_number_of_returns | [uint32](#uint32) | optional | Number of returned points recorded:
 
 Each point of the [total_number_of_points](#blickfeld.protocol.data.Frame.total_number_of_points) can produce several returns. |
+| scanlines | [Scanline](#blickfeld.protocol.data.Scanline) | repeated | Refer to [Scanline](#blickfeld.protocol.data.Scanline) |
+| packed | [Frame.Packed](#blickfeld.protocol.data.Frame.Packed) | optional | <blockquote>Introduced in BSL v2.16 and firmware v1.17</blockquote> Refer to [Packed](#blickfeld.protocol.data.Frame.Packed) |
+
+
+
+
+
+
+<a name="blickfeld.protocol.data.Frame.Packed"></a>
+
+### Frame.Packed
+> Introduced in BSL v2.16 and firmware v1.17
+
+This format returns point clouds as flat binary structures.
+These can be efficiently encoded & decoded, which increases the performance on low-performance clients significantly.
+The network bandwidth is usually slightly higher as the data is not encoded.
+
+Note:
+The reference frame concept is handled differently for packed structures.
+To activate the packed format, it is sufficient to set an empty packed message in the reference frame.
+The requested fields need to be selected in the scanlines structure.
+Refer to REF_FRAME_PACKED in the client implementations.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| length | [uint32](#uint32) | optional | Length of arrays |
+| cartesian | [bytes](#bytes) | optional | Cartesian coordinates. 3-dimensional array in row-major format with [x, y, z] tuples. Unit: [m]. Type: Float32. Byte Order: Big Endian. |
+| direction | [bytes](#bytes) | optional | Polar coordinates. 2-dimensional array in row-major format with [azimuth, elevation] tuples. Unit: [rad]. Type: Float32. Byte Order: Big Endian. |
+| range | [bytes](#bytes) | optional | Distance to the return. 1-dimensional array. Unit: [m]. Type: Float32. Byte Order: Big Endian. |
+| intensity | [bytes](#bytes) | optional | Intensity of the returned laser pulse. 1-dimensional array. Type: UInt32. Byte Order: Big Endian. |
+| ambient_light_level | [bytes](#bytes) | optional | Ambient light level in the direction of the point. 1-dimensional array. Type: UInt32. Byte Order: Big Endian. |
+| start_offset_ns | [bytes](#bytes) | optional | Starting time of the point in relation to [Frame.start_time_ns](#blickfeld.protocol.data.Frame.start_time_ns). 1-dimensional array. Unit: [ns]. Type: UInt64. Byte Order: Big Endian. |
+| point_id | [bytes](#bytes) | optional | Unique point identifier within a frame and scan pattern. 1-dimensional array. Type: UInt32. Byte Order: Big Endian. |
+| channel_id | [bytes](#bytes) | optional | Identifier of the channel that detected the point. 1-dimensional array. Type: UInt8. |
+| return_id | [bytes](#bytes) | optional | Identifier of the return. Note: Returns are ordered by intensity not by distance. 1-dimensional array. Type: UInt8. |
 
 
 
@@ -1934,6 +2171,7 @@ This section describes the contents of a point cloud header.
 | start_time_ns | [uint64](#uint64) | optional | Unit: [s] - Start timestamp of the requested pointcloud stream |
 | firmware_version | [string](#string) | optional | Firmware version of the device which recorded the pointcloud |
 | hardware_variant | [blickfeld.protocol.update.HardwareVariant](#blickfeld.protocol.update.HardwareVariant) | optional | Hardware variant of the device which recorded the pointcloud |
+| subscription | [blickfeld.protocol.stream.Subscribe.PointCloud](#blickfeld.protocol.stream.Subscribe.PointCloud) | optional | <blockquote>Introduced in BSL v2.16 and firmware v1.17</blockquote> Used & merged subscription for stream |
 
 
 
@@ -2000,26 +2238,13 @@ This section describes the contents of a single scan line in a point cloud frame
 | ----- | ---- | ----- | ----------- |
 | library_version | [string](#string) | optional | Library version |
 | file_time_ns | [uint64](#uint64) | optional | Unit: [ns] - File time stamp |
-| language | [Client.Language](#blickfeld.protocol.file.Client.Language) | optional | Used library language for file creation |
+| language | [blickfeld.protocol.Language](#blickfeld.protocol.Language) | optional | Used library language for file creation |
 
 
 
 
 
  <!-- end messages -->
-
-
-<a name="blickfeld.protocol.file.Client.Language"></a>
-
-### Client.Language
-
-
-| Name | Number | Description |
-| ---- | ------ | ----------- |
-| CPP | 1 |  |
-| PYTHON | 2 |  |
-| TYPESCRIPT | 3 |  |
-
 
  <!-- end enums -->
 

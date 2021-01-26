@@ -5,6 +5,7 @@ import "blickfeld/data/frame.proto";
 import "blickfeld/data/scanline.proto";
 import "blickfeld/options.proto";
 import "blickfeld/update/hardware.proto";
+import "blickfeld/stream/connection.proto";
 
 package blickfeld.protocol.data;
 
@@ -22,6 +23,7 @@ message PointCloud {
 		optional uint64 start_time_ns = 3; // Unit: [s] - Start timestamp of the requested pointcloud stream
 		optional string firmware_version = 4 [(regex)="v[0-9]+\\.[0-9]+\\.[0-9]+"]; // Firmware version of the device which recorded the pointcloud
 		optional update.HardwareVariant hardware_variant = 5; // Hardware variant of the device which recorded the pointcloud
+		optional stream.Subscribe.PointCloud subscription = 6; // <blockquote>Introduced in BSL v2.16 and firmware v1.17</blockquote> Used & merged subscription for stream
 	}
 
 	oneof data {

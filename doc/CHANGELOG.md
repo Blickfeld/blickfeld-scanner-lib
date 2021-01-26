@@ -13,6 +13,22 @@ influence the resulting point cloud.
 
 ### Removed
 
+## [2.16.1] - 2021.01.26
+
+### Added
+* Python: Structured numpy interface flag is now available for file streams
+
+### Changed
+* Bugfix: Do not enforce the legacy serial number for hardware modules
+* API: Rename filter `points_with_no_returns` to `delete_points_without_returns`
+
+## [2.16.0] - 2020.12.16
+
+### Added
+* [Introduced in firmware v1.17] API: Introduce packed frame format. The format returns point clouds as flat binary structures. These can be efficiently encoded & decoded, which increases the performance on low-performance clients significantly.
+* Python: Add structured numpy interface for point clouds
+* [Introduced in firmware v1.17] Extended hello message with library, firmware, and hardware information. Added requests for serial number & product variant.
+
 ## [2.15.0] - 2020.12.02
 
 ### Added

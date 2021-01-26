@@ -30,7 +30,7 @@ void point_cloud_record::start(const protocol::data::PointCloud::Header& header)
 	auto client_header = metadata.mutable_header()->mutable_client();
 	client_header->set_library_version(BSL_VERSION);
 	client_header->set_file_time_ns(std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now().time_since_epoch()).count());
-	client_header->set_language(protocol::file::Client::CPP);
+	client_header->set_language(protocol::Language::CPP);
 
 	// Write header
 	google::protobuf::io::CodedOutputStream pb_ocstream(&pb_ozstream);

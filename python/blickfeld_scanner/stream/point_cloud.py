@@ -16,7 +16,7 @@ import warnings
 from google.protobuf.internal.decoder import _DecodeVarint32
 from google.protobuf.internal.encoder import _EncodeVarint
 
-from ..protocol import connection_pb2
+from ..protocol import connection_pb2, common_pb2
 from ..protocol.file import general_pb2, point_cloud_pb2
 from ..protocol.data import frame_pb2
 from .. import version
@@ -84,6 +84,33 @@ REF_FRAME_DEPTH_MAP.scanlines[0].points[0].ambient_light_level = 0
 REF_FRAME_DEPTH_MAP.scanlines[0].points[0].returns[0].intensity = 0
 REF_FRAME_DEPTH_MAP.scanlines[0].points[0].returns[0].range = 0
 
+""" Reference frame: All attributes (default) """
+REF_FRAME_FULL = frame_pb2.Frame()
+REF_FRAME_FULL = frame_pb2.Frame()
+REF_FRAME_FULL.CopyFrom(REF_FRAME_XYZ_I_ID_TS)
+REF_FRAME_FULL.scanlines[0].points[0].ambient_light_level = 0
+REF_FRAME_FULL.scanlines[0].points[0].direction.azimuth = 0
+REF_FRAME_FULL.scanlines[0].points[0].direction.elevation = 0
+REF_FRAME_FULL.scanlines[0].points[0].returns[0].range = 0
+
+""" Reference frame in packed (for Python: numpy): XYZ coordinates, direction, range, intensity, ambient_light_level, frame id, scanline id, point id, return id, timestamps  """
+REF_FRAME_PACKED = frame_pb2.Frame()
+REF_FRAME_PACKED.id = 0
+REF_FRAME_PACKED.scan_pattern.SetInParent()
+REF_FRAME_PACKED.total_number_of_points = 0
+REF_FRAME_PACKED.total_number_of_returns = 0
+REF_FRAME_PACKED.start_time_ns = 0
+REF_FRAME_PACKED.scanlines.add().points.add().returns.add()
+REF_FRAME_PACKED.scanlines[0].points[0].id = 0
+REF_FRAME_PACKED.scanlines[0].points[0].ambient_light_level = 0
+REF_FRAME_PACKED.scanlines[0].points[0].start_offset_ns = 0
+REF_FRAME_PACKED.scanlines[0].points[0].direction.azimuth = 0
+REF_FRAME_PACKED.scanlines[0].points[0].direction.elevation = 0
+REF_FRAME_PACKED.scanlines[0].points[0].returns[0].id = 0
+REF_FRAME_PACKED.scanlines[0].points[0].returns[0].range = 0
+REF_FRAME_PACKED.scanlines[0].points[0].returns[0].intensity = 0
+REF_FRAME_PACKED.scanlines[0].points[0].returns[0].cartesian.append(0)
+REF_FRAME_PACKED.packed.SetInParent()  # To get packed frames, this parameter needs to be set in the reference frame
 
 class point_cloud(object):
     """ Class to request a point cloud stream
@@ -109,6 +136,14 @@ class point_cloud(object):
         > Introduced in BSL v2.13 and firmware v1.13
 
         Extend point cloud subscription request with additional parameters. This is mainly used internally.
+    
+    :param as_numpy:
+        > Introduced in BSL v2.16
+
+        This enables numpy support of the point cloud stream. Use recv_frame_as_numpy() to fetch frames as numpy structured arrays.
+        Specify the required attributes via the reference_frame attribute.
+        
+        Note: With devices with an firmware version older than v1.17, the performance is significantly worse than with up-to-date devices as the format needs to be converted on the client side. Consider updating the device.
     """
 
     REF_FRAME_XYZ = REF_FRAME_XYZ  #: Reference frame: XYZ coordinates
@@ -116,14 +151,19 @@ class point_cloud(object):
     REF_FRAME_XYZ_I_ID = REF_FRAME_XYZ_I_ID  #: Reference frame: XYZ coordinates, intensity, frame id, scanline id, point id, return id
     REF_FRAME_XYZ_I_ID_TS = REF_FRAME_XYZ_I_ID_TS  #: Reference frame: XYZ coordinates, intensity, frame id, scanline id, point id, return id, timestamps
     REF_FRAME_DEPTH_MAP = REF_FRAME_DEPTH_MAP  #: Reference frame: ambient_light_level, intensity, range, frame id, scanline id, point id
+    REF_FRAME_FULL = REF_FRAME_FULL # Reference frame: All attributes (default)
+    REF_FRAME_PACKED = REF_FRAME_PACKED #: Reference frame in packed (for Python: numpy) format: XYZ coordinates, direction, range, intensity, ambient_light_level, frame id, scanline id, point id, return id, timestamps
 
-    def __init__(self, connection=None, from_file=None, filter=None, reference_frame=None, point_filter=None, extend_subscribe_request=None):
+    def __init__(self, connection=None, from_file=None, filter=None, reference_frame=None, point_filter=None, extend_subscribe_request=None, as_numpy=False):
         self._metadata = point_cloud_pb2.PointCloud.Metadata()
 
         if connection and from_file:
             raise AttributeError("Either provide connection or from_file.")
         if not connection and not from_file:
             raise AttributeError("Neither connection nor from_file is provided.")
+        if as_numpy:
+            import numpy
+        self.as_numpy = as_numpy
 
         self._thread = None
         self._connection = None
@@ -146,8 +186,10 @@ class point_cloud(object):
             if filter:
                 warnings.warn("Please use 'point_filter' instead of 'filter'. 'filter' is deprecated.", DeprecationWarning, stacklevel=2)
                 req.subscribe.point_cloud.filter.CopyFrom(filter)
-            if reference_frame:
-                req.subscribe.point_cloud.reference_frame.CopyFrom(reference_frame)
+            if reference_frame or as_numpy:
+                req.subscribe.point_cloud.reference_frame.CopyFrom(reference_frame if reference_frame else REF_FRAME_PACKED)
+                if as_numpy:
+                    req.subscribe.point_cloud.reference_frame.packed.SetInParent()
             if extend_subscribe_request:
                 req.subscribe.point_cloud.MergeFrom(extend_subscribe_request)
 
@@ -155,7 +197,7 @@ class point_cloud(object):
 
             self._metadata.header.client.library_version = version.__version__
             self._metadata.header.client.file_time_ns = int(time.time() * 1e9)
-            self._metadata.header.client.language = general_pb2.Client.Language.PYTHON
+            self._metadata.header.client.language = common_pb2.Language.PYTHON
         else:
             # Open file
             self._file_name = from_file
@@ -232,15 +274,135 @@ class point_cloud(object):
         :return: Point cloud metadata, see: :any:`protobuf_protocol` PointCloud.Metadata
         """
         return self._metadata
-
+    
     def recv_frame(self, fail_on_lost_frames=False):
         """ Receive point cloud frame
+        
+        Note: It is recommended to use recv_frame_as_numpy() with the 'as_numpy=True' attribute if numpy is available. Its performance is significantly better with up-to-date devices.
 
         :param fail_on_lost_frames: An exception will be raised when a frame is lost. Please check performance of client or network. If file recording is enabled the compressions level of gzip can be reduced and therefore less CPU power is needed. See :py:func:`record_to_file`
 
         :return: point cloud frame with all the data in it, see: :any:`protobuf_protocol` Frame
         """
+        if self.as_numpy:
+            raise AttributeError("The recv_frame() can only be used in combination with the 'as_numpy=False' attribute in the stream constructor.")
+        
+        return self.__recv_frame(fail_on_lost_frames)
+    
+    def recv_frame_as_numpy(self, fail_on_lost_frames=False):
+        """ Receive point cloud frame as numpy structured array.
+        
+        Note: With devices with an firmware version older than v1.17, the performance is significantly worse than with up-to-date devices as the format needs to be converted on the client side. Consider updating the device.
 
+        :param fail_on_lost_frames: An exception will be raised when a frame is lost. Please check performance of client or network. If file recording is enabled the compressions level of gzip can be reduced and therefore less CPU power is needed. See :py:func:`record_to_file`
+
+        :return: point cloud frame as numpy structured array. The available fields depend on the reference_frame in the stream constructor or on the available fields in a recording.
+        """
+        
+        if not self.as_numpy:
+            raise AttributeError("The recv_frame_as_numpy() can only be used in combination with the 'as_numpy=True' attribute in the stream constructor.")
+        
+        import numpy as np
+        
+        frame = self.__recv_frame(fail_on_lost_frames)
+        
+        # Handle old unpacked frames
+        is_packed = frame.HasField('packed')
+        if not is_packed:
+            if len(frame.scanlines) == 0 or len(frame.scanlines[0].points) == 0:
+                return None
+            
+            ref_frame = self._metadata.header.device.subscription.reference_frame if self._metadata.header.device.HasField("subscription") else REF_FRAME_FULL
+            ref_point = ref_frame.scanlines[0].points[0]
+            has_ref_return = len(ref_point.returns) > 0;
+            if has_ref_return:
+                ref_return = ref_point.returns[0];
+        
+        # Construct dtype according to available fields
+        dtype = []
+        if frame.packed.HasField('cartesian') or (not is_packed and has_ref_return and len(ref_return.cartesian) > 0):
+            dtype.append( ('cartesian', [ ('x', '>f4'), ('y', '>f4'), ('z', '>f4') ] ) )
+        if frame.packed.HasField('direction') or (not is_packed and ref_point.HasField('direction')):
+            dtype.append( ('direction', [ ('azimuth', '>f4'), ('elevation', '>f4') ] ) )
+        if frame.packed.HasField('range') or (not is_packed and has_ref_return and ref_return.HasField('range')):
+            dtype.append( ('range', '>f4') )
+        if frame.packed.HasField('intensity') or (not is_packed and has_ref_return and ref_return.HasField('intensity')):
+            dtype.append( ('intensity', '>u4') )
+        if frame.packed.HasField('ambient_light_level') or (not is_packed and ref_point.HasField('ambient_light_level')):
+            dtype.append( ('ambient_light_level', '>u4') )
+        if frame.packed.HasField('start_offset_ns') or (not is_packed and ref_point.HasField('start_offset_ns')):
+            dtype.append( ('start_offset_ns', '>u8') )
+        if frame.packed.HasField('point_id') or (not is_packed and ref_point.HasField('id')):
+            dtype.append( ('point_id', '>u8') )
+        if frame.packed.HasField('channel_id') or (not is_packed and ref_point.HasField('channel_id')):
+            dtype.append( ('channel_id', '>u1') )
+        if frame.packed.HasField('return_id') or (not is_packed and has_ref_return and ref_return.HasField('id')):
+            dtype.append( ('return_id', '>u1') )
+        
+        if is_packed:
+            # Cast buffers to the correct format
+            res = np.zeros(frame.packed.length, dtype=dtype)
+            if frame.packed.HasField('cartesian'):
+                res['cartesian'] = np.frombuffer(frame.packed.cartesian, dtype={'names': ['x', 'y', 'z'], 'formats': ['>f4', '>f4', '>f4']})
+            if frame.packed.HasField('direction'):
+                res['direction'] = np.frombuffer(frame.packed.direction, dtype={'names': ['azimuth', 'elevation'], 'formats': ['>f4', '>f4']})
+            if frame.packed.HasField('range'):
+                res['range'] = np.frombuffer(frame.packed.range, dtype='>f4')
+            if frame.packed.HasField('intensity'):
+                res['intensity'] = np.frombuffer(frame.packed.intensity, dtype='>u4')
+            if frame.packed.HasField('ambient_light_level'):
+                res['ambient_light_level'] = np.frombuffer(frame.packed.ambient_light_level, dtype='>u4')
+            if frame.packed.HasField('start_offset_ns'):
+                res['start_offset_ns'] = np.frombuffer(frame.packed.start_offset_ns, dtype='>u8')
+            if frame.packed.HasField('point_id'):
+                res['point_id'] = np.frombuffer(frame.packed.point_id, dtype='>u4')
+            if frame.packed.HasField('channel_id'):
+                res['channel_id'] = np.frombuffer(frame.packed.channel_id, dtype='>u1')
+            if frame.packed.HasField('return_id'):
+                res['return_id'] = np.frombuffer(frame.packed.return_id, dtype='>u1')
+        else:
+            # Handle old unpacked frames
+            res = np.zeros(frame.total_number_of_points + frame.total_number_of_returns, dtype=dtype)
+            
+            i = 0
+            for s in frame.scanlines:
+                for p in s.points:
+                    def fill_point():
+                        if ref_point.HasField('id'):
+                            res['point_id'][i] = p.id
+                        if ref_point.HasField('direction'):
+                            res['direction'][i] = (p.direction.azimuth, p.direction.elevation)
+                        if ref_point.HasField('ambient_light_level'):
+                            res['ambient_light_level'][i] = p.ambient_light_level
+                        if ref_point.HasField('start_offset_ns'):
+                            res['start_offset_ns'][i] = p.start_offset_ns
+                        if ref_point.HasField('channel_id'):
+                            res['channel_id'][i] = p.channel_id
+                    fill_point()
+                    
+                    for r in p.returns:
+                        fill_point()
+                        
+                        if has_ref_return:
+                            if ref_return.HasField('id'):
+                                res['return_id'][i] = r.id
+                            if ref_return.HasField('range'):
+                                res['range'][i] = r.range
+                            if ref_return.HasField('intensity'):
+                                res['intensity'][i] = r.intensity
+                            if len(ref_return.cartesian) > 0:
+                                res['cartesian'][i] = tuple(r.cartesian)
+                        
+                        i = i + 1
+                        
+                    if len(p.returns) == 0:
+                        i = i + 1
+                        
+            res.resize(i, refcheck=False)
+                        
+        return frame, res
+
+    def __recv_frame(self, fail_on_lost_frames=False):        
         # If stream is closed with CTRL-C it will still write the footer and save the file
         if terminate:
             self.stop()

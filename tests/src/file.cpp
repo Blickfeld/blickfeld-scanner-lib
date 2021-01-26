@@ -14,9 +14,12 @@
 
 #include "simulated_connection.h"
 
-TEST(file, simulate_record_and_read) {
+class file_simulate_record_and_read : public ::testing::TestWithParam<string> {
+};
+
+TEST_P(file_simulate_record_and_read, simulate_record_and_read) {
 	{
-		auto connection = std::make_shared<simulated_connection>("../tests/assets/dump.bfpc");
+		auto connection = std::make_shared<simulated_connection>(GetParam());
 
 		// Open dump file
 		std::ofstream dump_file;
@@ -53,3 +56,11 @@ TEST(file, simulate_record_and_read) {
 		dump_file.close();
 	}
 }
+
+INSTANTIATE_TEST_CASE_P(
+	simulate_record_and_read,
+	file_simulate_record_and_read,
+	::testing::Values(
+		"../tests/assets/dump.bfpc",
+		"../tests/assets/packed.bfpc"
+		));

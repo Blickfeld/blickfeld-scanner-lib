@@ -1,0 +1,11 @@
+syntax = "proto2";
+
+package blickfeld.protocol.config;
+
+/**
+ * Product variant
+ */
+enum Product {
+	PRODUCT_CUBE = 0;
+	PRODUCT_CUBE_RANGE = 2;
+};
