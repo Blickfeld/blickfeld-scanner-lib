@@ -128,6 +128,16 @@ The data, such as a point cloud, are also packed in protobuf messages.
   
   
 
+- [blickfeld/config/algorithm.proto](#blickfeld/config/algorithm.proto)
+    - [Algorithm](#blickfeld.protocol.config.Algorithm)
+    - [Algorithm.BackgroundSubtraction](#blickfeld.protocol.config.Algorithm.BackgroundSubtraction)
+    - [Algorithm.NeighborFilter](#blickfeld.protocol.config.Algorithm.NeighborFilter)
+    - [Algorithm.StaticTransformation](#blickfeld.protocol.config.Algorithm.StaticTransformation)
+  
+  
+  
+  
+
 - [blickfeld/config/generate.proto](#blickfeld/config/generate.proto)
     - [Generate](#blickfeld.protocol.config.Generate)
   
@@ -177,6 +187,16 @@ The data, such as a point cloud, are also packed in protobuf messages.
   
     - [Secure.CertType](#blickfeld.protocol.config.Secure.CertType)
     - [Secure.Permissions](#blickfeld.protocol.config.Secure.Permissions)
+  
+  
+  
+
+- [blickfeld/data/algorithm.proto](#blickfeld/data/algorithm.proto)
+    - [Algorithm](#blickfeld.protocol.data.Algorithm)
+    - [Algorithm.BackgroundSubtraction](#blickfeld.protocol.data.Algorithm.BackgroundSubtraction)
+    - [Algorithm.NeighborFilter](#blickfeld.protocol.data.Algorithm.NeighborFilter)
+    - [Algorithm.StaticTransformation](#blickfeld.protocol.data.Algorithm.StaticTransformation)
+  
   
   
   
@@ -1480,6 +1500,132 @@ Parameters, which control the server behavior.
 
 
 
+<a name="blickfeld/config/algorithm.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## blickfeld/config/algorithm.proto
+
+
+
+<a name="blickfeld.protocol.config.Algorithm"></a>
+
+### Algorithm
+> Introduced in BSL v2.17 and firmware v1.18
+
+This section describes configuration of on-device algorithms.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| background_subtraction | [Algorithm.BackgroundSubtraction](#blickfeld.protocol.config.Algorithm.BackgroundSubtraction) | optional | Refer to [BackgroundSubtraction](#blickfeld.protocol.config.Algorithm.BackgroundSubtraction) |
+| neighbor_filter | [Algorithm.NeighborFilter](#blickfeld.protocol.config.Algorithm.NeighborFilter) | optional | Refer to [NeighborFilter](#blickfeld.protocol.config.Algorithm.NeighborFilter) |
+| static_transformation | [Algorithm.StaticTransformation](#blickfeld.protocol.config.Algorithm.StaticTransformation) | optional | Refer to [StaticTransformation](#blickfeld.protocol.config.Algorithm.StaticTransformation) |
+
+
+
+
+
+
+<a name="blickfeld.protocol.config.Algorithm.BackgroundSubtraction"></a>
+
+### Algorithm.BackgroundSubtraction
+> Introduced in firmware v1.16
+
+This message configures the background subtraction.
+
+The algorithm uses a configurable number of reference frames to estimate static points (background) in the scene.
+Once the number of reference frames are processed it removes all static points from the point cloud output.
+The resulting point cloud only contains the non-static points (foreground).
+Points which are a certain time in the foreground and don't move will be added to the background and if some object in the background, like a box is removed, the points will also appear.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| initialization_frames | [uint32](#uint32) | optional | Number of frames to initialize the background with Default: 10 |
+| exponential_decay_rate | [float](#float) | optional | Controls how fast objects switch between foreground and background. Exponential decay factor. Default: 0.0025 |
+| classification_threshold | [float](#float) | optional | Controls the resolution of the background subtraction in standard deviations Default: 3 |
+
+
+
+
+
+
+<a name="blickfeld.protocol.config.Algorithm.NeighborFilter"></a>
+
+### Algorithm.NeighborFilter
+> Introduced in firmware v1.18
+
+The neighbor filter is a simple noise filter, which uses the knowledge of neighbor points in the scan pattern.
+
+The algorithm iterates through all returns and removes all, which have zero neighbors.
+A neighbor return must be:
+- to the left / to the right / above / below the current return in the scan pattern
+- close the current range. The maximum range is defined by the angle spacing of the scan pattern and the range of the current return.
+
+No parameters can be configured at the moment.
+
+
+
+
+
+
+<a name="blickfeld.protocol.config.Algorithm.StaticTransformation"></a>
+
+### Algorithm.StaticTransformation
+> Introduced in firmware v1.18
+
+This message configures a static geometric transformation.
+
+The algorithm applies a static rotation and translation to the point cloud output.
+
+The rotation matrix **R** is expected to be a 3 x 3 matrix serialized in row major order.
+
+Rotation in matrix representation:
+
+|     |  R  |     |
+| --- | --- | --- |
+| r<sub>1,1</sub> | r<sub>1,2</sub> | r<sub>1,3</sub> |
+| r<sub>2,1</sub> | r<sub>2,2</sub> | r<sub>2,3</sub> |
+| r<sub>3,1</sub> | r<sub>3,2</sub> | r<sub>3,3</sub> |
+
+Rotation in serialized representation:
+
+**R** = [r<sub>1,1</sub>, r<sub>1,2</sub>, ... r<sub>3,2</sub>, r<sub>3,3</sub>]
+
+The translation vector **T** is expected to be a 3 x 1 vector.
+
+Translation in vector representation:
+
+|  T  |
+| --- |
+|  t<sub>1</sub>  |
+|  t<sub>2</sub>  |
+|  t<sub>3</sub>  |
+
+Translation in serialized representation:
+
+**T** = [t<sub>1</sub>, t<sub>2</sub>, t<sub>3</sub>] =  [x, y, z]
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| rotation_matrix | [float](#float) | repeated | rotation matrix **R** in serialized representation. |
+| translation_vector | [float](#float) | repeated | translation vector **T** in serialized representation. |
+
+
+
+
+
+ <!-- end messages -->
+
+ <!-- end enums -->
+
+ <!-- end HasExtensions -->
+
+ <!-- end services -->
+
+
+
 <a name="blickfeld/config/generate.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
@@ -1671,6 +1817,7 @@ where the point.ambient_light_level is the ambient light level of the point the 
 | ----- | ---- | ----- | ----------- |
 | offset | [uint32](#uint32) | optional | Can be seen as minimum intensity filter, if there is no ambient light. |
 | gain | [float](#float) | optional | The gain scales a non-linear function, which uses the ambient light level of the point the laser shoots at, as an input. |
+| enable | [bool](#bool) | optional | <blockquote>Introduced in BSL v2.17 and firmware v1.18</blockquote>	This flag can be used to disable the internal noise filter completely. By default, the noise filter is enabled. Default: true |
 
 
 
@@ -1970,6 +2117,82 @@ do NOT change enum labels, they are used as strings in ssl certs
 
 
 
+<a name="blickfeld/data/algorithm.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## blickfeld/data/algorithm.proto
+
+
+
+<a name="blickfeld.protocol.data.Algorithm"></a>
+
+### Algorithm
+> Introduced in BSL v2.17 and firmware v1.18
+
+This section describes the additional data output of on-device algorithms.
+The data is attached to the frame.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| background_subtraction | [Algorithm.BackgroundSubtraction](#blickfeld.protocol.data.Algorithm.BackgroundSubtraction) | optional | Refer to [BackgroundSubtraction](#blickfeld.protocol.data.Algorithm.BackgroundSubtraction). |
+| neighbor_filter | [Algorithm.NeighborFilter](#blickfeld.protocol.data.Algorithm.NeighborFilter) | optional | Refer to [NeighborFilter](#blickfeld.protocol.data.Algorithm.NeighborFilter). |
+| static_transformation | [Algorithm.StaticTransformation](#blickfeld.protocol.data.Algorithm.StaticTransformation) | optional | Refer to [StaticTransformation](#blickfeld.protocol.data.Algorithm.StaticTransformation). |
+| execution_time | [float](#float) | optional | Execution time of the algorithm in [s] |
+
+
+
+
+
+
+<a name="blickfeld.protocol.data.Algorithm.BackgroundSubtraction"></a>
+
+### Algorithm.BackgroundSubtraction
+The description of the algorithm can be found at [config.Algorithm.BackgroundSubtraction](#blickfeld.protocol.config.Algorithm.BackgroundSubtraction).
+
+The algorithm does not output any additional information.
+It subtracts returns from the main frame.
+
+
+
+
+
+
+<a name="blickfeld.protocol.data.Algorithm.NeighborFilter"></a>
+
+### Algorithm.NeighborFilter
+The description of the algorithm can be found at [config.Algorithm.NeighborFilter](#blickfeld.protocol.config.Algorithm.NeighborFilter).
+
+The algorithm does not output any additional information.
+It subtracts returns from the main frame.
+
+
+
+
+
+
+<a name="blickfeld.protocol.data.Algorithm.StaticTransformation"></a>
+
+### Algorithm.StaticTransformation
+The description of the algorithm can be found at [config.Algorithm.StaticTransformation](#blickfeld.protocol.config.Algorithm.StaticTransformation).
+
+The algorithm does not output any additional information.
+It transforms the cartesian coordinates in the frame.
+
+
+
+
+
+ <!-- end messages -->
+
+ <!-- end enums -->
+
+ <!-- end HasExtensions -->
+
+ <!-- end services -->
+
+
+
 <a name="blickfeld/data/frame.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
@@ -1995,6 +2218,7 @@ This section describes the contents of a point cloud frame.
 Each point of the [total_number_of_points](#blickfeld.protocol.data.Frame.total_number_of_points) can produce several returns. |
 | scanlines | [Scanline](#blickfeld.protocol.data.Scanline) | repeated | Refer to [Scanline](#blickfeld.protocol.data.Scanline) |
 | packed | [Frame.Packed](#blickfeld.protocol.data.Frame.Packed) | optional | <blockquote>Introduced in BSL v2.16 and firmware v1.17</blockquote> Refer to [Packed](#blickfeld.protocol.data.Frame.Packed) |
+| algorithms | [Algorithm](#blickfeld.protocol.data.Algorithm) | repeated | <blockquote>Introduced in BSL v2.17 and firmware v1.16</blockquote> Refer to [data.Algorithm](#blickfeld.protocol.data.Algorithm). Each algorithm configured can output additional data, which is provided with this field. |
 
 
 
@@ -2657,6 +2881,8 @@ This request is used for subscribing to a point cloud stream.
 | ----- | ---- | ----- | ----------- |
 | reference_frame | [blickfeld.protocol.data.Frame](#blickfeld.protocol.data.Frame) | optional | <blockquote>Introduced in BSL v2.10 and firmware v1.9</blockquote> If present, only fields that are set in this message and submessages will be present in the point cloud. If less fields are requested, the Protobuf encoding and network transport time can reduce significantly. |
 | filter | [blickfeld.protocol.config.ScanPattern.Filter](#blickfeld.protocol.config.ScanPattern.Filter) | optional | <blockquote>Introduced in BSL v2.10 and firmware v1.9</blockquote> Refer to [ScanPattern.Filter](#blickfeld.protocol.config.ScanPattern.Filter). Overrides parameters of scan pattern. |
+| algorithms | [blickfeld.protocol.config.Algorithm](#blickfeld.protocol.config.Algorithm) | repeated | <blockquote>Introduced in BSL v2.17 and firmware v1.16</blockquote> Refer to [config.Algorithm](#blickfeld.protocol.config.Algorithm). Sets algorithms, which are initialized, configured for the stream and are executed on each frame in the post-processing on the device. |
+| prepend_advanced_config_algorithms | [bool](#bool) | optional | <blockquote>Introduced in BSL v2.17 and firmware v1.16</blockquote> With the server.default_point_cloud_subscription algorithms can be persisted on the device and they are by default prepended to the list of sent algorithms in the subscribe request. This behaviour can be disabled with this field to e.g. disable or overwrite all algorithms. Default: true |
 
 
 

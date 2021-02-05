@@ -273,19 +273,34 @@ std::shared_ptr<scanner::point_cloud_stream<protocol::data::Frame> > scanner::ge
 }
 
 std::shared_ptr<scanner::point_cloud_stream<protocol::data::Frame> > scanner::get_point_cloud_stream(const protocol::data::Frame reference_frame) {
-	return std::make_shared<point_cloud_stream<protocol::data::Frame> >(create_connection(), nullptr, &reference_frame);
+	protocol::stream::Subscribe::PointCloud extend_subscription;
+	extend_subscription.mutable_reference_frame()->MergeFrom(reference_frame);
+	return std::make_shared<point_cloud_stream<protocol::data::Frame> >(create_connection(), &extend_subscription);
 }
 
 std::shared_ptr<scanner::point_cloud_stream<protocol::data::Frame> > scanner::get_point_cloud_stream(const protocol::config::ScanPattern::Filter filter) {
-	return std::make_shared<point_cloud_stream<protocol::data::Frame> >(create_connection(), &filter, nullptr);
+	protocol::stream::Subscribe::PointCloud extend_subscription;
+	extend_subscription.mutable_filter()->MergeFrom(filter);
+	return std::make_shared<point_cloud_stream<protocol::data::Frame> >(create_connection(), &extend_subscription);
 }
 
 std::shared_ptr<scanner::point_cloud_stream<protocol::data::Frame> > scanner::get_point_cloud_stream(const protocol::config::ScanPattern::Filter filter, const protocol::data::Frame reference_frame) {
-	return std::make_shared<point_cloud_stream<protocol::data::Frame> >(create_connection(), &filter, &reference_frame);
+	protocol::stream::Subscribe::PointCloud extend_subscription;
+	extend_subscription.mutable_filter()->MergeFrom(filter);
+	extend_subscription.mutable_reference_frame()->MergeFrom(reference_frame);
+	return std::make_shared<point_cloud_stream<protocol::data::Frame> >(create_connection(), &extend_subscription);
 }
 
-std::shared_ptr<scanner::point_cloud_stream<protocol::data::Frame> > scanner::get_point_cloud_stream(const protocol::config::ScanPattern::Filter filter, const protocol::data::Frame reference_frame, const protocol::stream::Subscribe::PointCloud extend_subscription) {
-	return std::make_shared<point_cloud_stream<protocol::data::Frame> >(create_connection(), &filter, &reference_frame, &extend_subscription);
+std::shared_ptr<scanner::point_cloud_stream<protocol::data::Frame> > scanner::get_point_cloud_stream(const std::vector<protocol::config::Algorithm> algorithms) {
+	protocol::stream::Subscribe::PointCloud extend_subscription;
+	for(auto a : algorithms) {
+		extend_subscription.mutable_algorithms()->Add()->CopyFrom(a);
+	}
+	return std::make_shared<point_cloud_stream<protocol::data::Frame> >(create_connection(), &extend_subscription);
+}
+
+std::shared_ptr<scanner::point_cloud_stream<protocol::data::Frame> > scanner::get_point_cloud_stream(const protocol::stream::Subscribe::PointCloud extend_subscription) {
+	return std::make_shared<point_cloud_stream<protocol::data::Frame> >(create_connection(), &extend_subscription);
 }
 
 #ifdef BSL_RECORDING

@@ -1,0 +1,47 @@
+syntax = "proto2";
+option cc_enable_arenas = true;
+
+package blickfeld.protocol.data;
+
+/**
+ * > Introduced in BSL v2.17 and firmware v1.18
+ *
+ * This section describes the additional data output of on-device algorithms.
+ * The data is attached to the frame.
+ */
+message Algorithm {
+	/**
+	 * The description of the algorithm can be found at [config.Algorithm.BackgroundSubtraction](#blickfeld.protocol.config.Algorithm.BackgroundSubtraction).
+	 *
+	 * The algorithm does not output any additional information.
+	 * It subtracts returns from the main frame.
+	 */
+	message BackgroundSubtraction {
+	}
+
+	/**
+	 * The description of the algorithm can be found at [config.Algorithm.NeighborFilter](#blickfeld.protocol.config.Algorithm.NeighborFilter).
+	 *
+	 * The algorithm does not output any additional information.
+	 * It subtracts returns from the main frame.
+	 */
+	message NeighborFilter {
+	}
+
+	/**
+	 * The description of the algorithm can be found at [config.Algorithm.StaticTransformation](#blickfeld.protocol.config.Algorithm.StaticTransformation).
+	 *
+	 * The algorithm does not output any additional information.
+	 * It transforms the cartesian coordinates in the frame.
+	 */
+	message StaticTransformation {
+	}
+
+	oneof algo {
+		BackgroundSubtraction background_subtraction = 1; // Refer to [BackgroundSubtraction](#blickfeld.protocol.data.Algorithm.BackgroundSubtraction).
+		NeighborFilter neighbor_filter = 2; // Refer to [NeighborFilter](#blickfeld.protocol.data.Algorithm.NeighborFilter).
+		StaticTransformation static_transformation = 3; // Refer to [StaticTransformation](#blickfeld.protocol.data.Algorithm.StaticTransformation).
+	}
+
+	optional float execution_time = 100; // Execution time of the algorithm in [s]
+}

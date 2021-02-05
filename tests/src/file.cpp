@@ -19,7 +19,7 @@ class file_simulate_record_and_read : public ::testing::TestWithParam<string> {
 
 TEST_P(file_simulate_record_and_read, simulate_record_and_read) {
 	{
-		auto connection = std::make_shared<simulated_connection>(GetParam());
+		auto connection = std::make_shared<network::simulated_connection>(GetParam(), nullptr, false);
 
 		// Open dump file
 		std::ofstream dump_file;

@@ -13,6 +13,12 @@ influence the resulting point cloud.
 
 ### Removed
 
+## [2.17.0] - 2021.02.05
+
+### Added
+* [Introduced in firmware v1.18] Algorithm API with three on-device processing algorithms: Background subtraction, neighbour noise filter, and static transformation.
+* [Introduced in firmware v1.18] Option to disable the noise filter in the scan pattern configuration
+
 ## [2.16.1] - 2021.01.26
 
 ### Added

@@ -2,6 +2,7 @@ syntax = "proto2";
 option cc_enable_arenas = true;
 
 import "blickfeld/options.proto";
+import "blickfeld/config/algorithm.proto";
 import "blickfeld/data/frame.proto";
 import "blickfeld/config/scan_pattern.proto";
 
@@ -18,7 +19,9 @@ message Subscribe {
 	message PointCloud {
 		optional data.Frame reference_frame = 1 [(optional)=true, (allow_sparse)=true]; // <blockquote>Introduced in BSL v2.10 and firmware v1.9</blockquote> If present, only fields that are set in this message and submessages will be present in the point cloud. If less fields are requested, the Protobuf encoding and network transport time can reduce significantly.
 		optional config.ScanPattern.Filter filter = 2; // <blockquote>Introduced in BSL v2.10 and firmware v1.9</blockquote> Refer to [ScanPattern.Filter](#blickfeld.protocol.config.ScanPattern.Filter). Overrides parameters of scan pattern.
-		extensions 3; // Internal developer configuration
+
+		repeated config.Algorithm algorithms = 3; // <blockquote>Introduced in BSL v2.17 and firmware v1.16</blockquote> Refer to [config.Algorithm](#blickfeld.protocol.config.Algorithm). Sets algorithms, which are initialized, configured for the stream and are executed on each frame in the post-processing on the device.
+		optional bool prepend_advanced_config_algorithms = 4 [default = true]; // <blockquote>Introduced in BSL v2.17 and firmware v1.16</blockquote> With the server.default_point_cloud_subscription algorithms can be persisted on the device and they are by default prepended to the list of sent algorithms in the subscribe request. This behaviour can be disabled with this field to e.g. disable or overwrite all algorithms.
 	}
 
 	/**

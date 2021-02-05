@@ -22,6 +22,7 @@ import time
 from .protocol import connection_pb2
 from .protocol.stream import connection_pb2 as stream_connection_pb2
 from .protocol import options_pb2, common_pb2
+from .protocol.config import algorithm_pb2
 from . import stream
 from .version import __version__
 
@@ -128,7 +129,7 @@ class scanner(object):
         """
         return stream.status(self.create_connection())
 
-    def get_point_cloud_stream(self, filter=None, reference_frame=None, point_filter=None, as_numpy=False):
+    def get_point_cloud_stream(self, filter=None, reference_frame=None, point_filter=None, algorithms=None, as_numpy=False):
         """ Request point cloud stream of device
 
         :param filter: DEPRECATED
@@ -144,6 +145,10 @@ class scanner(object):
             > Introduced in BSL v2.13 and firmware v1.9
 
             Filter points and returns by point attributes during the post-processing on the device. This replaces the 'filter' parameter
+        :param algorithms:
+            > Introduced in BSL v2.17 and firmware v1.16
+
+            Add set of algorithms which post-process the point cloud data.
         :param as_numpy:
             > Introduced in BSL v2.16
     
@@ -159,7 +164,7 @@ class scanner(object):
         if filter:
             warnings.warn("Please use 'point_filter' instead of 'filter'. 'filter' is deprecated.", DeprecationWarning, stacklevel=2)
             point_filter = filter
-        return stream.point_cloud(self.create_connection(), point_filter=point_filter, reference_frame=reference_frame, as_numpy=as_numpy)
+        return stream.point_cloud(self.create_connection(), point_filter=point_filter, reference_frame=reference_frame, algorithms=algorithms, as_numpy=as_numpy)
 
     def get_raw_point_cloud_stream(self, point_filter=None, reference_frame=None):
         """ Request raw point cloud stream of device
@@ -210,7 +215,7 @@ class scanner(object):
             req.point_cloud.reference_frame.CopyFrom(reference_frame)
 
         return stream.raw(self.create_connection(), req, file_name)
-
+        
     @staticmethod
     def file_point_cloud_stream(dump_filename, as_numpy=False):
         """ Request a point_cloud_stream, which streams off a .bfpc file.
@@ -227,6 +232,29 @@ class scanner(object):
         :return: :py:class:`blickfeld_scanner.scanner.stream.point_cloud` object
         """
         return stream.point_cloud(from_file=dump_filename, as_numpy=as_numpy)
+
+    def set_default_point_cloud_algorithms(self, persist=False, background_subtraction=False, neighbor_filter=False):
+        advanced = self.get_advanced_config()
+        del advanced.server.default_point_cloud_subscription.algorithms[:]
+        
+        algorithms = []
+        if background_subtraction:
+            cfg = algorithm_pb2.Algorithm()
+            if type(background_subtraction) == bool:
+                cfg.background_subtraction.SetInParent()
+            else:
+                cfg.background_subtraction.CopyFrom(background_subtraction)
+            algorithms.append(cfg)
+        if neighbor_filter:
+            cfg = algorithm_pb2.Algorithm()
+            if type(neighbor_filter) == bool:
+                cfg.neighbor_filter.SetInParent()
+            else:
+                cfg.neighbor_filter.CopyFrom(neighbor_filter)
+            algorithms.append(cfg)
+        
+        advanced.server.default_point_cloud_subscription.algorithms.extend(algorithms)
+        return self.set_advanced_config(advanced, persist=persist)
     
     def set_scan_pattern(self, config=None, name=None, persist = False):
         """ Function to set a new scan pattern, see: :any:`protobuf_protocol`.

@@ -1,0 +1,93 @@
+syntax = "proto2";
+option cc_enable_arenas = true;
+
+import "blickfeld/options.proto";
+
+package blickfeld.protocol.config;
+
+/**
+ * > Introduced in BSL v2.17 and firmware v1.18
+ *
+ * This section describes configuration of on-device algorithms.
+ */
+message Algorithm {
+	/**
+	 * > Introduced in firmware v1.16
+	 *
+	 * This message configures the background subtraction.
+	 *
+	 * The algorithm uses a configurable number of reference frames to estimate static points (background) in the scene.
+	 * Once the number of reference frames are processed it removes all static points from the point cloud output.
+	 * The resulting point cloud only contains the non-static points (foreground).
+	 * Points which are a certain time in the foreground and don't move will be added to the background and if some object in the background, like a box is removed, the points will also appear.
+	 *
+	 */
+	message BackgroundSubtraction {
+		optional uint32 initialization_frames = 1 [default=10, (d_min) = 1]; // Number of frames to initialize the background with
+		optional float exponential_decay_rate = 2 [default=0.0025, (d_min) = 0, (d_max) = 1]; // Controls how fast objects switch between foreground and background. Exponential decay factor.
+		optional float classification_threshold = 4 [default=3.0, (d_min) = 0, (d_max) = 5]; // Controls the resolution of the background subtraction in standard deviations
+	}
+
+	/**
+	 * > Introduced in firmware v1.18
+	 *
+	 * The neighbor filter is a simple noise filter, which uses the knowledge of neighbor points in the scan pattern.
+	 *
+	 * The algorithm iterates through all returns and removes all, which have zero neighbors.
+	 * A neighbor return must be:
+	 * - to the left / to the right / above / below the current return in the scan pattern
+	 * - close the current range. The maximum range is defined by the angle spacing of the scan pattern and the range of the current return.
+	 *
+	 * No parameters can be configured at the moment.
+	 */
+	message NeighborFilter {
+	}
+
+	/**
+	 *
+	 * > Introduced in firmware v1.18
+	 *
+	 * This message configures a static geometric transformation.
+	 *
+	 * The algorithm applies a static rotation and translation to the point cloud output.
+	 *
+	 * The rotation matrix **R** is expected to be a 3 x 3 matrix serialized in row major order.
+	 *
+	 * Rotation in matrix representation:
+	 *
+	 * |     |  R  |     |
+	 * | --- | --- | --- |
+	 * | r<sub>1,1</sub> | r<sub>1,2</sub> | r<sub>1,3</sub> |
+	 * | r<sub>2,1</sub> | r<sub>2,2</sub> | r<sub>2,3</sub> |
+	 * | r<sub>3,1</sub> | r<sub>3,2</sub> | r<sub>3,3</sub> |
+	 *
+	 * Rotation in serialized representation:
+	 *
+	 * **R** = [r<sub>1,1</sub>, r<sub>1,2</sub>, ... r<sub>3,2</sub>, r<sub>3,3</sub>]
+	 *
+	 * The translation vector **T** is expected to be a 3 x 1 vector.
+	 *
+	 * Translation in vector representation:
+	 *
+	 * |  T  |
+	 * | --- |
+	 * |  t<sub>1</sub>  |
+	 * |  t<sub>2</sub>  |
+	 * |  t<sub>3</sub>  |
+	 *
+	 * Translation in serialized representation:
+	 *
+	 * **T** = [t<sub>1</sub>, t<sub>2</sub>, t<sub>3</sub>] =  [x, y, z]
+	 *
+	 */
+	message StaticTransformation {
+		repeated float rotation_matrix = 1 [(length) = 9, (optional) = true, packed = true]; // rotation matrix **R** in serialized representation.
+		repeated float translation_vector = 2 [(length) = 3, (optional) = true, packed = true]; // translation vector **T** in serialized representation.
+	}
+
+	oneof algo {
+		BackgroundSubtraction background_subtraction = 1; // Refer to [BackgroundSubtraction](#blickfeld.protocol.config.Algorithm.BackgroundSubtraction)
+		NeighborFilter neighbor_filter = 2; // Refer to [NeighborFilter](#blickfeld.protocol.config.Algorithm.NeighborFilter)
+		StaticTransformation static_transformation = 3; // Refer to [StaticTransformation](#blickfeld.protocol.config.Algorithm.StaticTransformation)
+	}
+}
