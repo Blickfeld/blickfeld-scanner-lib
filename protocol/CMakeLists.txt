@@ -168,8 +168,8 @@ foreach(FILE ${PROTOBUF_SOURCES})
 			DEPENDS ${FILE}
 			WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
 		)
+		list(APPEND PROTOBUF_GENERATED_PY ${PROTOBUF_GENERATED_PY_DIR}/${FILE_PY})
 	endif()
-	list(APPEND PROTOBUF_GENERATED_PY ${PROTOBUF_GENERATED_PY_DIR}/${FILE_PY})
 endforeach()
 
 # NPM Build (moved out of the loop as pbjs and pbts accepts all .proto files at once.)

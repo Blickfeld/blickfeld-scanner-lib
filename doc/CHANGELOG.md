@@ -13,6 +13,13 @@ influence the resulting point cloud.
 
 ### Removed
 
+## [2.17.1] - 2021.02.08
+
+### Changed
+* Replace c++17 with c++14 call and added test to check compatibility
+* Bugfix: Builds without Python failed with missing target dependency
+* Enforce protobuf version 3
+
 ## [2.17.0] - 2021.02.05
 
 ### Added

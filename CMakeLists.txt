@@ -135,7 +135,7 @@ set (LIBINCLUDEDIR_TOP "${PROJECT_BINARY_DIR}/include")
 # Protobuf
 set(PROTOBUF_SRC_DIR "${PROJECT_SOURCE_DIR}/thirdparty/protobuf")
 if(BF_USE_SYSTEM_PROTOBUF)
-  find_package(Protobuf REQUIRED)
+  find_package(Protobuf 3.0.0 REQUIRED)
 
   # Check version of protobuf
   if(PROTOBUF_FOUND AND Protobuf_PROTOC_EXECUTABLE)

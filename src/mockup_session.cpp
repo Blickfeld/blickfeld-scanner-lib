@@ -83,7 +83,8 @@ void mockup_session::do_read() {
 }
 
 void mockup_session::do_send() {
-	auto weak_self(weak_from_this());
+	auto self(shared_from_this());
+	auto weak_self = std::weak_ptr<mockup_session>(self);
 
 	send_thread = std::make_shared<asio::thread>([this, weak_self] {
 				while (auto self = weak_self.lock()) {
