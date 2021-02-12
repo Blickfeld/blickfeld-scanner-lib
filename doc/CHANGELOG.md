@@ -13,6 +13,11 @@ influence the resulting point cloud.
 
 ### Removed
 
+## [2.17.3] - 2021.02.12
+
+### Changed
+* CI: Update outdated auto-generated protocol documentation
+
 ## [2.17.2] - 2021.02.12
 
 ### Added
