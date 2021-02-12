@@ -13,6 +13,15 @@ influence the resulting point cloud.
 
 ### Removed
 
+## [2.17.2] - 2021.02.12
+
+### Added
+* Mockup-server, which can simulate a Blickfeld scanner by reading a point cloud recording. The implementation is currently **incomplete**, please read the documentation in the source code and the C++ server example.
+
+### Changed
+* Protocol: Improved documentation of algorithms
+* Python: Extended set_default_point_cloud_algorithms with static transformation
+
 ## [2.17.1] - 2021.02.08
 
 ### Changed

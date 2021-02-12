@@ -233,7 +233,19 @@ class scanner(object):
         """
         return stream.point_cloud(from_file=dump_filename, as_numpy=as_numpy)
 
-    def set_default_point_cloud_algorithms(self, persist=False, background_subtraction=False, neighbor_filter=False):
+    def set_default_point_cloud_algorithms(self, persist=False, background_subtraction=False, neighbor_filter=False, static_transformation=False):
+        """ Sets point cloud algorithms, which are then applied on all point cloud stream subscribe requests of clients.
+        Clients can still actively request other algorithms or disabled them.
+
+        Args:
+            persist (bool, optional): Persist the configuration on the device and activates it after a power-cycle. Defaults to False.
+            background_subtraction (bool, optional): Either enable the background subtraction with default parameters or supply a configuration object. Defaults to False.
+            neighbor_filter (bool, optional): Either enable the neighbor filter with default parameters or supply a configuration object Defaults to False.
+            static_transformation (bool, optional): Either enable the static transformation with default parameters or supply a configuration object. Defaults to False.
+
+        Returns:
+            Currently set advanced config, see :any:`protobuf_protocol` advanced config
+        """
         advanced = self.get_advanced_config()
         del advanced.server.default_point_cloud_subscription.algorithms[:]
         
@@ -251,6 +263,13 @@ class scanner(object):
                 cfg.neighbor_filter.SetInParent()
             else:
                 cfg.neighbor_filter.CopyFrom(neighbor_filter)
+            algorithms.append(cfg)
+        if static_transformation:
+            cfg = algorithm_pb2.Algorithm()
+            if type(static_transformation) == bool:
+                cfg.static_transformation.SetInParent()
+            else:
+                cfg.static_transformation.CopyFrom(static_transformation)
             algorithms.append(cfg)
         
         advanced.server.default_point_cloud_subscription.algorithms.extend(algorithms)

@@ -17,9 +17,11 @@ message Algorithm {
 	 * This message configures the background subtraction.
 	 *
 	 * The algorithm uses a configurable number of reference frames to estimate static points (background) in the scene.
-	 * Once the number of reference frames are processed it removes all static points from the point cloud output.
-	 * The resulting point cloud only contains the non-static points (foreground).
-	 * Points which are a certain time in the foreground and don't move will be added to the background and if some object in the background, like a box is removed, the points will also appear.
+	 * Once the number of reference frames are processed, it removes all static points from the point cloud output.
+	 * The resulting point cloud then only contains the non-static points (foreground).
+	 * Points that are a initially part of the foreground and but then stop moving, will be added to the background and
+	 * thus disappear after a certain amount of time, which is given by the exponential decay rate parameter.
+	 * Conversely, if an object that is already part of the background suddenly starts moving, it will be added to the foreground.
 	 *
 	 */
 	message BackgroundSubtraction {
@@ -31,12 +33,12 @@ message Algorithm {
 	/**
 	 * > Introduced in firmware v1.18
 	 *
-	 * The neighbor filter is a simple noise filter, which uses the knowledge of neighbor points in the scan pattern.
+	 * The neighbor filter is a simple noise filter, which uses neighboring returns in the scan pattern to decide if returns should be filtered.
 	 *
 	 * The algorithm iterates through all returns and removes all, which have zero neighbors.
 	 * A neighbor return must be:
-	 * - to the left / to the right / above / below the current return in the scan pattern
-	 * - close the current range. The maximum range is defined by the angle spacing of the scan pattern and the range of the current return.
+	 * - directly to the left / to the right / above / below the current return in the scan pattern
+	 * - close to the current return. The maximum range, used for this condition, is defined by the angle spacing of the scan pattern and the range of the current return. As with higher distance, neighboring returns are expected to be further away.
 	 *
 	 * No parameters can be configured at the moment.
 	 */
