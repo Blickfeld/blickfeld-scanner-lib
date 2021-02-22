@@ -135,7 +135,7 @@ set (LIBINCLUDEDIR_TOP "${PROJECT_BINARY_DIR}/include")
 # Protobuf
 set(PROTOBUF_SRC_DIR "${PROJECT_SOURCE_DIR}/thirdparty/protobuf")
 if(BF_USE_SYSTEM_PROTOBUF)
-  find_package(Protobuf REQUIRED)
+  find_package(Protobuf 3.0.0 REQUIRED)
 
   # Check version of protobuf
   if(PROTOBUF_FOUND AND Protobuf_PROTOC_EXECUTABLE)
@@ -205,6 +205,9 @@ set(BLICKFELD_SCANNER_SOURCES
   src/discover.cpp
   src/point_cloud_record.cpp
   src/point_cloud_stream.cpp
+  src/mockup_server.cpp
+  src/mockup_session.cpp
+  src/simulated_connection.cpp
 )
 set(BLICKFELD_SCANNER_INCLUDES
   ${Protobuf_INCLUDE_DIRS}
@@ -270,6 +273,7 @@ endif()
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 target_link_libraries(blickfeld-scanner INTERFACE ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries(blickfeld-scanner-static INTERFACE ${CMAKE_THREAD_LIBS_INIT})
 
 # Set version to lib
 set_target_properties(blickfeld-scanner

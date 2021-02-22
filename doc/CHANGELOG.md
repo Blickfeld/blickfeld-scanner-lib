@@ -13,6 +13,33 @@ influence the resulting point cloud.
 
 ### Removed
 
+## [2.17.3] - 2021.02.12
+
+### Changed
+* CI: Update outdated auto-generated protocol documentation
+
+## [2.17.2] - 2021.02.12
+
+### Added
+* Mockup-server, which can simulate a Blickfeld scanner by reading a point cloud recording. The implementation is currently **incomplete**, please read the documentation in the source code and the C++ server example.
+
+### Changed
+* Protocol: Improved documentation of algorithms
+* Python: Extended set_default_point_cloud_algorithms with static transformation
+
+## [2.17.1] - 2021.02.08
+
+### Changed
+* Replace c++17 with c++14 call and added test to check compatibility
+* Bugfix: Builds without Python failed with missing target dependency
+* Enforce protobuf version 3
+
+## [2.17.0] - 2021.02.05
+
+### Added
+* [Introduced in firmware v1.18] Algorithm API with three on-device processing algorithms: Background subtraction, neighbour noise filter, and static transformation.
+* [Introduced in firmware v1.18] Option to disable the noise filter in the scan pattern configuration
+
 ## [2.16.1] - 2021.01.26
 
 ### Added

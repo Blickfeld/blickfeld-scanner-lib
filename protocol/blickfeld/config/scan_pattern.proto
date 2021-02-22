@@ -236,6 +236,7 @@ message ScanPattern {
 		message Noise {
 			optional uint32 offset = 1 [ (d_min) = 0, (d_max) = 50 ]; // Can be seen as minimum intensity filter, if there is no ambient light.
 			optional float gain = 2 [ (d_min) = 0, (d_max) = 0.5 ]; // The gain scales a non-linear function, which uses the ambient light level of the point the laser shoots at, as an input.
+			optional bool enable = 3 [ default = true ]; // <blockquote>Introduced in BSL v2.17 and firmware v1.18</blockquote>	This flag can be used to disable the internal noise filter completely. By default, the noise filter is enabled.
 		}
 
 		optional uint32 max_number_of_returns_per_point = 1 [ default = 1, (d_min) = 1, (d_max) = 3 ]; // Set maximum number of returns per point. By default, secondary returns are disabled. Set this, e.g. to 2, to enable secondary returns.

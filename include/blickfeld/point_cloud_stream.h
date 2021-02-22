@@ -12,6 +12,7 @@
 
 #include <memory>
 #include <functional>
+#include <iostream>
 
 namespace google {
 namespace protobuf {
@@ -53,6 +54,17 @@ class point_cloud_record;
  */
 template<class frame_t>
 class point_cloud_stream {
+public:
+/**
+ * @brief Processor can be used to perform processing operations on the frames.
+ *
+ * The processor is called when a client requests a new point-cloud stream.
+ * The provided protocol::stream::Subscribe::PointCloud can be used to react to on client requests.
+ * The initial call should return a frame processor method, which is called on every frame, before it is passed to the client.
+ */
+	using processor_t = std::function<std::function<void (frame_t&)> (const protocol::stream::Subscribe_PointCloud)>;
+
+private:
 	std::shared_ptr<connection> conn;
 	protocol::Response* resp = nullptr;
 	protocol::file::PointCloud_Metadata* metadata = nullptr;
@@ -69,6 +81,10 @@ class point_cloud_stream {
 	google::protobuf::io::CodedInputStream* pb_icstream = nullptr;
 	std::ostream* ostream = nullptr;
 	point_cloud_record* record = nullptr;
+
+	std::streampos stream_start;
+	void stream_init_and_skip(int offset = 0);
+	int offset_data;
 #endif
 
 public:
@@ -76,10 +92,9 @@ public:
 	 * Internal use. Use scanner::get_point_cloud_stream or scanner::get_simple_point_cloud_stream.
 	 *
 	 * @param conn Scanner connection which should be used for stream.
-	 * @param filter Filter points and returns by point attributes during the post-processing on the device.
 	 * @param reference_frame Frame representing the desired data. To request a field, set it to any value (also in submessages). For a repeated field, add at least one element.
 	 */
-	point_cloud_stream(std::shared_ptr<connection> conn, const protocol::config::ScanPattern_Filter* filter = nullptr, const protocol::data::Frame* reference_frame = nullptr, const protocol::stream::Subscribe_PointCloud* extend_subscription = nullptr);
+	point_cloud_stream(std::shared_ptr<connection> conn, const protocol::stream::Subscribe_PointCloud* extend_subscription = nullptr);
 #ifdef BSL_RECORDING
 	/**
 	 * Internal use. Use the static methods scanner::file_point_cloud_stream or scanner::simple_file_point_cloud_stream.
@@ -112,6 +127,12 @@ public:
 	 * @return False if further frames can be fetch with recv_frame. True if the end of stream has been reached.
 	 */
 	bool end_of_stream();
+
+	/**
+	 * Jumps to the first frame of the stream.
+	 * Only works if point_cloud_stream has been initialized with an stream input.
+	 */
+	void jump_to_first_frame();
 #endif
 
 	/**

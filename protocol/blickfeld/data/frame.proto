@@ -4,6 +4,7 @@ option cc_enable_arenas = true;
 import "blickfeld/options.proto";
 import "blickfeld/config/scan_pattern.proto";
 import "blickfeld/data/scanline.proto";
+import "blickfeld/data/algorithm.proto";
 
 package blickfeld.protocol.data;
 
@@ -54,4 +55,6 @@ message Frame {
 
 	repeated Scanline scanlines = 2 [(optional)=true]; // Refer to [Scanline](#blickfeld.protocol.data.Scanline)
 	optional Packed packed = 8 [(optional)=true]; // <blockquote>Introduced in BSL v2.16 and firmware v1.17</blockquote> Refer to [Packed](#blickfeld.protocol.data.Frame.Packed)
+
+	repeated data.Algorithm algorithms = 10; // <blockquote>Introduced in BSL v2.17 and firmware v1.16</blockquote> Refer to [data.Algorithm](#blickfeld.protocol.data.Algorithm). Each algorithm configured can output additional data, which is provided with this field.
 }

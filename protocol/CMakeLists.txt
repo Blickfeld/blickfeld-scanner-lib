@@ -80,7 +80,8 @@ endif()
 
 # list .proto files here
 set(PROTOBUF_DEFS_DIR ${PROJECT_SOURCE_DIR})
-set(PROTOBUF_SOURCES 
+set(PROTOBUF_SOURCES	
+	blickfeld/config/algorithm.proto
 	blickfeld/config/advanced.proto
 	blickfeld/config/product.proto
 	blickfeld/config/generate.proto
@@ -93,6 +94,7 @@ set(PROTOBUF_SOURCES
 	blickfeld/status/temperature.proto
 	blickfeld/status/server.proto
 	
+	blickfeld/data/algorithm.proto
 	blickfeld/data/frame.proto
 	blickfeld/data/point_cloud.proto
 	blickfeld/data/point.proto
@@ -166,8 +168,8 @@ foreach(FILE ${PROTOBUF_SOURCES})
 			DEPENDS ${FILE}
 			WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
 		)
+		list(APPEND PROTOBUF_GENERATED_PY ${PROTOBUF_GENERATED_PY_DIR}/${FILE_PY})
 	endif()
-	list(APPEND PROTOBUF_GENERATED_PY ${PROTOBUF_GENERATED_PY_DIR}/${FILE_PY})
 endforeach()
 
 # NPM Build (moved out of the loop as pbjs and pbts accepts all .proto files at once.)

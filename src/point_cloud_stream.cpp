@@ -17,7 +17,6 @@
 
 #include <string>
 #include <chrono>
-#include <iostream>
 #include <iomanip>
 #include <math.h>
 #include <google/protobuf/io/zero_copy_stream_impl.h>
@@ -139,7 +138,7 @@ void convert_point_cloud(const protocol::data::Frame& frame_i, protocol::data::F
 }
 
 template<class frame_t>
-point_cloud_stream<frame_t>::point_cloud_stream(std::shared_ptr<connection> conn, const protocol::config::ScanPattern_Filter* filter, const protocol::data::Frame* reference_frame, const protocol::stream::Subscribe_PointCloud* extend_subscription) :
+point_cloud_stream<frame_t>::point_cloud_stream(std::shared_ptr<connection> conn, const protocol::stream::Subscribe_PointCloud* extend_subscription) :
 	conn(conn),
 	resp(new protocol::Response()),
 	metadata(new protocol::file::PointCloud::Metadata()),
@@ -148,10 +147,6 @@ point_cloud_stream<frame_t>::point_cloud_stream(std::shared_ptr<connection> conn
 	protocol::Request req;
 	protocol::Response resp;
 	req.mutable_subscribe()->mutable_point_cloud();
-	if (filter)
-		req.mutable_subscribe()->mutable_point_cloud()->mutable_filter()->CopyFrom(*filter);
-	if (reference_frame)
-		req.mutable_subscribe()->mutable_point_cloud()->mutable_reference_frame()->CopyFrom(*reference_frame);
 	if (extend_subscription)
 		req.mutable_subscribe()->mutable_point_cloud()->MergeFrom(*extend_subscription);
 	conn->send_request(req, resp);
@@ -169,19 +164,7 @@ point_cloud_stream<frame_t>::point_cloud_stream(std::istream* istream) :
 		throw str_exception("Input file stream is not valid. Failed to open stream.");
 
 	// Helper methods
-	auto stream_start = istream->tellg();
-	auto stream_init_and_skip = [this, stream_start] (int offset = 0) {
-			if (pb_icstream)
-				delete pb_icstream;
-			if (pb_istream)
-				delete pb_istream;
-			this->istream->clear();
-			this->istream->seekg(stream_start);
-			pb_istream = new google::protobuf::io::IstreamInputStream(this->istream);
-			pb_izstream = new google::protobuf::io::GzipInputStream(pb_istream);
-			pb_icstream = new google::protobuf::io::CodedInputStream(pb_izstream);
-			pb_icstream->Skip(offset);
-		};
+	stream_start = istream->tellg();
 
 	// Read header
 	stream_init_and_skip();
@@ -192,7 +175,7 @@ point_cloud_stream<frame_t>::point_cloud_stream(std::istream* istream) :
 	pb_icstream->PopLimit(limit);
 
 	// Get offset of footer
-	int offset_data = pb_icstream->CurrentPosition();
+	offset_data = pb_icstream->CurrentPosition();
 	int offset_footer = offset_data;
 	int offset_d = offset_footer;
 
@@ -216,6 +199,20 @@ point_cloud_stream<frame_t>::point_cloud_stream(std::istream* istream) :
 
 	// Go back to data
 	stream_init_and_skip(offset_data);
+}
+
+template<class frame_t>
+void point_cloud_stream<frame_t>::stream_init_and_skip(int offset) {
+	if (pb_icstream)
+		delete pb_icstream;
+	if (pb_istream)
+		delete pb_istream;
+	this->istream->clear();
+	this->istream->seekg(stream_start);
+	pb_istream = new google::protobuf::io::IstreamInputStream(this->istream);
+	pb_izstream = new google::protobuf::io::GzipInputStream(pb_istream);
+	pb_icstream = new google::protobuf::io::CodedInputStream(pb_izstream);
+	pb_icstream->Skip(offset);
 }
 
 #endif
@@ -308,6 +305,15 @@ bool point_cloud_stream<frame_t>::end_of_stream() {
 	}
 
 	return !stream_buffered || stream_data->has_footer();
+}
+
+template<class frame_t>
+void point_cloud_stream<frame_t>::jump_to_first_frame() {
+	if (conn)
+		throw str_exception("Cannot use jump_to_first_frame() with a live connection.");
+
+	stream_init_and_skip(offset_data);
+	read_stream();
 }
 
 template<class frame_t>

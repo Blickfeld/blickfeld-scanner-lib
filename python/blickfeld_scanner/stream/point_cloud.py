@@ -131,6 +131,10 @@ class point_cloud(object):
         > Introduced in BSL v2.10 and firmware v1.9
 
         Filter points and returns by point attributes during the post-processing on the device. This replaces the 'filter' parameter
+    :param algorithms:
+        > Introduced in BSL v2.17 and firmware v1.16
+
+        Add set of algorithms which post-process the point cloud data.
         
     :param extend_subscribe_request:
         > Introduced in BSL v2.13 and firmware v1.13
@@ -154,7 +158,7 @@ class point_cloud(object):
     REF_FRAME_FULL = REF_FRAME_FULL # Reference frame: All attributes (default)
     REF_FRAME_PACKED = REF_FRAME_PACKED #: Reference frame in packed (for Python: numpy) format: XYZ coordinates, direction, range, intensity, ambient_light_level, frame id, scanline id, point id, return id, timestamps
 
-    def __init__(self, connection=None, from_file=None, filter=None, reference_frame=None, point_filter=None, extend_subscribe_request=None, as_numpy=False):
+    def __init__(self, connection=None, from_file=None, filter=None, reference_frame=None, point_filter=None, algorithms=None, extend_subscribe_request=None, as_numpy=False):
         self._metadata = point_cloud_pb2.PointCloud.Metadata()
 
         if connection and from_file:
@@ -190,6 +194,8 @@ class point_cloud(object):
                 req.subscribe.point_cloud.reference_frame.CopyFrom(reference_frame if reference_frame else REF_FRAME_PACKED)
                 if as_numpy:
                     req.subscribe.point_cloud.reference_frame.packed.SetInParent()
+            if algorithms is not None:
+                req.subscribe.point_cloud.algorithms[:].extend(algorithms)
             if extend_subscribe_request:
                 req.subscribe.point_cloud.MergeFrom(extend_subscribe_request)
 
@@ -502,7 +508,7 @@ class point_cloud(object):
         self.stop_recording()
 
         if self._connection:
-            if self._connection.socket._closed:
+            if self._connection.socket.fileno() == -1:
                 return
 
             req = connection_pb2.Request()

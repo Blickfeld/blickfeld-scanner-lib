@@ -14,10 +14,9 @@ IF(NOT HAVE_GOOGLETEST)
   add_subdirectory("googletest" EXCLUDE_FROM_ALL)
 ENDIF()
 
-if (BSL_RECORDING)
+if (NOT BSL_STANDALONE AND BSL_RECORDING)
 	set (BSL_RECORDING_TESTS
 	  src/file.cpp
-	  src/simulated_connection.cpp
 	)
 endif()		
 
