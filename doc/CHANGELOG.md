@@ -13,6 +13,19 @@ influence the resulting point cloud.
 
 ### Removed
 
+## [2.18.0] - 2021.03.02
+
+### Added
+* [Introduced in firmware v1.19] Support for on-board IMU stream. Accelerometer and gyroscope data is provided with approx. 1 kHz and synchronized timestamps.
+* [Introduced in firmware v1.19] Support for PTPv2 time synchronization
+* Protocol: Status message and state of time synchronization
+
+### Changed
+* Python: Re-worked time synchronization interface. Advanced configuration is used with up-to-date devices.
+
+### Removed
+* Protocol: Remove advanced `classification_threshold` of background subtraction algorithm
+
 ## [2.17.3] - 2021.02.12
 
 ### Changed

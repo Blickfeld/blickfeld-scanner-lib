@@ -47,9 +47,9 @@ class status(object):
         return self._connection.recv().event.status
 
     def stop(self):
-        """Unsubscribe of the point cloud stream and close connection. Always call this function before deleting a stream.status object.
+        """Unsubscribe of the status stream and close connection. Always call this function before deleting a stream.status object.
         """
-        if self._connection.socket._closed:
+        if self._connection.socket.fileno() == -1:
             return
 
         req = connection_pb2.Request()

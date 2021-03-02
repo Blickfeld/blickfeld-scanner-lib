@@ -25,9 +25,11 @@ message Algorithm {
 	 *
 	 */
 	message BackgroundSubtraction {
-		optional uint32 initialization_frames = 1 [default=10, (d_min) = 1]; // Number of frames to initialize the background with
+		reserved 3, 4;
+		reserved "classification_threshold"; // Removed parameter to reduce complexity
+
+		optional uint32 initialization_frames = 1 [default=10, (d_min) = 1, (d_max)=10]; // Number of frames to initialize the background with
 		optional float exponential_decay_rate = 2 [default=0.0025, (d_min) = 0, (d_max) = 1]; // Controls how fast objects switch between foreground and background. Exponential decay factor.
-		optional float classification_threshold = 4 [default=3.0, (d_min) = 0, (d_max) = 5]; // Controls the resolution of the background subtraction in standard deviations
 	}
 
 	/**

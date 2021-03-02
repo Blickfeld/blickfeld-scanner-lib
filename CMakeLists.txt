@@ -208,6 +208,7 @@ set(BLICKFELD_SCANNER_SOURCES
   src/mockup_server.cpp
   src/mockup_session.cpp
   src/simulated_connection.cpp
+  src/imu_stream.cpp
 )
 set(BLICKFELD_SCANNER_INCLUDES
   ${Protobuf_INCLUDE_DIRS}

@@ -46,6 +46,7 @@ def example(args):
             if device_ntp_server_ip != args.ntp_server_ip:  # It the ntp server ip address is different to the
                 # given ntp_server_ip set the ntp server ip address to the given ntp_server_ip
                 device.set_ntp_server(args.ntp_server_ip)
+                print("On device: " + device.hostname_or_ip  + " new ntp server is: " + device.get_ntp_server())
     else:
         print("Requested pattern:", config)
         print(devices[0].fill_scan_pattern(config))

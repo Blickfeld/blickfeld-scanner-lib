@@ -49,8 +49,7 @@ message Field {
 	repeated Identifier identifiers = 1;
 
 	// Numerical scale which is applied on a field value before using it for validation.
-	// This is required to prevent floating point precision issues due to rounding, which could fail a validation.
-	//
+	// This is required to prevent floating point precision issues due to rounding, which could fail a validation.<br>
 	// Validation example:
 	// Field value is stored as radian but is shown to the user as degree.
 	// Without scaling and rounding, a possible degree format could be rejected as it exceeded the maximum value of the radian respresentation after down-scaling.

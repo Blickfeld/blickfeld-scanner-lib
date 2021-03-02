@@ -123,7 +123,11 @@ The data, such as a point cloud, are also packed in protobuf messages.
     - [Advanced.Detector](#blickfeld.protocol.config.Advanced.Detector)
     - [Advanced.Processing](#blickfeld.protocol.config.Advanced.Processing)
     - [Advanced.Server](#blickfeld.protocol.config.Advanced.Server)
+    - [Advanced.TimeSynchronization](#blickfeld.protocol.config.Advanced.TimeSynchronization)
+    - [Advanced.TimeSynchronization.NTP](#blickfeld.protocol.config.Advanced.TimeSynchronization.NTP)
+    - [Advanced.TimeSynchronization.PTP](#blickfeld.protocol.config.Advanced.TimeSynchronization.PTP)
   
+    - [Advanced.TimeSynchronization.PTP.DelayMechanism](#blickfeld.protocol.config.Advanced.TimeSynchronization.PTP.DelayMechanism)
   
   
   
@@ -209,6 +213,15 @@ The data, such as a point cloud, are also packed in protobuf messages.
   
   
 
+- [blickfeld/data/imu.proto](#blickfeld/data/imu.proto)
+    - [IMU](#blickfeld.protocol.data.IMU)
+    - [IMU.Packed](#blickfeld.protocol.data.IMU.Packed)
+    - [IMU.Sample](#blickfeld.protocol.data.IMU.Sample)
+  
+  
+  
+  
+
 - [blickfeld/data/point.proto](#blickfeld/data/point.proto)
     - [Point](#blickfeld.protocol.data.Point)
     - [Point.Direction](#blickfeld.protocol.data.Point.Direction)
@@ -255,6 +268,14 @@ The data, such as a point cloud, are also packed in protobuf messages.
   
   
 
+- [blickfeld/status/imu.proto](#blickfeld/status/imu.proto)
+    - [IMU](#blickfeld.protocol.status.IMU)
+    - [IMU.StaticState](#blickfeld.protocol.status.IMU.StaticState)
+  
+  
+  
+  
+
 - [blickfeld/status/main.proto](#blickfeld/status/main.proto)
     - [Status](#blickfeld.protocol.Status)
   
@@ -288,9 +309,20 @@ The data, such as a point cloud, are also packed in protobuf messages.
   
   
 
+- [blickfeld/status/time_synchronization.proto](#blickfeld/status/time_synchronization.proto)
+    - [TimeSynchronization](#blickfeld.protocol.status.TimeSynchronization)
+    - [TimeSynchronization.NTP](#blickfeld.protocol.status.TimeSynchronization.NTP)
+    - [TimeSynchronization.PTP](#blickfeld.protocol.status.TimeSynchronization.PTP)
+  
+    - [TimeSynchronization.State](#blickfeld.protocol.status.TimeSynchronization.State)
+  
+  
+  
+
 - [blickfeld/stream/connection.proto](#blickfeld/stream/connection.proto)
     - [Subscribe](#blickfeld.protocol.stream.Subscribe)
     - [Subscribe.Developer](#blickfeld.protocol.stream.Subscribe.Developer)
+    - [Subscribe.IMU](#blickfeld.protocol.stream.Subscribe.IMU)
     - [Subscribe.PointCloud](#blickfeld.protocol.stream.Subscribe.PointCloud)
     - [Subscribe.RawFile](#blickfeld.protocol.stream.Subscribe.RawFile)
     - [Subscribe.Status](#blickfeld.protocol.stream.Subscribe.Status)
@@ -401,9 +433,7 @@ Describes a protobuf field inside a (nested) message to efficiently use reflecti
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | identifiers | [Field.Identifier](#blickfeld.protocol.Field.Identifier) | repeated | Path to field in relation to given top level message. |
-| scale | [float](#float) | optional | Numerical scale which is applied on a field value before using it for validation. This is required to prevent floating point precision issues due to rounding, which could fail a validation.
-
-Validation example: Field value is stored as radian but is shown to the user as degree. Without scaling and rounding, a possible degree format could be rejected as it exceeded the maximum value of the radian respresentation after down-scaling. |
+| scale | [float](#float) | optional | Numerical scale which is applied on a field value before using it for validation. This is required to prevent floating point precision issues due to rounding, which could fail a validation.<br> Validation example: Field value is stored as radian but is shown to the user as degree. Without scaling and rounding, a possible degree format could be rejected as it exceeded the maximum value of the radian respresentation after down-scaling. |
 
 
 
@@ -1436,6 +1466,7 @@ The current set of parameters is preliminary, additional parameters may be added
 | detector | [Advanced.Detector](#blickfeld.protocol.config.Advanced.Detector) | optional | Refer to [Detector](#blickfeld.protocol.config.Advanced.Detector) |
 | processing | [Advanced.Processing](#blickfeld.protocol.config.Advanced.Processing) | optional | <blockquote>Introduced in BSL v2.12 and firmware v1.12</blockquote> Refer to [Processing](#blickfeld.protocol.config.Advanced.Processing) |
 | server | [Advanced.Server](#blickfeld.protocol.config.Advanced.Server) | optional | <blockquote>Introduced in BSL v2.13 and firmware v1.13</blockquote> Refer to [Server](#blickfeld.protocol.config.Advanced.Server) |
+| time_synchronization | [Advanced.TimeSynchronization](#blickfeld.protocol.config.Advanced.TimeSynchronization) | optional | <blockquote>Introduced in BSL v2.18 and firmware v1.19</blockquote> Refer to [TimeSynchronization](#blickfeld.protocol.config.Advanced.TimeSynchronization) |
 
 
 
@@ -1490,7 +1521,71 @@ Parameters, which control the server behavior.
 
 
 
+
+<a name="blickfeld.protocol.config.Advanced.TimeSynchronization"></a>
+
+### Advanced.TimeSynchronization
+> Introduced in BSL v2.18 and firmware v1.19
+
+Activate or deactivate synchronization and change parameters
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| ntp | [Advanced.TimeSynchronization.NTP](#blickfeld.protocol.config.Advanced.TimeSynchronization.NTP) | optional | If this field is set, NTP synchronization is activated, which is the default configuration. Refer to [NTP](#blickfeld.protocol.config.Advanced.Synchronization.NTP) |
+| ptp | [Advanced.TimeSynchronization.PTP](#blickfeld.protocol.config.Advanced.TimeSynchronization.PTP) | optional | If this field is set, PTP synchronization is activated and NTP synchronization is deactivated. Refer to [PTP](#blickfeld.protocol.config.Advanced.Synchronization.PTP) |
+
+
+
+
+
+
+<a name="blickfeld.protocol.config.Advanced.TimeSynchronization.NTP"></a>
+
+### Advanced.TimeSynchronization.NTP
+The Blickfeld devices can use an NTPv4 client to synchronize the local device time to a time server.
+NTP can achieve synchronization accuracy below one millisecond for measurement results in local networks.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| servers | [string](#string) | repeated | Specify list of NTP server. By default, debian pool NTP servers are used. |
+
+
+
+
+
+
+<a name="blickfeld.protocol.config.Advanced.TimeSynchronization.PTP"></a>
+
+### Advanced.TimeSynchronization.PTP
+The Blickfeld devices can use a PTP client to synchronize the local device time to a time server.
+PTP can achieve an higher accuracy than NTP in local networks.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| domain | [uint32](#uint32) | optional | PTP domain number. Default: 0 |
+| delay_mechanism | [Advanced.TimeSynchronization.PTP.DelayMechanism](#blickfeld.protocol.config.Advanced.TimeSynchronization.PTP.DelayMechanism) | optional | Delay detection mode used Default: E2E |
+| unicast_destinations | [string](#string) | repeated | Specify unicast slave addresses for unicast master operation, or unicast master addresses for slave operation. If this is set unicast mode will be activated. |
+
+
+
+
+
  <!-- end messages -->
+
+
+<a name="blickfeld.protocol.config.Advanced.TimeSynchronization.PTP.DelayMechanism"></a>
+
+### Advanced.TimeSynchronization.PTP.DelayMechanism
+
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| E2E | 1 | End to end delay detection |
+| P2P | 2 | Peer to peer delay detection |
+
 
  <!-- end enums -->
 
@@ -1545,7 +1640,6 @@ Conversely, if an object that is already part of the background suddenly starts 
 | ----- | ---- | ----- | ----------- |
 | initialization_frames | [uint32](#uint32) | optional | Number of frames to initialize the background with Default: 10 |
 | exponential_decay_rate | [float](#float) | optional | Controls how fast objects switch between foreground and background. Exponential decay factor. Default: 0.0025 |
-| classification_threshold | [float](#float) | optional | Controls the resolution of the background subtraction in standard deviations Default: 3 |
 
 
 
@@ -1785,11 +1879,7 @@ This can be used to e.g. filter points with low intensity or to enable secondary
 | ambient_light_level | [blickfeld.protocol.OptionalValueRange](#blickfeld.protocol.OptionalValueRange) | optional | Filter all points, which ambient light level values are not within this value range. |
 | range | [blickfeld.protocol.OptionalValueRange](#blickfeld.protocol.OptionalValueRange) | optional | Filter all points, which range values are not within this value range. |
 | noise | [ScanPattern.Filter.Noise](#blickfeld.protocol.config.ScanPattern.Filter.Noise) | optional | <blockquote>Introduced in BSL v2.11 and firmware v1.11</blockquote> Refer to [Filter.Noise](#blickfeld.protocol.config.ScanPattern.Filter.Noise) |
-| delete_points_without_returns | [bool](#bool) | optional | <blockquote> Introduced in BSL v2.16 and firmware v1.17</blockquote>
-
-All points without any returns are filtered if this setting is true. With active algorithms, such as background subtraction, this can reduce the bandwidth significantly.
-
-Note: It is recommended to not estimate required network bandwidths when this setting is active. In scenarios, where from one frame to another, all points have returns (e.g. due to environmental changes), the peak bandwidths might increase significantly. This could result, in these scenarios, in frame losses. Default: false |
+| delete_points_without_returns | [bool](#bool) | optional | <blockquote> Introduced in BSL v2.16 and firmware v1.17</blockquote> All points without any returns are filtered if this setting is true. With active algorithms, such as background subtraction, this can reduce the bandwidth significantly. <br> Note: It is recommended to not estimate required network bandwidths when this setting is active. In scenarios, where from one frame to another, all points have returns (e.g. due to environmental changes), the peak bandwidths might increase significantly. This could result, in these scenarios, in frame losses. Default: false |
 
 
 
@@ -2215,9 +2305,7 @@ This section describes the contents of a point cloud frame.
 | scan_pattern | [blickfeld.protocol.config.ScanPattern](#blickfeld.protocol.config.ScanPattern) | optional | Refer to [ScanPattern](#blickfeld.protocol.config.ScanPattern) |
 | is_ramp_up_phase | [bool](#bool) | optional | <blockquote>Introduced in BSL v2.16 and firmware v1.17</blockquote> If the frame_mode in the scan pattern is set to SEPARATE, this value indicates if the given frame was captured during up-ramping or down-ramping. |
 | total_number_of_points | [uint32](#uint32) | optional | Number of laser pulses emitted in this frame. |
-| total_number_of_returns | [uint32](#uint32) | optional | Number of returned points recorded:
-
-Each point of the [total_number_of_points](#blickfeld.protocol.data.Frame.total_number_of_points) can produce several returns. |
+| total_number_of_returns | [uint32](#uint32) | optional | Number of returned points recorded: Each point of the [total_number_of_points](#blickfeld.protocol.data.Frame.total_number_of_points) can produce several returns. |
 | scanlines | [Scanline](#blickfeld.protocol.data.Scanline) | repeated | Refer to [Scanline](#blickfeld.protocol.data.Scanline) |
 | packed | [Frame.Packed](#blickfeld.protocol.data.Frame.Packed) | optional | <blockquote>Introduced in BSL v2.16 and firmware v1.17</blockquote> Refer to [Packed](#blickfeld.protocol.data.Frame.Packed) |
 | algorithms | [Algorithm](#blickfeld.protocol.data.Algorithm) | repeated | <blockquote>Introduced in BSL v2.17 and firmware v1.16</blockquote> Refer to [data.Algorithm](#blickfeld.protocol.data.Algorithm). Each algorithm configured can output additional data, which is provided with this field. |
@@ -2255,6 +2343,77 @@ Refer to REF_FRAME_PACKED in the client implementations.
 | point_id | [bytes](#bytes) | optional | Unique point identifier within a frame and scan pattern. 1-dimensional array. Type: UInt32. Byte Order: Big Endian. |
 | channel_id | [bytes](#bytes) | optional | Identifier of the channel that detected the point. 1-dimensional array. Type: UInt8. |
 | return_id | [bytes](#bytes) | optional | Identifier of the return. Note: Returns are ordered by intensity not by distance. 1-dimensional array. Type: UInt8. |
+
+
+
+
+
+ <!-- end messages -->
+
+ <!-- end enums -->
+
+ <!-- end HasExtensions -->
+
+ <!-- end services -->
+
+
+
+<a name="blickfeld/data/imu.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## blickfeld/data/imu.proto
+
+
+
+<a name="blickfeld.protocol.data.IMU"></a>
+
+### IMU
+> Introduced in BSL v2.18 and firmware v1.19
+
+The Cube has an on-board IMU, which can be used for e.g. mapping applications or static auto-leveling.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| start_time_ns | [uint64](#uint64) | optional | Unit: [ns] – start timestamp of data. The start_offset_ns in each sample refers to this value. The timestamp is synchronized to the ones in point cloud frames. |
+| samples | [IMU.Sample](#blickfeld.protocol.data.IMU.Sample) | repeated | Refer to [Sample](#blickfeld.protocol.data.IMU.Sample) |
+| packed | [IMU.Packed](#blickfeld.protocol.data.IMU.Packed) | optional | Refer to [Packed](#blickfeld.protocol.data.IMU.Packed) |
+
+
+
+
+
+
+<a name="blickfeld.protocol.data.IMU.Packed"></a>
+
+### IMU.Packed
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| length | [uint32](#uint32) | optional | Length of arrays |
+| start_offset_ns | [bytes](#bytes) | optional | Starting time of the point in relation to [Data.start_time_ns](#blickfeld.protocol.data.IMU.Data.start_time_ns). 1-dimensional array. Unit: [ns]. Type: UInt64. Byte Order: Big Endian. |
+| acceleration | [bytes](#bytes) | optional | Accerlation. 3-dimensional array in row-major format with [x, y, z] tuples. Unit: [g]. Type: Float32. Byte Order: Big Endian. |
+| angular_velocity | [bytes](#bytes) | optional | Angular velocity, measured with gyroscope. 3-dimensional array in row-major format with [x, y, z] tuples. Unit: [rad/s]. Type: Float32. Byte Order: Big Endian. |
+
+
+
+
+
+
+<a name="blickfeld.protocol.data.IMU.Sample"></a>
+
+### IMU.Sample
+Describes a single IMU state.
+Data rate is approx. 1.125 khz.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| start_offset_ns | [uint64](#uint64) | optional | Unit: [ns] – Offset to [start_time_ns](#blickfeld.protocol.data.IMU.start_time_ns) |
+| acceleration | [float](#float) | repeated | Unit: [g] - Format: [x,y,z] - Measured acceleration for 3-axes. |
+| angular_velocity | [float](#float) | repeated | Unit: [rad/s] - Format: [x,y,z] - Measured angular velocity by gyroscope for 3-axes. |
 
 
 
@@ -2620,6 +2779,54 @@ This section describes the contents of a point cloud. The first message in a Bli
 
 
 
+<a name="blickfeld/status/imu.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## blickfeld/status/imu.proto
+
+
+
+<a name="blickfeld.protocol.status.IMU"></a>
+
+### IMU
+> Introduced in BSL v2.18 and firmware v1.19
+
+This section defines the status of the IMU.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| static_state | [IMU.StaticState](#blickfeld.protocol.status.IMU.StaticState) | optional |  |
+
+
+
+
+
+
+<a name="blickfeld.protocol.status.IMU.StaticState"></a>
+
+### IMU.StaticState
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| acceleration | [float](#float) | repeated |  |
+
+
+
+
+
+ <!-- end messages -->
+
+ <!-- end enums -->
+
+ <!-- end HasExtensions -->
+
+ <!-- end services -->
+
+
+
 <a name="blickfeld/status/main.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
@@ -2638,6 +2845,8 @@ This section contains the status messages of the two deflection mirrors and the 
 | scanner | [status.Scanner](#blickfeld.protocol.status.Scanner) | optional | Refer to [Scanner](#blickfeld.protocol.status.scanner.Scanner) |
 | temperatures | [status.Temperature](#blickfeld.protocol.status.Temperature) | repeated | Refer to [Temperature](#blickfeld.protocol.status.temperature.Temperature) |
 | server | [status.Server](#blickfeld.protocol.status.Server) | optional | Refer to [Client](#blickfeld.protocol.status.server.Server) |
+| imu | [status.IMU](#blickfeld.protocol.status.IMU) | optional | <blockquote>Introduced in BSL v2.18 and firmware v1.19</blockquote> Refer to [IMU](#blickfeld.protocol.status.IMU) |
+| time_synchronization | [status.TimeSynchronization](#blickfeld.protocol.status.TimeSynchronization) | optional | <blockquote>Introduced in BSL v2.18 and firmware v1.19</blockquote> Refer to [TimeSynchronization](#blickfeld.protocol.status.TimeSynchronization) |
 
 
 
@@ -2837,6 +3046,95 @@ This section describes the hardware modules in the device.
 
 
 
+<a name="blickfeld/status/time_synchronization.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## blickfeld/status/time_synchronization.proto
+
+
+
+<a name="blickfeld.protocol.status.TimeSynchronization"></a>
+
+### TimeSynchronization
+> Introduced in BSL v2.18 and firmware v1.19
+
+This section defines the synchronization status of the server.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| state | [TimeSynchronization.State](#blickfeld.protocol.status.TimeSynchronization.State) | optional |  |
+| offset_from_master | [float](#float) | optional | Current offset value from master device in seconds. NTP: time offset (seconds) in loopstats PTP: It is the main output of the PTP engine that is in the worker state. This value is the input for clock corrections in the clock servo algorithms. This value is typically measured when estimating the performance of the worker device. |
+| ntp | [TimeSynchronization.NTP](#blickfeld.protocol.status.TimeSynchronization.NTP) | optional | Refer to [NTP](#blickfeld.protocol.status.TimeSynchronization.NTP) |
+| ptp | [TimeSynchronization.PTP](#blickfeld.protocol.status.TimeSynchronization.PTP) | optional | Refer to [PTP](#blickfeld.protocol.status.TimeSynchronization.PTP) |
+
+
+
+
+
+
+<a name="blickfeld.protocol.status.TimeSynchronization.NTP"></a>
+
+### TimeSynchronization.NTP
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| frequency_offset | [float](#float) | optional | frequency offset (parts per million - PPM) as in loopstats |
+| rms_jitter | [float](#float) | optional | RMS jitter (seconds) as in loopstats |
+| allan_deviation | [float](#float) | optional | Allan deviation (PPM) as in loopstats |
+| clock_discipline_time_constant | [float](#float) | optional | clock discipline time constant as in loopstats |
+
+
+
+
+
+
+<a name="blickfeld.protocol.status.TimeSynchronization.PTP"></a>
+
+### TimeSynchronization.PTP
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| state | [string](#string) | optional | ONLY AVAILABLE FOR PTP, NTP doesnt have a state Follwing states can occur: init: Initializing, flt: Faulty, lstn_init: Listening (first time), lstn_reset: Listening (subsequent reset), pass: Passive (not best master, not announcing), uncl: Uncalibrated, slv: Worker, pmst: Pre-master, mst: Master (active), dsbl: Disabled, ? (unk): Unknown state |
+| clock_id | [string](#string) | optional | TODO Find out for NTP!! Clock ID Port identity of the current best master, as defined by IEEE 1588 standard. This ID is the local clock's ID if the local clock is the best master. This parameter is displayed as clock_id or port (host). Port is the PTP clock port number, not the User Datagram Protocol (UDP) port numbers. The clock ID is an Extended Unique Identifier (EUI)-64 64-bit ID, converted from the 48-bit MAC address, by inserting 0xfffe at the middle of the MAC address. |
+| one_way_delay | [float](#float) | optional | One-way delay Current value of one-way delay (or mean-path delay) in seconds, calculated by the ptpd daemon that is in the worker state from the delay request and delay response message exchange. Note: If this value remains at zero, it means that no delay response messages are being received, which might be because of a network issue. |
+| slave_to_master | [float](#float) | optional | Slave to master Intermediate offset value (seconds) extracted from the delay request and delay response message exchange. This value is used for computing one-way delay. If the last value was rejected by a filter, the previous value is shown in the log file. This value is zero (0) if the delay response messages are not received. |
+| master_to_slave | [float](#float) | optional | Master to slave Intermediate offset value (seconds) extracted from the sync messages. This value is used for computing the offset value from the master devices. If the last value was rejected by a filter, the previous value is shown in the log file. |
+| observed_drift | [float](#float) | optional | Observed drift The frequency difference between the worker clock and the master clock as measured by the integral accumulator of the clock control proportional integral (PI) servo model. This value stabilizes when the clock offset value is stabilized, and this value is used to detect clock stability. |
+| last_packet_received | [string](#string) | optional | Last packet Received This field shows which message was received last. It displays S for sync messages and D for delay response messages. If a worker device logs no D entries, it means that the worker device is not receiving delay response messages because of network issue. |
+
+
+
+
+
+ <!-- end messages -->
+
+
+<a name="blickfeld.protocol.status.TimeSynchronization.State"></a>
+
+### TimeSynchronization.State
+
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| STOPPED | 1 |  |
+| INITIALIZING | 2 |  |
+| SYNCED | 3 |  |
+| FAILED | 4 |  |
+
+
+ <!-- end enums -->
+
+ <!-- end HasExtensions -->
+
+ <!-- end services -->
+
+
+
 <a name="blickfeld/stream/connection.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
@@ -2857,6 +3155,7 @@ A stream regularly provides data or status updates for the user. The events will
 | status | [Subscribe.Status](#blickfeld.protocol.stream.Subscribe.Status) | optional | Refer to [Subscribe.Status](#blickfeld.protocol.stream.Subscribe.Status) |
 | developer | [Subscribe.Developer](#blickfeld.protocol.stream.Subscribe.Developer) | optional | Refer to [Subscribe.Developer](#blickfeld.protocol.stream.Subscribe.Developer) |
 | raw_file | [Subscribe.RawFile](#blickfeld.protocol.stream.Subscribe.RawFile) | optional | Refer to [Subscribe.RawFile](#blickfeld.protocol.stream.Subscribe.RawFile) |
+| imu | [Subscribe.IMU](#blickfeld.protocol.stream.Subscribe.IMU) | optional | <blockquote>Introduced in BSL v2.18 and firmware v1.19</blockquote> Refer to [Subscribe.IMU](#blickfeld.protocol.stream.Subscribe.IMU) |
 
 
 
@@ -2867,6 +3166,26 @@ A stream regularly provides data or status updates for the user. The events will
 
 ### Subscribe.Developer
 Internal use only
+
+
+
+
+
+
+<a name="blickfeld.protocol.stream.Subscribe.IMU"></a>
+
+### Subscribe.IMU
+> Introduced in BSL v2.18 and firmware v1.19
+
+The Cube has an on-board IMU, which can be used for e.g. mapping applications or static auto-leveling.
+A stream can be requested with this subscription.
+The default rate is approx. 1.125 kHz and is provided in bursts.
+The timestamps inside the protocol are synchronized to the ones in point cloud frames.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| packed_format | [bool](#bool) | optional | Request a packed binary format. This is currently used for efficent Python numpy decoding. Default: false |
 
 
 
@@ -2950,6 +3269,7 @@ This section describes the events of streams.
 | developer | [Event.Developer](#blickfeld.protocol.stream.Event.Developer) | optional | Refer to [Event.Developer](#blickfeld.protocol.stream.Event.Developer) |
 | raw_file | [bytes](#bytes) | optional | <blockquote>Introduced in BSL v2.13 and firmware v1.13</blockquote> Raw bytes, which should be written sequentially in a file. Refer to [RawFile](#blickfeld.protocol.stream.Subscribe.RawFile). |
 | end_of_stream | [Event.EndOfStream](#blickfeld.protocol.stream.Event.EndOfStream) | optional | <blockquote>Introduced in BSL v2.13 and firmware v1.13</blockquote> Refer to [EndOfStream](#blickfeld.protocol.stream.Event.EndOfStream) |
+| imu | [blickfeld.protocol.data.IMU](#blickfeld.protocol.data.IMU) | optional | <blockquote>Introduced in BSL v2.18 and firmware v1.19</blockquote> Refer to [IMU](#blickfeld.protocol.data.IMU) |
 
 
 

@@ -303,6 +303,10 @@ std::shared_ptr<scanner::point_cloud_stream<protocol::data::Frame> > scanner::ge
 	return std::make_shared<point_cloud_stream<protocol::data::Frame> >(create_connection(), &extend_subscription);
 }
 
+std::shared_ptr<imu_stream> scanner::get_imu_stream() {
+	return std::make_shared<imu_stream>(create_connection());
+}
+
 #ifdef BSL_RECORDING
 std::shared_ptr<scanner::point_cloud_stream<protocol::data::Frame> > scanner::file_point_cloud_stream(std::istream* istream) {
 	return std::make_shared<point_cloud_stream<protocol::data::Frame> >(istream);
@@ -404,6 +408,34 @@ void scanner::subscribe(subscribe_status_callback_t cb) {
 	conn->async_run();
 }
 
+const protocol::config::Advanced scanner::get_advanced_config() {
+	protocol::Request req;
+	protocol::Response resp;
+	req.mutable_get_advanced_config();
+	conn->send_request(req, resp);
+	return resp.get_advanced_config().config();
+}
+
+void scanner::set_advanced_config(protocol::config::Advanced config, bool persist) {
+	protocol::Request req;
+	protocol::Response resp;
+	req.mutable_set_advanced_config()->mutable_config()->CopyFrom(config);
+	req.mutable_set_advanced_config()->set_persist(persist);
+	conn->send_request(req, resp);
+}
+
+void scanner::set_ntp_time_synchronization(std::vector<std::string> servers, bool persist) {
+	auto cfg = this->get_advanced_config();
+	*cfg.mutable_time_synchronization()->mutable_ntp()->mutable_servers() = {servers.begin(), servers.end()};
+	this->set_advanced_config(cfg, persist);
+}
+
+void scanner::set_ptp_time_synchronization(std::vector<std::string> unicast_destinations, bool persist) {
+	auto cfg = this->get_advanced_config();
+	*cfg.mutable_time_synchronization()->mutable_ptp()->mutable_unicast_destinations() = {unicast_destinations.begin(), unicast_destinations.end()};
+	this->set_advanced_config(cfg, persist);
+}
+
 #endif
 
 }
@@ -417,7 +449,8 @@ std::ostream& operator<<(std::ostream &strm, const blickfeld::protocol::data::Fr
 	int scanlines = blickfeld::protocol::data::get_total_number_of_scanlines(frame);
 	return strm << "<Blickfeld Frame " << frame.id() << ": " << frame.total_number_of_returns() << " returns, "
 		    << setprecision(1) << fixed << frame.scan_pattern().horizontal().fov() * 180.0f / M_PI << "x" << frame.scan_pattern().vertical().fov() * 180.0f / M_PI << " FoV, "
-		    << setprecision(0) << fixed << scanlines << " scanlines>";
+		    << setprecision(0) << fixed << scanlines << " scanlines, "
+		    << blickfeld::os::get_time_string(frame.start_time_ns() / 1e9) << ">";
 }
 
 std::ostream& operator<<(std::ostream &strm, const blickfeld::protocol::data::Point& point) {

@@ -366,6 +366,8 @@ class point_cloud(object):
                 res['channel_id'] = np.frombuffer(frame.packed.channel_id, dtype='>u1')
             if frame.packed.HasField('return_id'):
                 res['return_id'] = np.frombuffer(frame.packed.return_id, dtype='>u1')
+
+            frame.ClearField('packed')
         else:
             # Handle old unpacked frames
             res = np.zeros(frame.total_number_of_points + frame.total_number_of_returns, dtype=dtype)
