@@ -13,6 +13,11 @@ influence the resulting point cloud.
 
 ### Removed
 
+## [2.18.1] - 2021.03.02
+
+### Changed
+* Protocol: Do not enforce new status fields
+
 ## [2.18.0] - 2021.03.02
 
 ### Added

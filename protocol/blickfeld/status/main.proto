@@ -1,5 +1,6 @@
 syntax = "proto2";
 
+import "blickfeld/options.proto";
 import "blickfeld/status/scanner.proto";
 import "blickfeld/status/temperature.proto";
 import "blickfeld/status/server.proto";
@@ -16,6 +17,6 @@ message Status {
 	repeated status.Temperature temperatures = 2; // Refer to [Temperature](#blickfeld.protocol.status.temperature.Temperature)
 	extensions 3, 4, 6; // Internal use only
 	optional status.Server server = 5; // Refer to [Client](#blickfeld.protocol.status.server.Server)
-	optional status.IMU imu = 7; // <blockquote>Introduced in BSL v2.18 and firmware v1.19</blockquote> Refer to [IMU](#blickfeld.protocol.status.IMU)
-	optional status.TimeSynchronization time_synchronization = 8;  // <blockquote>Introduced in BSL v2.18 and firmware v1.19</blockquote> Refer to [TimeSynchronization](#blickfeld.protocol.status.TimeSynchronization)
+	optional status.IMU imu = 7 [(optional) = true]; // <blockquote>Introduced in BSL v2.18 and firmware v1.19</blockquote> Refer to [IMU](#blickfeld.protocol.status.IMU)
+	optional status.TimeSynchronization time_synchronization = 8 [(optional) = true];  // <blockquote>Introduced in BSL v2.18 and firmware v1.19</blockquote> Refer to [TimeSynchronization](#blickfeld.protocol.status.TimeSynchronization)
 }

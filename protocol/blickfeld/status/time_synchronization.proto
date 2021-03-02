@@ -101,6 +101,7 @@ message TimeSynchronization {
 	optional float offset_from_master = 2 [(optional) = true];
 
 	oneof kind {
+		option (optional_one_of) = true;
 		NTP ntp = 3;  // Refer to [NTP](#blickfeld.protocol.status.TimeSynchronization.NTP)
 		PTP ptp = 4;  // Refer to [PTP](#blickfeld.protocol.status.TimeSynchronization.PTP)
 	}
