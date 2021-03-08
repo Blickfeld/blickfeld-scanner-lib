@@ -372,12 +372,23 @@ public:
 
 	/// > Introduced in BSL v2.18 and firmware v1.19
 	///
+	/// Function to set time synchronization
+	/// The existing config will be overwritten.
+	///
+	/// @param config: Configuration, see protobuf_protocol advanced config
+	/// @param persist: Persist advanced config on device and reload it after a power-cycle
+	/// @param wait_for_sync: Wait until device is synchronized. Raises exception if device is not synchronized within max_sync_duration.
+	/// @param max_sync_duration: Specify maximum time in seconds for synchronization.
+	void set_time_synchronization(const protocol::config::Advanced::TimeSynchronization config, bool persist=true, bool wait_for_sync=true, int max_sync_duration=60);
+
+	/// > Introduced in BSL v2.18 and firmware v1.19
+	///
 	/// Function to set ntp time synchronization, a vector of servers can be provided.
 	/// The old servers and config will be overwritten.
 	///
 	/// @param servers: vector of servers to connect to for time synchronization
 	/// @param persist: Persist advanced config on device and reload it after a power-cycle
-	void set_ntp_time_synchronization(std::vector<std::string> servers={}, bool persist=false);
+	void set_ntp_time_synchronization(std::vector<std::string> servers={});
 
 	/// > Introduced in BSL v2.18 and firmware v1.19
 	///
@@ -388,7 +399,7 @@ public:
 	///
 	/// @param servers: vector of unicast destinations to connect to for time synchronization (if not given or vector is empty, multicast will be used)
 	/// @param persist: Persist advanced config on device and reload it after a power-cycle
-	void set_ptp_time_synchronization(std::vector<std::string> unicast_destinations={}, bool persist=false);
+	void set_ptp_time_synchronization(std::vector<std::string> unicast_destinations={});
 
 	/// Start self test on device
 	const protocol::Response::RunSelfTest run_self_test();

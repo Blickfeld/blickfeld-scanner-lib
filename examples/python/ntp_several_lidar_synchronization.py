@@ -41,16 +41,11 @@ def example(args):
 
     if args.ntp_server_ip != "":  # If the ntp_server_ip variable is set, set the ntp servers
         for device in devices:  # iterate through devices
-            device_ntp_server_ip = device.get_ntp_server()  # Get ntp server ip address of the device
-            print("On device: " + device.hostname_or_ip  + " current ntp server is: " + device.get_ntp_server())
-            if device_ntp_server_ip != args.ntp_server_ip:  # It the ntp server ip address is different to the
-                # given ntp_server_ip set the ntp server ip address to the given ntp_server_ip
-                device.set_ntp_server(args.ntp_server_ip)
-                print("On device: " + device.hostname_or_ip  + " new ntp server is: " + device.get_ntp_server())
-    else:
-        print("Requested pattern:", config)
-        print(devices[0].fill_scan_pattern(config))
-        blickfeld_scanner.scanner.sync(devices=devices, scan_pattern=config, target_frame_rate=args.frame_rate)
+            device.set_time_synchronization(ntp = [args.ntp_server_ip])
+
+    print("Requested pattern:", config)
+    print(devices[0].fill_scan_pattern(config))
+    blickfeld_scanner.scanner.sync(devices=devices, scan_pattern=config, target_frame_rate=args.frame_rate)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()  # Command line argument parser

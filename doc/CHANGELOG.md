@@ -13,6 +13,15 @@ influence the resulting point cloud.
 
 ### Removed
 
+## [2.18.2] - 2021.03.08
+
+### Added
+* C++: Add clean shutdown method to mockup server
+* Automatically wait for successful time synchronization
+
+### Removed
+* Python: Dropped legacy methods `set_ntp_server` and `get_ntp_server`
+
 ## [2.18.1] - 2021.03.02
 
 ### Changed

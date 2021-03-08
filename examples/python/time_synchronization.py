@@ -26,11 +26,10 @@ def example(args):
 
     device = blickfeld_scanner.scanner(args.host)  # Connect to the device
 
+    print("Starting time_synchronization..");
     device.set_time_synchronization(ntp=args.ntp, ptp=args.ptp)  # Set time synchronization method. A list of ntp server or a list of ptp unicast destinations can be given as arguments as well.
 
     print(device.get_status().time_synchronization)  # Print time synchronization status
-    time.sleep(60)  # Sleep 1 minute to make sure synchronization worked and then print the resulting time synchronization status
-    print(device.get_status().time_synchronization)
 
 
 if __name__ == "__main__":

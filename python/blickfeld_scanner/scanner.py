@@ -24,6 +24,7 @@ from .protocol import connection_pb2
 from .protocol.stream import connection_pb2 as stream_connection_pb2
 from .protocol import options_pb2, common_pb2
 from .protocol.config import algorithm_pb2
+from .protocol.status import time_synchronization_pb2
 from . import stream
 from .version import __version__
 
@@ -369,7 +370,7 @@ class scanner(object):
         req.hello.protocol_version = self.protocol_version
         return self._connection.send_request(req).timestamp_ns / 1e9
 
-    def set_time_synchronization(self, ntp=False, ptp=False, persist=True):
+    def set_time_synchronization(self, ntp=False, ptp=False, persist=True, wait_for_sync=True, max_sync_duration=60):
         """> Introduced in BSL v2.18 and firmware v1.19
         
         Set the type of time synchronization and set basic parameters
@@ -379,7 +380,9 @@ class scanner(object):
         :param ntp: Set this field to choose NTPv4 time synchronization, this can be a list of ntp servers or a bool if the standard config should be used
         :param ptp: Set this field to choose PTP time synchronization, this can be a list of ptp unicast destinations, this will also activate unicast mode and deactivate multicast mode or a bool if the standard config should be used
         :param persist: Persist time synchronization config on device and reload it after a power-cycle
-        :return: response advanced config, see :any:`protobuf_protocol` advanced config
+        :param wait_for_sync: Wait until device is synchronized. Raises exception if device is not synchronized within max_sync_duration.
+        :param max_sync_duration: Specify maximum time in seconds for synchronization.
+        :return: None.
         """
         cfg = self.get_advanced_config()
 
@@ -403,45 +406,17 @@ class scanner(object):
             else:
                 cfg.time_synchronization.ptp.CopyFrom(ptp)
 
-        return self.set_advanced_config(cfg, persist=persist)
-    
-    def get_ntp_server(self):
-        """Attention: To use this function you need the requests library
-        `https://requests.readthedocs.io/en/master/`
+        ret = self.set_advanced_config(cfg, persist=persist)
 
-        Function to get a ntp server
-
-        :return: Returns the ntp server IP address
-        """
-        if self._hello.library_version and LooseVersion(self._hello.library_version) >= LooseVersion("2.18.0"):
-            ntp = self.get_advanced_config().time_synchronization.ntp
-            return ntp.servers[0] if len(ntp.servers) > 0 else ""
-        else:
-            import requests
-            req = requests.get(self.api_path + "network/ntp")
-            req.raise_for_status()
-            return req.json()['data']['server']
-    
-    def set_ntp_server(self, server):
-        """Attention: To use this function you need the requests library
-        `https://requests.readthedocs.io/en/master/`
-
-        Function to set a ntp server
-
-        :param server: Server IP to set the ntp server to
-        :type server: str
-        """
-
-        if self._hello.library_version and LooseVersion(self._hello.library_version) >= LooseVersion("2.18.0"):
-            return self.set_time_synchronization(ntp=[server])
-        else:
-            import requests
-            import json
-            cur_server = self.get_ntp_server()
-            if cur_server != server:
-                req = requests.put(self.api_path + "network/ntp/server", data=json.dumps({ "data": server }), headers={"Content-Type": "application/json"})
-                req.raise_for_status()
-                log.info("Configured NTP server to '%s'. Please power cycle the device to apply changes." % (self.get_ntp_server()))
+        if wait_for_sync:
+            while max_sync_duration > 0:
+                status = self.get_status()
+                if status.time_synchronization.state == time_synchronization_pb2.TimeSynchronization.State.SYNCED:
+                    return
+                time.sleep(1)
+                max_sync_duration = max_sync_duration - 1
+        
+            raise Exception("Device failed to synchronize. Current state is %s." % (time_synchronization_pb2.TimeSynchronization.State.Name(status.time_synchronization.state)))
             
     def run_self_test(self):
         """> Introduced in BSL v2.10 and firmware v1.9

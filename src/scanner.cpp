@@ -424,16 +424,34 @@ void scanner::set_advanced_config(protocol::config::Advanced config, bool persis
 	conn->send_request(req, resp);
 }
 
-void scanner::set_ntp_time_synchronization(std::vector<std::string> servers, bool persist) {
+void scanner::set_time_synchronization(const protocol::config::Advanced::TimeSynchronization config, bool persist, bool wait_for_sync, int max_sync_duration) {
 	auto cfg = this->get_advanced_config();
-	*cfg.mutable_time_synchronization()->mutable_ntp()->mutable_servers() = {servers.begin(), servers.end()};
+	cfg.mutable_time_synchronization()->CopyFrom(config);
 	this->set_advanced_config(cfg, persist);
+
+	if (wait_for_sync) {
+		protocol::Status status;
+		while (max_sync_duration--) {
+			status = this->get_status();
+			if (status.time_synchronization().state() == status.time_synchronization().SYNCED)
+				return;
+			std::this_thread::sleep_for(std::chrono::seconds(1));
+		}
+		throw str_exception("Device failed to synchronize. Current state is %s.",
+				    protocol::status::TimeSynchronization::State_Name(status.time_synchronization().state()).c_str());
+	}
 }
 
-void scanner::set_ptp_time_synchronization(std::vector<std::string> unicast_destinations, bool persist) {
-	auto cfg = this->get_advanced_config();
-	*cfg.mutable_time_synchronization()->mutable_ptp()->mutable_unicast_destinations() = {unicast_destinations.begin(), unicast_destinations.end()};
-	this->set_advanced_config(cfg, persist);
+void scanner::set_ntp_time_synchronization(std::vector<std::string> servers) {
+	protocol::config::Advanced::TimeSynchronization cfg;
+	*cfg.mutable_ntp()->mutable_servers() = {servers.begin(), servers.end()};
+	this->set_time_synchronization(cfg);
+}
+
+void scanner::set_ptp_time_synchronization(std::vector<std::string> unicast_destinations) {
+	protocol::config::Advanced::TimeSynchronization cfg;
+	*cfg.mutable_ptp()->mutable_unicast_destinations() = {unicast_destinations.begin(), unicast_destinations.end()};
+	this->set_time_synchronization(cfg);
 }
 
 #endif

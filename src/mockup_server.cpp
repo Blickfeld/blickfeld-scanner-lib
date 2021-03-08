@@ -28,6 +28,7 @@ mockup_server::mockup_server(const std::string replay_dump_fn, point_cloud_strea
 }
 
 mockup_server::~mockup_server() {
+	shutdown();
 	if (acceptor)
 		delete acceptor;
 	if (io_context)
@@ -37,7 +38,7 @@ mockup_server::~mockup_server() {
 int mockup_server::serve_forever() {
 	log_info("started...\n");
 	io_context->run();
-	log_info("shutting down...\n");
+	log_info("stopped.\n");
 	return 0;
 }
 
@@ -60,7 +61,22 @@ void mockup_server::do_accept() {
 
 				if (acceptor->is_open())
 					do_accept();
+
+				sessions.push_back(client);
 			});
+}
+
+void mockup_server::shutdown() {
+	log_info("shutting down..\n");
+	acceptor->close();
+
+	for (auto session : sessions) {
+		if (auto session_lock = session.lock()) {
+			session_lock->stop();
+		}
+	}
+
+	io_context->stop();
 }
 
 }  // namespace network

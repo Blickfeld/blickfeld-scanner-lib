@@ -32,18 +32,16 @@ int example(int argc, char* argv[]) {
 	std::cout << "Connected to " << scanner_ip_or_host << std::endl;
 
 	if (time_sync == "ntp") {
-		std::cout << "NTP synchronization selected" << std::endl;
+		std::cout << "NTP synchronization selected. Starting time synchronization.." << std::endl;
 		scanner->set_ntp_time_synchronization();
 	} else if (time_sync == "ptp") {
-		std::cout << "PTP synchronization selected" << std::endl;
+		std::cout << "PTP synchronization selected. Starting time synchronization.." << std::endl;
 		scanner->set_ptp_time_synchronization();
 	} else {
 		std::cout << "Couldn't parse second input, please provide either NTP or PTP" << std::endl;
 		return 0;
 	}
-	std::cout << "Synchronization status:" << std::endl;
-	std::cout << scanner->get_status().time_synchronization().DebugString() << std::endl;
-	std::this_thread::sleep_for(std::chrono::seconds(60));
+
 	std::cout << "Synchronization status:" << std::endl;
 	std::cout << scanner->get_status().time_synchronization().DebugString() << std::endl;
 

@@ -42,6 +42,11 @@ void mockup_session::start() {
 	do_send();
 }
 
+void mockup_session::stop() {
+	socket->close();
+	context_thread->join();
+}
+
 void mockup_session::do_read() {
 	auto self(shared_from_this());
 
