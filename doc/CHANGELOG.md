@@ -13,6 +13,33 @@ influence the resulting point cloud.
 
 ### Removed
 
+## [2.18.2] - 2021.03.08
+
+### Added
+* C++: Add clean shutdown method to mockup server
+* Automatically wait for successful time synchronization
+
+### Removed
+* Python: Dropped legacy methods `set_ntp_server` and `get_ntp_server`
+
+## [2.18.1] - 2021.03.02
+
+### Changed
+* Protocol: Do not enforce new status fields
+
+## [2.18.0] - 2021.03.02
+
+### Added
+* [Introduced in firmware v1.19] Support for on-board IMU stream. Accelerometer and gyroscope data is provided with approx. 1 kHz and synchronized timestamps.
+* [Introduced in firmware v1.19] Support for PTPv2 time synchronization
+* Protocol: Status message and state of time synchronization
+
+### Changed
+* Python: Re-worked time synchronization interface. Advanced configuration is used with up-to-date devices.
+
+### Removed
+* Protocol: Remove advanced `classification_threshold` of background subtraction algorithm
+
 ## [2.17.3] - 2021.02.12
 
 ### Changed

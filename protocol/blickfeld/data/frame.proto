@@ -45,13 +45,7 @@ message Frame {
 	optional config.ScanPattern scan_pattern = 5 [(optional)=true]; // Refer to [ScanPattern](#blickfeld.protocol.config.ScanPattern)
 	optional bool is_ramp_up_phase = 9 [(optional)=true]; // <blockquote>Introduced in BSL v2.16 and firmware v1.17</blockquote> If the frame_mode in the scan pattern is set to SEPARATE, this value indicates if the given frame was captured during up-ramping or down-ramping.
 	optional uint32 total_number_of_points = 6; // Number of laser pulses emitted in this frame.
-
-	/**
-	 * Number of returned points recorded:
-	 *
-	 * Each point of the [total_number_of_points](#blickfeld.protocol.data.Frame.total_number_of_points) can produce several returns.
-	 */
-	optional uint32 total_number_of_returns = 7;
+	optional uint32 total_number_of_returns = 7; // Number of returned points recorded: Each point of the [total_number_of_points](#blickfeld.protocol.data.Frame.total_number_of_points) can produce several returns.
 
 	repeated Scanline scanlines = 2 [(optional)=true]; // Refer to [Scanline](#blickfeld.protocol.data.Scanline)
 	optional Packed packed = 8 [(optional)=true]; // <blockquote>Introduced in BSL v2.16 and firmware v1.17</blockquote> Refer to [Packed](#blickfeld.protocol.data.Frame.Packed)

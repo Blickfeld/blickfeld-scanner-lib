@@ -41,6 +41,7 @@ public:
 	virtual ~mockup_session();
 
 	void start();
+	void stop();
 };
 
 }  // namespace network

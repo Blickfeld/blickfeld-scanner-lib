@@ -1,0 +1,35 @@
+syntax = "proto2";
+option cc_enable_arenas = true;
+
+import "blickfeld/options.proto";
+package blickfeld.protocol.data;
+
+/**
+ * > Introduced in BSL v2.18 and firmware v1.19
+ *
+ * The Cube has an on-board IMU, which can be used for e.g. mapping applications or static auto-leveling.
+ */
+message IMU {
+	/**
+	 * Describes a single IMU state.
+	 * Data rate is approx. 1.125 khz.
+	 */
+	message Sample {
+		optional uint64 start_offset_ns = 1; // Unit: [ns] – Offset to [start_time_ns](#blickfeld.protocol.data.IMU.start_time_ns)
+		repeated float acceleration = 2 [(length) = 3, packed=true]; // Unit: [g] - Format: [x,y,z] - Measured acceleration for 3-axes.
+		repeated float angular_velocity = 3 [(length) = 3, packed=true]; // Unit: [rad/s] - Format: [x,y,z] - Measured angular velocity by gyroscope for 3-axes.
+	}
+
+	message Packed {
+		optional uint32 length = 1; // Length of arrays
+
+		optional bytes start_offset_ns = 2; // Starting time of the point in relation to [Data.start_time_ns](#blickfeld.protocol.data.IMU.Data.start_time_ns). 1-dimensional array. Unit: [ns]. Type: UInt64. Byte Order: Big Endian.
+		optional bytes acceleration = 3; // Accerlation. 3-dimensional array in row-major format with [x, y, z] tuples. Unit: [g]. Type: Float32. Byte Order: Big Endian.
+		optional bytes angular_velocity = 4; // Angular velocity, measured with gyroscope. 3-dimensional array in row-major format with [x, y, z] tuples. Unit: [rad/s]. Type: Float32. Byte Order: Big Endian.
+	}
+
+	optional uint64 start_time_ns = 1 [(optional)=true]; // Unit: [ns] – start timestamp of data. The start_offset_ns in each sample refers to this value. The timestamp is synchronized to the ones in point cloud frames.
+
+	repeated Sample samples = 2 [(optional)=true]; // Refer to [Sample](#blickfeld.protocol.data.IMU.Sample)
+	optional Packed packed = 3 [(optional)=true]; // Refer to [Packed](#blickfeld.protocol.data.IMU.Packed)
+}

@@ -8,10 +8,12 @@
 add_subdirectory(async_fetch_clouds)
 add_subdirectory(reduced_clouds)
 add_subdirectory(fetch_clouds)
+add_subdirectory(fetch_imu)
 add_subdirectory(server)
 add_subdirectory(set_scan_pattern)
 add_subdirectory(error_handling)
 add_subdirectory(named_scan_pattern)
+add_subdirectory(time_synchronization)
 
 if (HAVE_OPENSSL)
     add_subdirectory(ssl)

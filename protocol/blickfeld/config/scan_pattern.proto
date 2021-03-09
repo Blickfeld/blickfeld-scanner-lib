@@ -247,10 +247,9 @@ message ScanPattern {
 
 		/*
 		 * <blockquote> Introduced in BSL v2.16 and firmware v1.17</blockquote>
-		 *
 		 * All points without any returns are filtered if this setting is true.
 		 * With active algorithms, such as background subtraction, this can reduce the bandwidth significantly.
-		 *
+		 * <br>
 		 * Note:
 		 * It is recommended to not estimate required network bandwidths when this setting is active.
 		 * In scenarios, where from one frame to another, all points have returns (e.g. due to environmental changes),

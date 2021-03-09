@@ -3,6 +3,7 @@ option cc_enable_arenas = true;
 
 import "blickfeld/options.proto";
 import "blickfeld/data/point_cloud.proto";
+import "blickfeld/data/imu.proto";
 import "blickfeld/status/main.proto";
 import "blickfeld/stream/connection.proto";
 
@@ -38,5 +39,6 @@ message Event {
 		Developer developer = 13;  // Refer to [Event.Developer](#blickfeld.protocol.stream.Event.Developer)
 		bytes raw_file = 14;  // <blockquote>Introduced in BSL v2.13 and firmware v1.13</blockquote> Raw bytes, which should be written sequentially in a file. Refer to [RawFile](#blickfeld.protocol.stream.Subscribe.RawFile).
 		EndOfStream end_of_stream = 15;  // <blockquote>Introduced in BSL v2.13 and firmware v1.13</blockquote> Refer to [EndOfStream](#blickfeld.protocol.stream.Event.EndOfStream)
+		data.IMU imu = 16; // <blockquote>Introduced in BSL v2.18 and firmware v1.19</blockquote> Refer to [IMU](#blickfeld.protocol.data.IMU)
 	}
 }

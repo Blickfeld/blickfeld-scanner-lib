@@ -18,11 +18,13 @@ import tempfile
 import os
 import warnings
 import time
+from distutils.version import LooseVersion, StrictVersion
 
 from .protocol import connection_pb2
 from .protocol.stream import connection_pb2 as stream_connection_pb2
 from .protocol import options_pb2, common_pb2
 from .protocol.config import algorithm_pb2
+from .protocol.status import time_synchronization_pb2
 from . import stream
 from .version import __version__
 
@@ -67,9 +69,9 @@ class scanner(object):
         
         self._connection = self.create_connection()
         
-        hello = self.hello()
-        if __version__ != hello.library_version:
-            warnings.warn("Warning: The client BSL version does not match the server BSL version. Client has '%s', server has '%s'." % (__version__, hello.library_version), DeprecationWarning, stacklevel=2)
+        self._hello = self.hello()
+        if __version__ != self._hello.library_version:
+            warnings.warn("Warning: The client BSL version does not match the server BSL version. Client has '%s', server has '%s'." % (__version__, self._hello.library_version), DeprecationWarning, stacklevel=2)
 
     def __del__(self):
         if hasattr(self, "_connection"):
@@ -367,36 +369,54 @@ class scanner(object):
         req = connection_pb2.Request()
         req.hello.protocol_version = self.protocol_version
         return self._connection.send_request(req).timestamp_ns / 1e9
-    
-    def get_ntp_server(self):
-        """Attention: To use this function you need the requests library
-        `https://requests.readthedocs.io/en/master/`
 
-        Function to get a ntp server
+    def set_time_synchronization(self, ntp=False, ptp=False, persist=True, wait_for_sync=True, max_sync_duration=60):
+        """> Introduced in BSL v2.18 and firmware v1.19
+        
+        Set the type of time synchronization and set basic parameters
 
-        :return: Returns the ntp server IP address
+        Either NTP or PTP has to be set (If both are set NTP will be choosen). It will overwrite the current time synchronization configuration
+
+        :param ntp: Set this field to choose NTPv4 time synchronization, this can be a list of ntp servers or a bool if the standard config should be used
+        :param ptp: Set this field to choose PTP time synchronization, this can be a list of ptp unicast destinations, this will also activate unicast mode and deactivate multicast mode or a bool if the standard config should be used
+        :param persist: Persist time synchronization config on device and reload it after a power-cycle
+        :param wait_for_sync: Wait until device is synchronized. Raises exception if device is not synchronized within max_sync_duration.
+        :param max_sync_duration: Specify maximum time in seconds for synchronization.
+        :return: None.
         """
-        import requests
-        req = requests.get(self.api_path + "network/ntp")
-        req.raise_for_status()
-        return req.json()['data']['server']
-    
-    def set_ntp_server(self, server):
-        """Attention: To use this function you need the requests library
-        `https://requests.readthedocs.io/en/master/`
+        cfg = self.get_advanced_config()
 
-        Function to set a ntp server
+        if ntp and ptp:
+            raise AttributeError("Either provide ntp or ptp configuration. Not both.")
+        if not ntp and not ptp:
+            raise AttributeError("Neither ntp nor ptp is provided.")
 
-        :param server: Server IP to set the ntp server to
-        :type server: str
-        """
-        import requests
-        import json
-        cur_server = self.get_ntp_server()
-        if cur_server != server:
-            req = requests.put(self.api_path + "network/ntp/server", data=json.dumps({ "data": server }), headers={"Content-Type": "application/json"})
-            req.raise_for_status()
-            log.info("Configured NTP server to '%s'. Please power cycle the device to apply changes." % (self.get_ntp_server()))
+        if ntp:
+            if type(ntp) == bool:
+                cfg.time_synchronization.ntp.SetInParent()
+            elif type(ntp) == list:
+                cfg.time_synchronization.ntp.servers[:] = ntp
+            else:
+                cfg.time_synchronization.ntp.CopyFrom(ntp)
+        if ptp:
+            if type(ptp) == bool:
+                cfg.time_synchronization.ptp.SetInParent()
+            elif type(ptp) == list:
+                cfg.time_synchronization.ptp.unicast_destinations[:] = ptp
+            else:
+                cfg.time_synchronization.ptp.CopyFrom(ptp)
+
+        ret = self.set_advanced_config(cfg, persist=persist)
+
+        if wait_for_sync:
+            while max_sync_duration > 0:
+                status = self.get_status()
+                if status.time_synchronization.state == time_synchronization_pb2.TimeSynchronization.State.SYNCED:
+                    return
+                time.sleep(1)
+                max_sync_duration = max_sync_duration - 1
+        
+            raise Exception("Device failed to synchronize. Current state is %s." % (time_synchronization_pb2.TimeSynchronization.State.Name(status.time_synchronization.state)))
             
     def run_self_test(self):
         """> Introduced in BSL v2.10 and firmware v1.9
@@ -465,6 +485,15 @@ class scanner(object):
         req = connection_pb2.Request()
         req.delete_named_scan_pattern.name = name
         return self._connection.send_request(req).delete_named_scan_pattern
+
+    def get_imu_stream(self, as_numpy=False):
+        """> Introduced in BSL v2.18 and firmware v1.19
+        
+        Request IMU stream of device
+
+        :returns: :py:class:`blickfeld_scanner.scanner.stream.imu` object
+        """
+        return stream.imu(self.create_connection(), as_numpy=as_numpy)
  
     @staticmethod
     def sync(devices, scan_pattern = None, target_frame_rate = None, max_time_difference = 0.1):

@@ -45,6 +45,18 @@ message Subscribe {
 	}
 
 	/**
+	 * > Introduced in BSL v2.18 and firmware v1.19
+	 *
+	 * The Cube has an on-board IMU, which can be used for e.g. mapping applications or static auto-leveling.
+	 * A stream can be requested with this subscription.
+	 * The default rate is approx. 1.125 kHz and is provided in bursts.
+	 * The timestamps inside the protocol are synchronized to the ones in point cloud frames.
+	 */
+	message IMU {
+		optional bool packed_format = 1 [ default = false ]; // Request a packed binary format. This is currently used for efficent Python numpy decoding.
+	}
+
+	/**
 	 * Internal use only
 	 */
 	message Developer {
@@ -60,5 +72,6 @@ message Subscribe {
 		Status status = 12;  // Refer to [Subscribe.Status](#blickfeld.protocol.stream.Subscribe.Status)
 		Developer developer = 13;  // Refer to [Subscribe.Developer](#blickfeld.protocol.stream.Subscribe.Developer)
 		RawFile raw_file = 14; // Refer to [Subscribe.RawFile](#blickfeld.protocol.stream.Subscribe.RawFile)
+		IMU imu = 16; // <blockquote>Introduced in BSL v2.18 and firmware v1.19</blockquote> Refer to [Subscribe.IMU](#blickfeld.protocol.stream.Subscribe.IMU)
 	}
 }

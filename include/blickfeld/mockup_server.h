@@ -32,6 +32,7 @@ namespace blickfeld {
 namespace network {
 
 class simulated_connection;
+class mockup_session;
 
 /**
  * @brief This server mocks the blickfeld-scanner-server, which accepts the BSL connections on the Blickfeld devices.
@@ -53,6 +54,7 @@ protected:
 
 	asio::io_context* io_context;
 	asio::basic_socket_acceptor<asio::ip::tcp, asio::executor>* acceptor;
+	std::vector<std::weak_ptr<mockup_session> > sessions;
 
 	void do_accept();
 
@@ -73,6 +75,13 @@ public:
 	 * @return int Return 0 if it has been exited normally.
 	 */
 	int serve_forever();
+
+	/**
+	 * @brief Shutdown server
+	 *
+	 * This can be called asynchronously to shutdown the server.
+	 */
+	void shutdown();
 };
 
 }  // namespace network

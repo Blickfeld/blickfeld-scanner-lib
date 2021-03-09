@@ -93,9 +93,12 @@ set(PROTOBUF_SOURCES
 	blickfeld/status/scanner.proto
 	blickfeld/status/temperature.proto
 	blickfeld/status/server.proto
+	blickfeld/status/time_synchronization.proto
+	blickfeld/status/imu.proto
 	
 	blickfeld/data/algorithm.proto
 	blickfeld/data/frame.proto
+	blickfeld/data/imu.proto
 	blickfeld/data/point_cloud.proto
 	blickfeld/data/point.proto
 	blickfeld/data/scanline.proto

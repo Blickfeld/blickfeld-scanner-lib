@@ -1,0 +1,108 @@
+syntax = "proto2";
+
+import "blickfeld/options.proto";
+
+package blickfeld.protocol.status;
+
+/**
+ * > Introduced in BSL v2.18 and firmware v1.19
+ *
+ * This section defines the synchronization status of the server.
+ */
+message TimeSynchronization {
+
+	enum State {
+		STOPPED = 1;
+		INITIALIZING = 2;
+		SYNCED = 3;
+		FAILED = 4;
+	}
+
+	message PTP {
+		/**
+		 * ONLY AVAILABLE FOR PTP, NTP doesnt have a state
+		 * Follwing states can occur:
+		 * init: Initializing,
+		 * flt: Faulty,
+		 * lstn_init: Listening (first time),
+		 * lstn_reset: Listening (subsequent reset),
+		 * pass: Passive (not best master, not announcing),
+		 * uncl: Uncalibrated,
+		 * slv: Worker,
+		 * pmst: Pre-master,
+		 * mst: Master (active),
+		 * dsbl: Disabled,
+		 * ? (unk): Unknown state
+		 */
+		optional string state = 1 [(optional) = true];
+
+		/**
+		 * TODO Find out for NTP!!
+		 * Clock ID
+		 * Port identity of the current best master, as defined by IEEE 1588 standard. This ID is the local clock's ID if the local clock is the best master.
+		 * This parameter is displayed as clock_id or port (host). Port is the PTP clock port number, not the User Datagram Protocol (UDP) port numbers.
+		 * The clock ID is an Extended Unique Identifier (EUI)-64 64-bit ID, converted from the 48-bit MAC address, by inserting 0xfffe at the middle of the MAC address.
+		 */
+		optional string clock_id = 2 [(optional) = true];
+
+		/**
+		 * One-way delay
+		 * Current value of one-way delay (or mean-path delay) in seconds, calculated by the ptpd daemon that is in the worker state from the delay request and delay response message exchange.
+		 * Note: If this value remains at zero, it means that no delay response messages are being received, which might be because of a network issue.
+		 */
+		optional float one_way_delay = 3 [(optional) = true];
+
+		/**
+		 * Slave to master
+		 * Intermediate offset value (seconds) extracted from the delay request and delay response message exchange.
+		 * This value is used for computing one-way delay. If the last value was rejected by a filter, the previous value is shown in the log file.
+		 * This value is zero (0) if the delay response messages are not received.
+		 */
+		optional float slave_to_master = 4 [(optional) = true];
+
+		/**
+		 * Master to slave
+		 * Intermediate offset value (seconds) extracted from the sync messages. This value is used for computing the offset value from the master devices.
+		 * If the last value was rejected by a filter, the previous value is shown in the log file.
+		 */
+		optional float master_to_slave = 5 [(optional) = true];
+
+		/**
+		 * Observed drift
+		 * The frequency difference between the worker clock and the master clock as measured by the integral accumulator of the clock control proportional integral (PI) servo model.
+		 * This value stabilizes when the clock offset value is stabilized, and this value is used to detect clock stability.
+		 */
+		optional float observed_drift = 6 [(optional) = true];
+
+		/**
+		 * Last packet Received
+		 * This field shows which message was received last. It displays S for sync messages and D for delay response messages.
+		 * If a worker device logs no D entries, it means that the worker device is not receiving delay response messages because of network issue.
+		 */
+		optional string last_packet_received = 7 [(optional) = true];
+	}
+
+	message NTP {
+		optional float frequency_offset = 1 [(optional) = true];  // frequency offset (parts per million - PPM) as in loopstats
+		optional float rms_jitter = 2 [(optional) = true];  // RMS jitter (seconds) as in loopstats
+		optional float allan_deviation = 3 [(optional) = true];  // Allan deviation (PPM) as in loopstats
+		optional float clock_discipline_time_constant = 4 [(optional) = true];  // clock discipline time constant as in loopstats
+	}
+
+	optional State state = 1;
+
+	/**
+	 * Current offset value from master device in seconds.
+	 * NTP: time offset (seconds) in loopstats
+	 * PTP:
+	 * It is the main output of the PTP engine that is in the worker state.
+	 * This value is the input for clock corrections in the clock servo algorithms. This value is typically measured when estimating the performance of the worker device.
+	 */
+	optional float offset_from_master = 2 [(optional) = true];
+
+	oneof kind {
+		option (optional_one_of) = true;
+		NTP ntp = 3;  // Refer to [NTP](#blickfeld.protocol.status.TimeSynchronization.NTP)
+		PTP ptp = 4;  // Refer to [PTP](#blickfeld.protocol.status.TimeSynchronization.PTP)
+	}
+}

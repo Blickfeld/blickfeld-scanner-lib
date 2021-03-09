@@ -23,6 +23,7 @@
 #ifndef BSL_STANDALONE
 #include "blickfeld/connection.pb.h"
 #include "blickfeld/file/point_cloud.pb.h"
+#include "blickfeld/imu_stream.h"
 #endif
 
 namespace asio {
@@ -269,6 +270,16 @@ public:
 	 */
 	std::shared_ptr<scanner::point_cloud_stream<protocol::data::Frame> > get_point_cloud_stream(const protocol::stream::Subscribe::PointCloud extend_subscription);
 
+	/**
+	 * > Introduced in BSL v2.18 and firmware v1.19
+	 *
+	 * Fetches IMU data from Cube.
+	 * Delete the shared reference to stop the stream.
+	 *
+	 * @return Shared pointer of stream instance. Use the recv_burst method to get IMU data.
+	 */
+	std::shared_ptr<imu_stream> get_imu_stream();
+
 #ifdef BSL_RECORDING
 
 	/**
@@ -342,6 +353,53 @@ public:
 	///
 	/// @param name: Name of the scan pattern
 	void delete_named_scan_pattern(std::string name);
+
+	/// > Introduced in BSL v2.11 and firmware v1.11
+	///
+	/// Returns the currently set advanced config, see: protobuf_protocol.
+	///
+	/// @returns Currently set advanced config, see protobuf_protocol advanced config
+	const protocol::config::Advanced get_advanced_config();
+
+	/// > Introduced in BSL v2.11 and firmware v1.11
+	///
+	/// Function to set advanced config, see: protobuf_protocol AdvancedConfig.
+	/// Expert parameters: It is not recommended to adapt this calibrated configuration without understanding the influences on the resulting point cloud quality.
+	///
+	/// @param config: advanced config to be set
+	/// @param persist: Persist advanced config on device and reload it after a power-cycle
+	void set_advanced_config(protocol::config::Advanced config, bool persist=false);
+
+	/// > Introduced in BSL v2.18 and firmware v1.19
+	///
+	/// Function to set time synchronization
+	/// The existing config will be overwritten.
+	///
+	/// @param config: Configuration, see protobuf_protocol advanced config
+	/// @param persist: Persist advanced config on device and reload it after a power-cycle
+	/// @param wait_for_sync: Wait until device is synchronized. Raises exception if device is not synchronized within max_sync_duration.
+	/// @param max_sync_duration: Specify maximum time in seconds for synchronization.
+	void set_time_synchronization(const protocol::config::Advanced::TimeSynchronization config, bool persist=true, bool wait_for_sync=true, int max_sync_duration=60);
+
+	/// > Introduced in BSL v2.18 and firmware v1.19
+	///
+	/// Function to set ntp time synchronization, a vector of servers can be provided.
+	/// The old servers and config will be overwritten.
+	///
+	/// @param servers: vector of servers to connect to for time synchronization
+	/// @param persist: Persist advanced config on device and reload it after a power-cycle
+	void set_ntp_time_synchronization(std::vector<std::string> servers={});
+
+	/// > Introduced in BSL v2.18 and firmware v1.19
+	///
+	/// Function to set ptp time synchronization.
+	/// A vector of unicast destinations can be provided, this will also activate unicast mode and deactivate multicast mode.
+	/// If no destinations are given the standard configuration (multicast will be used).
+	/// The old servers and config will be overwritten.
+	///
+	/// @param servers: vector of unicast destinations to connect to for time synchronization (if not given or vector is empty, multicast will be used)
+	/// @param persist: Persist advanced config on device and reload it after a power-cycle
+	void set_ptp_time_synchronization(std::vector<std::string> unicast_destinations={});
 
 	/// Start self test on device
 	const protocol::Response::RunSelfTest run_self_test();

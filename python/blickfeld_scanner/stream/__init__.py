@@ -13,8 +13,10 @@ __all__ = [
     "point_cloud",
     "raw",
     "status",
+    "imu",
 ]
 
 from .point_cloud import point_cloud
 from .raw import raw
 from .status import status
+from .imu import imu

@@ -39,7 +39,44 @@ message Advanced {
 		optional stream.Subscribe.PointCloud default_point_cloud_subscription = 1; // Overwrite default point cloud subscription. Can still be overridden with client requests.
 	}
 
+	/**
+	 * > Introduced in BSL v2.18 and firmware v1.19
+	 *
+	 * Activate or deactivate synchronization and change parameters
+	 */
+	message TimeSynchronization {
+		/**
+		 * The Blickfeld devices can use an NTPv4 client to synchronize the local device time to a time server.
+		 * NTP can achieve synchronization accuracy below one millisecond for measurement results in local networks.
+		 */
+		message NTP {
+			repeated string servers = 1 [ (optional)=true, (regex) = "[[:alnum:]\\.\\-]+" ]; // Specify list of NTP server. By default, debian pool NTP servers are used.
+		}
+
+		/**
+		 * The Blickfeld devices can use a PTP client to synchronize the local device time to a time server.
+		 * PTP can achieve an higher accuracy than NTP in local networks.
+		 */
+		message PTP {
+			enum DelayMechanism {
+				E2E = 1;  // End to end delay detection
+				P2P = 2;  // Peer to peer delay detection
+			}
+
+			optional uint32 domain = 1 [default=0];  // PTP domain number.
+			optional DelayMechanism delay_mechanism = 2 [default=E2E];  // Delay detection mode used
+			repeated string unicast_destinations = 3 [ (optional) = true, (regex) = "[[:alnum:]\\.\\-]+" ]; // Specify unicast slave addresses for unicast master operation, or unicast master addresses for slave operation. If this is set unicast mode will be activated.
+		}
+
+		oneof kind {
+			option (optional_one_of) = true;
+			NTP ntp = 1;  // If this field is set, NTP synchronization is activated, which is the default configuration. Refer to [NTP](#blickfeld.protocol.config.Advanced.Synchronization.NTP)
+			PTP ptp = 2;  // If this field is set, PTP synchronization is activated and NTP synchronization is deactivated. Refer to [PTP](#blickfeld.protocol.config.Advanced.Synchronization.PTP)
+		}
+	}
+
 	optional Detector detector = 1; // Refer to [Detector](#blickfeld.protocol.config.Advanced.Detector)
 	optional Processing processing = 2; // <blockquote>Introduced in BSL v2.12 and firmware v1.12</blockquote> Refer to [Processing](#blickfeld.protocol.config.Advanced.Processing)
 	optional Server server = 3; // <blockquote>Introduced in BSL v2.13 and firmware v1.13</blockquote> Refer to [Server](#blickfeld.protocol.config.Advanced.Server)
+	optional TimeSynchronization time_synchronization = 4; // <blockquote>Introduced in BSL v2.18 and firmware v1.19</blockquote> Refer to [TimeSynchronization](#blickfeld.protocol.config.Advanced.TimeSynchronization)
 }

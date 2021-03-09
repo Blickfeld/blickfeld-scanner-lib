@@ -1,0 +1,18 @@
+syntax = "proto2";
+
+import "blickfeld/options.proto";
+
+package blickfeld.protocol.status;
+
+/**
+ * > Introduced in BSL v2.18 and firmware v1.19
+ *
+ * This section defines the status of the IMU.
+ */
+message IMU {
+	message StaticState {
+		repeated float acceleration = 1 [(length) = 3];
+	}
+
+	optional StaticState static_state = 1;
+}
