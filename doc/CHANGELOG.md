@@ -13,6 +13,11 @@ influence the resulting point cloud.
 
 ### Removed
 
+## [2.19.1] - 2021.03.22
+
+### Changed
+* Doc: Update IMU calibration example
+
 ## [2.19.0] - 2021.03.22
 
 ### Added

@@ -1,6 +1,6 @@
 # Numpy frame
 
-Fetch the point cloud of a device as a numpy structued array.
+Fetch the point cloud of a device as a numpy structured array.
 
 This example will stop after 10 received frames.
 
