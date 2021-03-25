@@ -616,7 +616,7 @@ class connection(object):
                 raise
             os.unlink(key_and_cert_file)
             
-            self._ssl_context.verify_mode = ssl.CERT_REQUIRED
+            self._ssl_context.verify_mode = ssl.CERT_NONE
             self.socket = self._ssl_context.wrap_socket(socket.create_connection((hostname_or_ip, port)), server_hostname=hostname_or_ip)
         else:
             self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

@@ -160,7 +160,7 @@ scanner::scanner(std::string hostname_or_ip, std::string cert_key_file) :
 		ssl_context->set_options(asio::ssl::context::default_workarounds|asio::ssl::context::no_sslv2|asio::ssl::context::single_dh_use);
 		ssl_context->use_certificate_file(cert_key_file, asio::ssl::context::pem);
 		ssl_context->use_private_key_file(cert_key_file, asio::ssl::context::pem);
-		ssl_context->set_verify_mode(asio::ssl::verify_peer);
+		ssl_context->set_verify_mode(asio::ssl::verify_none);
 		ssl_context->load_verify_file(cert_key_file);
 		conn = new scanner_connection(*io_context, hostname_or_ip, *ssl_context);
 #else

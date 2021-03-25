@@ -13,6 +13,11 @@ influence the resulting point cloud.
 
 ### Removed
 
+## [2.19.2] - 2021.03.25
+
+### Changed
+* Bugfix: Update device authentication
+
 ## [2.19.1] - 2021.03.22
 
 ### Changed
