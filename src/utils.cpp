@@ -141,4 +141,10 @@ int get_scanline_id_by_point_id(const Frame& frame, const uint32_t point_id) {
 } // namespace data
 } // namespace protocol
 
+const std::tuple<int, int, int> parse_version(const std::string version_str) {
+	int major = -1, minor = -1, patch = -1;
+	sscanf(version_str.c_str(), "%d.%d.%d", &major, &minor, &patch);
+	return std::make_tuple(major, minor, patch);
+}
+
 } // namespace blickfeld

@@ -70,8 +70,18 @@ class scanner(object):
         self._connection = self.create_connection()
         
         self._hello = self.hello()
+        # Compare library version of server and client
         if __version__ != self._hello.library_version:
-            warnings.warn("Warning: The client BSL version does not match the server BSL version. Client has '%s', server has '%s'." % (__version__, self._hello.library_version), DeprecationWarning, stacklevel=2)
+            def parse_version(version_str):
+                return [int(x) for x in version_str.split(".")]
+            
+            local_version = None
+            if self._hello.library_version and __version__:
+                local_version = [int(x) if x.isdecimal() else None for x in __version__.split(".")]
+                server_version = [int(x) if x.isdecimal() else None for x in self._hello.library_version.split(".")]
+            # Only warn if major or minor version does not match
+            if local_version is None or len(local_version) < 3 or len(server_version) < 3 or local_version[0] != server_version[0] or local_version[1] != server_version[1]:
+                warnings.warn("Warning: The client BSL version does not match the server BSL version. Client has '%s', server has '%s'." % (__version__, self._hello.library_version), DeprecationWarning, stacklevel=2)
 
     def __del__(self):
         if hasattr(self, "_connection"):

@@ -13,7 +13,7 @@ import blickfeld_scanner
 from blickfeld_scanner.protocol.config import scan_pattern_pb2
 
 def custom_trigger(target, horizontal_angle):
-    """Configure custom triggers and retrieve a point cloud with these settings
+    """Configure custom triggers and retrieve a point cloud for the trigger set.
 
     This example will stop after 10 received frames.
 
