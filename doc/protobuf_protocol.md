@@ -1499,6 +1499,7 @@ Processing parameters are set at the factory after calibration. Changing these v
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | range_offset | [float](#float) | optional | in [m] Default: 0 |
+| imu_static_rotation_offset | [float](#float) | repeated | <blockquote>Introduced in BSL v2.19 and firmware v1.20</blockquote> in [rad] - Offset rotation matrix for acceleration of IMU. Can be used to calibrate the accelerometer e.g. on a flat surface. |
 
 
 

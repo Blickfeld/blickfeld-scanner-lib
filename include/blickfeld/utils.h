@@ -55,6 +55,8 @@
 #define _USE_MATH_DEFINES
 #include <cmath>
 
+#include <tuple>
+
 namespace blickfeld {
 
 namespace os {
@@ -79,6 +81,8 @@ int get_scanline_id_by_point_id(const Frame& frame, const uint32_t point_id);
 
 } // namespace data
 } // namespace protocol
+
+const std::tuple<int, int, int> parse_version(const std::string version_str);
 
 }
 

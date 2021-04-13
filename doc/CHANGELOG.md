@@ -13,6 +13,29 @@ influence the resulting point cloud.
 
 ### Removed
 
+## [2.19.3] - 2021.04.13
+
+### Changed
+* Doc: Improve example descriptions
+* Use only major and minor version for compatibility warning
+
+## [2.19.2] - 2021.03.25
+
+### Changed
+* Bugfix: Update device authentication
+
+## [2.19.1] - 2021.03.22
+
+### Changed
+* Doc: Update IMU calibration example
+
+## [2.19.0] - 2021.03.22
+
+### Added
+* Doc: Add descriptions and source code of Python and C++ examples
+* Python: Example script for IMU calibration
+* Protocol: Advanced calibration configuration for static IMU accelerometer offset
+
 ## [2.18.2] - 2021.03.08
 
 ### Added

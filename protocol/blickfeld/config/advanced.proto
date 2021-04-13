@@ -28,6 +28,7 @@ message Advanced {
 	 */
 	message Processing {
 		optional float range_offset = 1 [default = 0, (d_min) = -2, (d_max) = 2]; // in [m]
+		repeated float imu_static_rotation_offset = 2 [(length) = 9, (optional) = true, packed = true]; // <blockquote>Introduced in BSL v2.19 and firmware v1.20</blockquote> in [rad] - Offset rotation matrix for acceleration of IMU. Can be used to calibrate the accelerometer e.g. on a flat surface.
 	}
 
 	/**

@@ -160,7 +160,7 @@ scanner::scanner(std::string hostname_or_ip, std::string cert_key_file) :
 		ssl_context->set_options(asio::ssl::context::default_workarounds|asio::ssl::context::no_sslv2|asio::ssl::context::single_dh_use);
 		ssl_context->use_certificate_file(cert_key_file, asio::ssl::context::pem);
 		ssl_context->use_private_key_file(cert_key_file, asio::ssl::context::pem);
-		ssl_context->set_verify_mode(asio::ssl::verify_peer);
+		ssl_context->set_verify_mode(asio::ssl::verify_none);
 		ssl_context->load_verify_file(cert_key_file);
 		conn = new scanner_connection(*io_context, hostname_or_ip, *ssl_context);
 #else
@@ -172,10 +172,18 @@ scanner::scanner(std::string hostname_or_ip, std::string cert_key_file) :
 
 	protocol::Response::Hello _hello;
 	__hello(&_hello);
-	if (std::string(BSL_VERSION) != _hello.library_version())
-		log_warning("Warning: The client BSL version does not match the server BSL version. Client has '%s', server has '%s'.\n",
-			    BSL_VERSION,
-			    _hello.library_version().c_str());
+
+	// Compare library version of server and client
+	if (std::string(BSL_VERSION) != _hello.library_version()) {
+		auto local_version = parse_version(std::string(BSL_VERSION));
+		auto server_version = parse_version(_hello.library_version());
+
+		// Only warn if major or minor version does not match
+		if (std::get<0>(local_version) != std::get<0>(server_version) || std::get<1>(local_version) != std::get<1>(server_version))
+			log_warning("Warning: The client BSL version does not match the server BSL version. Client has '%s', server has '%s'.\n",
+				    BSL_VERSION,
+				    _hello.library_version().c_str());
+	}
 }
 
 scanner::~scanner() {
