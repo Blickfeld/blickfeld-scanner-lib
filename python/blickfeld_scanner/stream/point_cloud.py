@@ -195,7 +195,7 @@ class point_cloud(object):
                 if as_numpy:
                     req.subscribe.point_cloud.reference_frame.packed.SetInParent()
             if algorithms is not None:
-                req.subscribe.point_cloud.algorithms[:].extend(algorithms)
+                req.subscribe.point_cloud.algorithms.extend(algorithms)
             if extend_subscribe_request:
                 req.subscribe.point_cloud.MergeFrom(extend_subscribe_request)
 
