@@ -13,6 +13,12 @@ influence the resulting point cloud.
 
 ### Removed
 
+## [2.19.4] - 2021.05.18
+
+### Changed
+* Bugfix: Algorithm extension broken in Python implementation
+* Bugfix: Rename of Python package failed due to setuptools normalization
+
 ## [2.19.3] - 2021.04.13
 
 ### Changed

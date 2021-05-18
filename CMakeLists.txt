@@ -49,9 +49,6 @@ else()
     OUTPUT_STRIP_TRAILING_WHITESPACE
   )
 
-  # Remove first letter 'g' after version
-  string(REGEX REPLACE "(v[0-9.-]+-)g" "\\1" PROJECT_GIT_DESCRIBE "${PROJECT_GIT_DESCRIBE}")
-
   IF(NOT PROJECT_VERSION)
       file (READ "${PROJECT_SOURCE_DIR}/version.txt" PROJECT_VERSION)  
       file (READ "${PROJECT_SOURCE_DIR}/version.txt" PROJECT_GIT_DESCRIBE)    
