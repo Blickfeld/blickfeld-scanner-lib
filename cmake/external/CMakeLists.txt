@@ -18,6 +18,7 @@ ExternalProject_Add(zlib
 
 ExternalProject_Add(protobuf
     GIT_REPOSITORY     https://github.com/protocolbuffers/protobuf.git
+    GIT_TAG            v3.17.1
     SOURCE_SUBDIR      "cmake/"
     CMAKE_ARGS         "-Dprotobuf_BUILD_TESTS=OFF" 
                        "-Dprotobuf_BUILD_EXAMPLES=OFF" 
