@@ -13,6 +13,12 @@ influence the resulting point cloud.
 
 ### Removed
 
+## [2.19.5] - 2021.06.08
+
+### Changed
+* [refs #30462] Protocol: Add advanced parameter to configure horizontal phase offset
+* Bugfix: Enforce Protobuf v3.17.1 in external CMake build due to linking errors in v3.17.2
+
 ## [2.19.4] - 2021.05.18
 
 ### Changed

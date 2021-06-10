@@ -29,6 +29,7 @@ message Advanced {
 	message Processing {
 		optional float range_offset = 1 [default = 0, (d_min) = -2, (d_max) = 2]; // in [m]
 		repeated float imu_static_rotation_offset = 2 [(length) = 9, (optional) = true, packed = true]; // <blockquote>Introduced in BSL v2.19 and firmware v1.20</blockquote> in [rad] - Offset rotation matrix for acceleration of IMU. Can be used to calibrate the accelerometer e.g. on a flat surface.
+		optional float horizontal_phase_offset = 3 [default = 0, (d_min) = -0.000032, (d_max) = 0.000032]; // <blockquote>Introduced in BSL v2.19.5 and firmware v1.21.1</blockquote> in [s] - Correction for phase offset in the horizontal field of view. This parameter might be adjusted in the field if the upper and lower half of the frame drifted horizontally.
 	}
 
 	/**
