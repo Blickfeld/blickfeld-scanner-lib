@@ -13,6 +13,11 @@ influence the resulting point cloud.
 
 ### Removed
 
+## [2.19.6] - 2021.10.25
+
+### Changed
+* [refs #32991] Enforce python zeroconf <= 0.32 due to breaking API changes
+
 ## [2.19.5] - 2021.06.08
 
 ### Changed
