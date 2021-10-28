@@ -28,6 +28,6 @@ setuptools.setup(
     ],
     install_requires=[
     	'protobuf>=3.8.0',
-    	'zeroconf'
+    	'zeroconf<=0.32.0', # Downgraded due to API change
 	],
 )
