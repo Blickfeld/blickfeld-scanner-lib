@@ -141,7 +141,7 @@ if(BF_USE_SYSTEM_PROTOBUF)
 		string(REGEX REPLACE "^libprotoc " "" Protobuf_Compiler_VERSION "${Protobuf_Compiler_VERSION}")
 
 		if(NOT Protobuf_VERSION STREQUAL Protobuf_Compiler_VERSION)
-			set(PROTOBUF_FOUND FALSE)
+			message( WARNING "Mismatch of protoc version (is ${Protobuf_Compiler_VERSION}) and libprotobuf version (is ${Protobuf_VERSION}). This might cause severe build issues.")
 		endif()
   endif()
 
