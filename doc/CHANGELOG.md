@@ -13,6 +13,14 @@ influence the resulting point cloud.
 
 ### Removed
 
+## [2.19.7] - 2022.05.31
+
+### Changed
+* Bugfix: Disable server example if file support is not given
+* [refs #37709] Bugfix: Change error "found no suitable protobuf version" to warning as recent Protobuf version fail version check
+* Bugfix: Downgrade Protobuf Python package < 4 (https://developers.google.com/protocol-buffers/docs/news/2022-05-06#python-updates)
+* Pin debian builds to buster
+
 ## [2.19.6] - 2021.10.25
 
 ### Changed

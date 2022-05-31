@@ -27,7 +27,7 @@ setuptools.setup(
         "Topic :: Utilities",
     ],
     install_requires=[
-    	'protobuf>=3.8.0',
+    	'protobuf >=3.8.0, <4.0.0',
     	'zeroconf<=0.32.0', # Downgraded due to API change
 	],
 )
