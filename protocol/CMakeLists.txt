@@ -26,7 +26,7 @@ if (BF_BUILD_NPM AND NODEJS_EXECUTABLE AND NPM_EXECUTABLE)
 		OUTPUT ${PBJS_PATH}
 		OUTPUT ${PBTS_PATH}
 		COMMAND ${CMAKE_COMMAND} -E make_directory ${PROJECT_BINARY_DIR}/npm-install
-		COMMAND ${NPM_EXECUTABLE} install protobufjs --prefix ${PROJECT_BINARY_DIR}/npm-install
+		COMMAND ${NPM_EXECUTABLE} install protobufjs@6.11.3 --prefix ${PROJECT_BINARY_DIR}/npm-install
 	)
 	add_custom_target(blickfeld-protocol-npm DEPENDS ${PBJS_PATH} DEPENDS ${PBTS_PATH})
 endif()

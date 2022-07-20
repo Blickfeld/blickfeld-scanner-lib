@@ -10,12 +10,15 @@
 
 #include "connection.h"
 
+#include <chrono>
+
 namespace blickfeld {
 
 class scanner_connection: public connection {
 protected:
 	asio::io_context& io_context;
-	std::string hostname;
+	const std::string hostname;
+	const std::chrono::duration<long int> timeout;
 #ifdef HAVE_OPENSSL
 	socket_wrapper socket;
 #else
@@ -39,9 +42,9 @@ public:
 	static const uint32_t default_server_ssl_port;
 #endif
 
-	scanner_connection(asio::io_context& io_context, std::string hostname);
+	scanner_connection(asio::io_context& io_context, std::string hostname, std::chrono::duration<long int> timeout = std::chrono::seconds(30));
 #ifdef HAVE_OPENSSL
-	scanner_connection(asio::io_context& io_context, std::string hostname, asio::ssl::context& ssl_context);
+	scanner_connection(asio::io_context& io_context, std::string hostname, asio::ssl::context& ssl_context, std::chrono::duration<long int> timeout = std::chrono::seconds(30));
 #endif
 
 	void recv(protocol::Response &resp) override;

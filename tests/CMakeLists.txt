@@ -5,7 +5,7 @@
 ## This source code is licensed under the BSD-style license found in the
 ## LICENSE.md file in the root directory of this source tree.
 ##
-cmake_minimum_required (VERSION 2.6)
+cmake_minimum_required (VERSION 2.8.12)
 
 include(CTest)
 

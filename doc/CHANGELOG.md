@@ -13,6 +13,20 @@ influence the resulting point cloud.
 
 ### Removed
 
+## [2.20.1] - 2022.07.20
+
+### Changed
+* Minor improvements on error descriptions
+
+## [2.20.0] - 2022.07.20
+
+### Added
+* [closes #34915, #40093] Client times out after 30 seconds and throws a ConnectionAbort error. Developers should check the error handling examples.
+
+### Changed
+* Fix deprecation warnings with newer CMake versions
+* Update googletest to latest release
+
 ## [2.19.7] - 2022.05.31
 
 ### Changed

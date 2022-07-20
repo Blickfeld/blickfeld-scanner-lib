@@ -163,6 +163,15 @@ message Error {
 		optional string reason = 1 [ default = "No detailed reason available." ]; // Description why this is not supported
 	}
 
+	/**
+	 * During reading, the connection to the device got aborted.
+	 */
+	message ConnectionAbort {
+		option (e_desc) = "During reading, the connection to the device got aborted. Check the network connectivity or power state of the device.\n\tDetails: {details:%s}";
+
+		optional string details = 1;
+	}
+
 	oneof error {
 		Unknown unknown = 1;  // Refer to [Unknown](#blickfeld.protocol.Error.Unknown)
 		NotImplemented not_implemented = 2;  // Refer to [NotImplemented](#blickfeld.protocol.Error.NotImplemented)
@@ -183,6 +192,7 @@ message Error {
 		TimeSyncFailed time_sync_failed = 23;  // Refer to [TimeSyncFailed](#blickfeld.protocol.Error.TimeSyncFailed)
 		NoDeviceDiscovered no_device_discovered = 24;  // Refer to [NoDeviceDiscovered](#blickfeld.protocol.Error.NoDeviceDiscovered)
 		NotSupported not_supported = 25; // Refer to [NotSupported](#blickfeld.protocol.Error.NotSupported)
+		ConnectionAbort connection_abort = 26; // Refer to [ConnectionAbort](#blickfeld.protocol.Error.ConnectionAbort)
 	}
 
 	reserved 7 to 10, 19, 20;

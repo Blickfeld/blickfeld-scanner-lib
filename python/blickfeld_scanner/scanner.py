@@ -20,7 +20,7 @@ import warnings
 import time
 from distutils.version import LooseVersion, StrictVersion
 
-from .protocol import connection_pb2
+from .protocol import connection_pb2, error_pb2
 from .protocol.stream import connection_pb2 as stream_connection_pb2
 from .protocol import options_pb2, common_pb2
 from .protocol.config import algorithm_pb2
@@ -38,6 +38,8 @@ class scanner(object):
     :type hostname_or_ip: str
     :param port: Port on which the device is reachable the default is 8000.
     :type port: int
+    :param timeout: Timeout in seconds until connection is aborted
+    :type timeout: int
     :param name: Name of the device used for string representation.
     :type name: str
     :param key_and_cert_file: Filename containing a private key and certificate for SSL connection.
@@ -49,8 +51,9 @@ class scanner(object):
     _default_port = 8000
     _default_ssl_port = 8800
     
-    def __init__(self, hostname_or_ip="localhost", port=None, name=None, key_and_cert_file=None, key_and_cert=None):
+    def __init__(self, hostname_or_ip="localhost", port=None, timeout=30, name=None, key_and_cert_file=None, key_and_cert=None):
         self.hostname_or_ip = hostname_or_ip
+        self.timeout = timeout
         self.name = name if name is not None else self.hostname_or_ip
         self.api_path = "http://" + hostname_or_ip + "/api/v1/"
         
@@ -445,7 +448,7 @@ class scanner(object):
         
         :return: Newly created :py:class:`blickfeld_scanner.scanner.connection`
         """
-        return connection(self.hostname_or_ip, self.port, self._key_and_cert)
+        return connection(self.hostname_or_ip, self.port, timeout=self.timeout, key_and_cert=self._key_and_cert)
             
     def attempt_error_recovery(self):
         """> Introduced in BSL v2.13 and firmware v1.13
@@ -603,12 +606,14 @@ class connection(object):
     :type hostname_or_ip: str
     :param port: port on which the connection should be established
     :type port: int
+    :param timeout: Timeout in seconds until connection is aborted
+    :type timeout: int
     :param key_and_cert: String containing a private key and certificate for SSL connection
     :type key_and_cert: str
     :param ssl_protocol: The protocol used for an SSL connection
     :type ssl_protocol: see ssl lib: `ssl.PROTOCOL_...`
     """
-    def __init__(self, hostname_or_ip, port, key_and_cert=None, ssl_protocol=ssl.PROTOCOL_TLS):
+    def __init__(self, hostname_or_ip, port, timeout, key_and_cert=None, ssl_protocol=ssl.PROTOCOL_TLS):
         self._key_and_cert = key_and_cert
         self.has_ssl = self._key_and_cert != None
         if self.has_ssl:
@@ -627,10 +632,9 @@ class connection(object):
             os.unlink(key_and_cert_file)
             
             self._ssl_context.verify_mode = ssl.CERT_NONE
-            self.socket = self._ssl_context.wrap_socket(socket.create_connection((hostname_or_ip, port)), server_hostname=hostname_or_ip)
+            self.socket = self._ssl_context.wrap_socket(socket.create_connection((hostname_or_ip, port), timeout=timeout), server_hostname=hostname_or_ip)
         else:
-            self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.socket.connect((hostname_or_ip, port))
+            self.socket = socket.create_connection((hostname_or_ip, port), timeout=timeout)
          
     def __del__(self):
         self.close()
@@ -690,9 +694,16 @@ class connection(object):
     def __recv_all(self, n):
         data = b''
         while len(data) < n:
-            packet = self.socket.recv(n - len(data))
+            try:
+                packet = self.socket.recv(n - len(data))
+            except socket.timeout:
+                err = error_pb2.Error()
+                err.connection_abort.details = "Timeout after %u seconds" % (self.socket.timeout)
+                raise protocol_exception(err)
             if not packet:
-                return None
+                err = error_pb2.Error()
+                err.connection_abort.details = "Receive failed"
+                raise protocol_exception(err)
             data += packet
         return data
 
