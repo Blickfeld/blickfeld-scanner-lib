@@ -1158,7 +1158,7 @@ The format type of response is an undocumented, internal feature required for th
 <a name="blickfeld.protocol.Error.ConnectionAbort"></a>
 
 ### Error.ConnectionAbort
-During reading, the connection to the client got aborted.
+During reading, the connection to the device got aborted.
 
 
 | Field | Type | Label | Description |

@@ -13,6 +13,11 @@ influence the resulting point cloud.
 
 ### Removed
 
+## [2.20.1] - 2022.07.20
+
+### Changed
+* Minor improvements on error descriptions
+
 ## [2.20.0] - 2022.07.20
 
 ### Added

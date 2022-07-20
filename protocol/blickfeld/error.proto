@@ -164,10 +164,10 @@ message Error {
 	}
 
 	/**
-	 * During reading, the connection to the client got aborted.
+	 * During reading, the connection to the device got aborted.
 	 */
 	message ConnectionAbort {
-		option (e_desc) = "During reading, the connection to the client got aborted. Check the network connectivity or power state of the device.\n\tDetails: {details:%s}";
+		option (e_desc) = "During reading, the connection to the device got aborted. Check the network connectivity or power state of the device.\n\tDetails: {details:%s}";
 
 		optional string details = 1;
 	}
