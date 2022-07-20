@@ -70,6 +70,7 @@ The data, such as a point cloud, are also packed in protobuf messages.
 
 - [blickfeld/error.proto](#blickfeld/error.proto)
     - [Error](#blickfeld.protocol.Error)
+    - [Error.ConnectionAbort](#blickfeld.protocol.Error.ConnectionAbort)
     - [Error.ConnectionClosed](#blickfeld.protocol.Error.ConnectionClosed)
     - [Error.Empty](#blickfeld.protocol.Error.Empty)
     - [Error.HardwareError](#blickfeld.protocol.Error.HardwareError)
@@ -1147,6 +1148,22 @@ The format type of response is an undocumented, internal feature required for th
 | time_sync_failed | [Error.TimeSyncFailed](#blickfeld.protocol.Error.TimeSyncFailed) | optional | Refer to [TimeSyncFailed](#blickfeld.protocol.Error.TimeSyncFailed) |
 | no_device_discovered | [Error.NoDeviceDiscovered](#blickfeld.protocol.Error.NoDeviceDiscovered) | optional | Refer to [NoDeviceDiscovered](#blickfeld.protocol.Error.NoDeviceDiscovered) |
 | not_supported | [Error.NotSupported](#blickfeld.protocol.Error.NotSupported) | optional | Refer to [NotSupported](#blickfeld.protocol.Error.NotSupported) |
+| connection_abort | [Error.ConnectionAbort](#blickfeld.protocol.Error.ConnectionAbort) | optional | Refer to [ConnectionAbort](#blickfeld.protocol.Error.ConnectionAbort) |
+
+
+
+
+
+
+<a name="blickfeld.protocol.Error.ConnectionAbort"></a>
+
+### Error.ConnectionAbort
+During reading, the connection to the client got aborted.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| details | [string](#string) | optional |  |
 
 
 

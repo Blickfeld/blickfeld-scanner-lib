@@ -30,6 +30,7 @@ static inline protocol_exception<Error::NotInRange> CreateErrorNotInRange(std::s
 static inline protocol_exception<Error::TimeSyncFailed> CreateErrorTimeSyncFailed(std::string ntp_daemon_log) { auto err = Error::TimeSyncFailed(); err.set_ntp_daemon_log(ntp_daemon_log);  return protocol_exception<decltype(err)>(err); }
 static inline protocol_exception<Error::NoDeviceDiscovered> CreateErrorNoDeviceDiscovered() { auto err = Error::NoDeviceDiscovered();  return protocol_exception<decltype(err)>(err); }
 static inline protocol_exception<Error::NotSupported> CreateErrorNotSupported(std::string reason="No detailed reason available.") { auto err = Error::NotSupported(); err.set_reason(reason);  return protocol_exception<decltype(err)>(err); }
+static inline protocol_exception<Error::ConnectionAbort> CreateErrorConnectionAbort(std::string details) { auto err = Error::ConnectionAbort(); err.set_details(details);  return protocol_exception<decltype(err)>(err); }
 
 
     static inline void throw_typed_protocol_exception (Error err) {
@@ -53,6 +54,7 @@ case 22: throw protocol_exception<Error::NotInRange>(err.not_in_range()); break;
 case 23: throw protocol_exception<Error::TimeSyncFailed>(err.time_sync_failed()); break; 
 case 24: throw protocol_exception<Error::NoDeviceDiscovered>(err.no_device_discovered()); break; 
 case 25: throw protocol_exception<Error::NotSupported>(err.not_supported()); break; 
+case 26: throw protocol_exception<Error::ConnectionAbort>(err.connection_abort()); break; 
 
             case Error::ERROR_NOT_SET:
             default:

@@ -25,9 +25,10 @@ const uint32_t scanner_connection::default_server_port = 8000;
 const uint32_t scanner_connection::default_server_ssl_port = 8800;
 #endif
 
-scanner_connection::scanner_connection(asio::io_context& io_context, string hostname) :
+scanner_connection::scanner_connection(asio::io_context& io_context, string hostname, std::chrono::duration<long int> timeout) :
 	io_context(io_context),
 	hostname(hostname),
+	timeout(timeout),
 #ifdef HAVE_OPENSSL
 	socket(std::make_shared<asio::ip::tcp::socket>(io_context))
 #else
@@ -47,9 +48,10 @@ scanner_connection::scanner_connection(asio::io_context& io_context, string host
 }
 
 #ifdef HAVE_OPENSSL
-scanner_connection::scanner_connection(asio::io_context& io_context, std::string hostname, asio::ssl::context& ssl_context) :
+scanner_connection::scanner_connection(asio::io_context& io_context, std::string hostname, asio::ssl::context& ssl_context, std::chrono::duration<long int> timeout) :
 	io_context(io_context),
 	hostname(hostname),
+	timeout(timeout),
 	socket(std::make_shared<asio::ssl::stream<asio::ip::tcp::socket> >(io_context, ssl_context))
 {
 	string port = to_string(default_server_ssl_port);
@@ -92,12 +94,44 @@ void scanner_connection::recv(protocol::Response &resp) {
 	} else {
 		std::istream recv_stream(&input_buffer);
 
-		uint32_t size;
-		asio::read(socket, input_buffer, asio::transfer_exactly(sizeof(uint32_t)));
-		recv_stream.read(reinterpret_cast<char*>(&size), sizeof(uint32_t));
-		asio::read(socket, input_buffer, asio::transfer_exactly(size));
+		// Set up sync flags and deadline timer
+		auto expired = make_shared<bool>(), received = make_shared<bool>();
+		*expired = false, *received = false;
+		asio::steady_timer timer(io_context);
+		timer.expires_from_now(timeout);
+		timer.async_wait([expired, received](const asio::error_code& ec) {
+				*expired = !*received;
+			});
 
-		parse_response(recv_stream, resp);
+		// Asynchronous read
+		asio::async_read(socket, input_buffer, asio::transfer_exactly(sizeof(uint32_t)), [this, &resp, received](const asio::error_code& ec, std::size_t length) {
+				if (ec) {
+					throw protocol::CreateErrorConnectionAbort("Failed to read message size with error code: " + ec.message());
+				}
+
+				uint32_t size;
+				std::istream recv_stream_size(&input_buffer);
+				recv_stream_size.read(reinterpret_cast<char*>(&size), sizeof(uint32_t));
+				asio::async_read(socket, input_buffer, asio::transfer_exactly(size), [this, &resp, received](const std::error_code& ec, std::size_t length) {
+					if (ec) {
+						throw protocol::CreateErrorConnectionAbort("Failed to read message buffer with error code: " + ec.message());
+					}
+
+					std::istream recv_stream(&input_buffer);
+					parse_response(recv_stream, resp);
+
+					// Successful read
+					*received = true;
+				});
+			});
+
+		// Make asynchronous read, synchronous
+		io_context.reset();
+		while(io_context.run_one() && !*received) {
+			if (*expired)
+				throw protocol::CreateErrorConnectionAbort("Timeout after " + to_string(timeout.count()) + " seconds");
+		}
+		timer.cancel();
 	}
 }
 
