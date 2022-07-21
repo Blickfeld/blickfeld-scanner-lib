@@ -652,8 +652,9 @@ class connection(object):
         (old_hostname_or_ip, old_port) = self.socket.getpeername()
 
         return connection(other_hostname_or_ip or old_hostname_or_ip, 
-                          other_port or old_port,
-                          other_key_and_cert or self._key_and_cert)
+                          other_port or old_port, 
+                          timeout=self.socket.timeout,
+                          key_and_cert=other_key_and_cert or self._key_and_cert)
         
     def send_request(self, req):
         """ Send request to the device
