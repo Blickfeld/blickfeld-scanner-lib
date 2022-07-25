@@ -31,6 +31,7 @@ protected:
 	protocol::Response async_resp, async_received;
 	bool async_read_active = false;
 
+	void connect(const std::string full_hostname, const uint32_t default_port);
 	void parse_response(std::istream &recv_stream, protocol::Response &resp);
 	void async_recv();
 
