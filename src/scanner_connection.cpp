@@ -35,16 +35,7 @@ scanner_connection::scanner_connection(asio::io_context& io_context, string host
 	socket(io_context)
 #endif
 {
-
-	string port = to_string(default_server_port);
-	string::size_type colon_pos = hostname.find(":");
-	if(colon_pos != string::npos) {
-		port = hostname.substr(colon_pos + 1);
-		hostname = hostname.substr(0, colon_pos);
-	}
-
-	asio::ip::tcp::resolver resolver(io_context);
-	socket.connect(*resolver.resolve(hostname, port).begin());
+	connect(hostname, default_server_port);
 }
 
 #ifdef HAVE_OPENSSL
@@ -54,19 +45,56 @@ scanner_connection::scanner_connection(asio::io_context& io_context, std::string
 	timeout(timeout),
 	socket(std::make_shared<asio::ssl::stream<asio::ip::tcp::socket> >(io_context, ssl_context))
 {
-	string port = to_string(default_server_ssl_port);
+	connect(hostname, default_server_ssl_port);
+	socket.handshake(asio::ssl::stream_base::client);
+}
+
+#endif
+
+void scanner_connection::connect(const std::string full_hostname, const uint32_t default_port) {
+	// Determine endpoint
+	string hostname = full_hostname;
+	string port = to_string(default_port);
 	string::size_type colon_pos = hostname.find(":");
 	if(colon_pos != string::npos) {
 		port = hostname.substr(colon_pos + 1);
 		hostname = hostname.substr(0, colon_pos);
 	}
 
-	asio::ip::tcp::resolver resolver(io_context);
-	socket.connect(*resolver.resolve(hostname, port).begin());
-	socket.handshake(asio::ssl::stream_base::client);
-}
+	// Prepare synchronous context
+	io_context.reset();
 
-#endif
+	// Set up sync flags and deadline timer
+	auto expired = make_shared<bool>(), connected = make_shared<bool>();
+	*expired = false, *connected = false;
+	asio::steady_timer timer(io_context);
+	timer.expires_from_now(timeout);
+	timer.async_wait([expired, connected](const asio::error_code& ec) {
+			*expired = !*connected;
+		});
+
+	// Resolve hostname & connect
+	asio::ip::tcp::resolver resolver(io_context);
+	resolver.async_resolve(hostname, port, [this, connected](const asio::error_code& ec, asio::ip::tcp::resolver::iterator endpoint_iterator) {
+			if (ec) {
+				throw protocol::CreateErrorConnectionAbort("Failed to resolve hostname. Failed with error: " + ec.message());
+			}
+
+			socket.async_connect(*endpoint_iterator, [this, connected](const asio::error_code& ec) {
+				if (ec) {
+					throw protocol::CreateErrorConnectionAbort("Failed to connect. Failed with error: " + ec.message());
+				}
+
+				*connected = true;
+			});
+		});
+
+	while(io_context.run_one() && !*connected) {
+		if (*expired)
+			throw protocol::CreateErrorConnectionAbort("Connection timeout after " + to_string(timeout.count()) + " seconds");
+	}
+	timer.cancel();
+}
 
 void scanner_connection::send(const protocol::Request &req) {
 	auto msg_size = req.ByteSizeLong();
@@ -93,6 +121,9 @@ void scanner_connection::recv(protocol::Response &resp) {
 		}
 	} else {
 		std::istream recv_stream(&input_buffer);
+
+		// Prepare synchronous context
+		io_context.reset();
 
 		// Set up sync flags and deadline timer
 		auto expired = make_shared<bool>(), received = make_shared<bool>();
@@ -126,7 +157,6 @@ void scanner_connection::recv(protocol::Response &resp) {
 			});
 
 		// Make asynchronous read, synchronous
-		io_context.reset();
 		while(io_context.run_one() && !*received) {
 			if (*expired)
 				throw protocol::CreateErrorConnectionAbort("Timeout after " + to_string(timeout.count()) + " seconds");

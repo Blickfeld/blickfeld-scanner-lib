@@ -13,6 +13,11 @@ influence the resulting point cloud.
 
 ### Removed
 
+## [2.20.3] - 2022.07.25
+
+### Changed
+* Bugfix: Add timeout for resolver & connect in C++ implementation
+
 ## [2.20.2] - 2022.07.21
 
 ### Changed
