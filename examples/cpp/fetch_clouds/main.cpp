@@ -13,11 +13,14 @@
 #include <blickfeld/scanner.h>
 #include <blickfeld/utils.h>
 
-std::shared_ptr<blickfeld::scanner::point_cloud_stream<blickfeld::protocol::data::Frame> > stream;
-
+bool keep_alive = true;
 void sigint_handler(int signal) {
-	stream = nullptr;
-	exit(signal);
+	if (keep_alive) {
+		std::cout << "Received SIGINT. Stopping stream." << std::endl;
+		keep_alive = false;
+	} else {
+		exit(signal);
+	}
 }
 
 int example(int argc, char* argv[]) {
@@ -38,7 +41,7 @@ int example(int argc, char* argv[]) {
 	std::cout << "Connected." << std::endl;
 
 	// Create a pointcloud stream object to receive pointclouds
-	stream = scanner->get_point_cloud_stream();
+	auto stream = scanner->get_point_cloud_stream();
 
 	std::ofstream dump_stream;
 #ifdef BSL_RECORDING
@@ -49,7 +52,7 @@ int example(int argc, char* argv[]) {
 	}
 #endif
 
-	while (true) {
+	while (keep_alive) {
 		// Format of frame is described in protocol/blickfeld/data/frame.proto or doc/protocol.md
 		// Protobuf API is described in https://developers.google.com/protocol-buffers/docs/cpptutorial
 		const blickfeld::protocol::data::Frame frame = stream->recv_frame();

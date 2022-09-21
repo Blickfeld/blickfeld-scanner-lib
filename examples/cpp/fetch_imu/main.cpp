@@ -14,11 +14,14 @@
 #include <blickfeld/scanner.h>
 #include <blickfeld/utils.h>
 
-std::shared_ptr<blickfeld::imu_stream> stream;
-
+bool keep_alive = true;
 void sigint_handler(int signal) {
-	stream = nullptr;
-	exit(signal);
+	if (keep_alive) {
+		std::cout << "Received SIGINT. Stopping stream." << std::endl;
+		keep_alive = false;
+	} else {
+		exit(signal);
+	}
 }
 
 int example(int argc, char* argv[]) {
@@ -35,9 +38,9 @@ int example(int argc, char* argv[]) {
 	std::cout << "Connected." << std::endl;
 
 	// Create a pointcloud stream object to receive pointclouds
-	stream = scanner->get_imu_stream();
+	auto stream = scanner->get_imu_stream();
 
-	while (true) {
+	while (keep_alive) {
 		// Format of IMU data is described in protocol documentation:
 		// https://docs.blickfeld.com/cube/latest/external/blickfeld-scanner-lib/protobuf_protocol.html
 		//
