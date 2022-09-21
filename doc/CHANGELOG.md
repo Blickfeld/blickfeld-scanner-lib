@@ -13,6 +13,16 @@ influence the resulting point cloud.
 
 ### Removed
 
+## [2.20.5] - 2022.09.21
+
+### Changed
+* [closes #42694] Properly terminate C++ examples on SIGINT
+
+## [2.20.4] - 2022.09.21
+
+### Changed
+* [closes #42735, refs #41706] Bugfix: Free memory properly on failed connection in constructor
+
 ## [2.20.3] - 2022.07.25
 
 ### Changed
