@@ -103,6 +103,8 @@ protected:
 	 */
 	std::shared_ptr<connection> create_connection();
 
+	void destruct();
+
 public:
 	virtual ~scanner();
 
