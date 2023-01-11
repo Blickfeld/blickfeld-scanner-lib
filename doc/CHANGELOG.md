@@ -13,6 +13,15 @@ influence the resulting point cloud.
 
 ### Removed
 
+## [2.20.6] - 2023.01.11
+
+### Changed
+* [closes #43198] Bugfix: When printing a ```Return``` message the ```z``` value is displayed correctly
+* [refs #43331] Disable Python build for Windows external project (install target is not functional) => Please use PIP package
+* [refs #43331] Add missing cmake_minimum_required to CMake external example which is requried for recent CMake versions
+* [refs #43331] Improve Windows build guide
+* Pin debian testing package to bullseye as bookworm is not yet supported
+
 ## [2.20.5] - 2022.09.21
 
 ### Changed

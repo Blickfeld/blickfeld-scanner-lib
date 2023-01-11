@@ -5,6 +5,8 @@
 ## This source code is licensed under the BSD-style license found in the
 ## LICENSE.md file in the root directory of this source tree.
 ##
+cmake_minimum_required (VERSION 3.12)
+
 project(bf-external)
 
 include(ExternalProject)
@@ -34,6 +36,7 @@ ExternalProject_Add(bsl
     SOURCE_DIR         ${PROJECT_SOURCE_DIR}/../..
     CMAKE_ARGS         "-DCMAKE_PREFIX_PATH=${CMAKE_CURRENT_BINARY_DIR}/install"
                        "-DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/install"
+                       "-DBF_BUILD_PYTHON=OFF"
     BUILD_ALWAYS	   ON
     DEPENDS protobuf
 )

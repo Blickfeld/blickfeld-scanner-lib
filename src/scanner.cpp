@@ -498,7 +498,7 @@ std::ostream& operator<<(std::ostream &strm, const blickfeld::protocol::data::Po
 		    << setprecision(2) << fixed
 		    << "(x: " << ret.cartesian(0)
 		    << ", y: " << ret.cartesian(1)
-		    << ", z: " << ret.cartesian(0)
+		    << ", z: " << ret.cartesian(2)
 		    << ") [m], "
 		    << setprecision(0) << "intensity of " << ret.intensity() << ">";
 }

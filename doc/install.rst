@@ -159,6 +159,8 @@ For this example git is required, to download the sources from protobuf and zlib
 
    As an example, the reduced_clouds example is build. The approach is working analogously for the other examples or custom applications.
 
+   Run the follwing commands in the root of the cloned blickfeld-scanner-lib repository:
+
    .. code-block:: bash
 
        mkdir build_example && cd build_example
@@ -169,8 +171,12 @@ For this example git is required, to download the sources from protobuf and zlib
 
 3. Start the example
 
+   To run the example, Linux needs to find the corresponding libraries which reside in the build/install/lib folder from the previous step.
+   The folder should be added to the LD_LIBRARY_PATH as described in the following example:
+
    .. code-block:: bash
 
+       export LD_LIBRARY_PATH="<path_to_bsl_install_dir>/lib:$LD_LIBRARY_PATH"
        ./bf-reduced_clouds <hostname>
 
    Use the device's hostname or ip adress as `<hostname>`.
@@ -214,6 +220,8 @@ For this example git is required, to download the sources from protobuf and zlib
 
    As an example, the reduced_clouds example is build. The approach is working analogously for the other examples or custom applications.
 
+   Run the follwing commands in the root of the cloned blickfeld-scanner-lib repository:
+
    .. code-block:: bash
 
 	   mkdir build_example && cd build_example
@@ -224,9 +232,13 @@ For this example git is required, to download the sources from protobuf and zlib
 
 3. Start the example
 
+   To run the example, Windows needs to find the corresponding DLLs which reside in the build/install/bin folder from the previous step.
+   The folder should be added to the PATH as described in the following example:
+
    .. code-block:: bash
 
-	   ./Release/bf-reduced_clouds.exe <hostname>
+	   set PATH=<path_to_bsl_install_dir>\bin;%PATH%
+	   .\Debug\bf-reduced_clouds.exe <hostname>
 
    Use the device's hostname or ip adress as `<hostname>`.
 
