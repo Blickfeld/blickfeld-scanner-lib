@@ -67,6 +67,12 @@ public:
 	}
 
 	template<typename ... Args>
+	void async_connect(Args... args)
+	{
+		OPERATE_ON_SOCKET(async_connect(args ...));
+	}
+
+	template<typename ... Args>
 	void handshake(Args... args)
 	{
 		OPERATE_ON_STREAM_T(handshake(args ...));
