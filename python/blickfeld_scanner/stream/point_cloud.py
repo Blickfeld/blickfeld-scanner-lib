@@ -27,9 +27,12 @@ import sys
 
 terminate = False
 
+original_sigint_handler = signal.getsignal(signal.SIGINT)
+
 def signal_handler(sig, frame):
     global terminate
     terminate = True
+    original_sigint_handler(sig, frame)
 
 # Catch CTRL-C and terminate and close the point cloud stream
 signal.signal(signal.SIGINT, signal_handler)
